@@ -15,6 +15,8 @@ const basePrefs: UserPrefs = {
   equipment: ["four", "airfryer", "micro", "poele"],
   householdSize: 2,
   mealsPerWeek: 5,
+  budget: 35,
+  ambiance: [],
 };
 
 const wideRequest: GenerationRequest = { budget: 200, mealTypes: [] };
@@ -71,5 +73,25 @@ describe("Recipe Matching Engine — combinatoire intelligente", () => {
     const loose = planWeek(RECIPES, basePrefs, { budget: 120, mealTypes: [] }, ingredientsById, store);
     expect(tight.recipes.length).toBeLessThanOrEqual(loose.recipes.length);
     expect(tight.total).toBeLessThanOrEqual(40 + 0.001);
+  });
+
+  it("la graine de variété (régénérer) reste déterministe et sous budget", () => {
+    const a = planWeek(RECIPES, basePrefs, { budget: 60, mealTypes: [], seed: 1 }, ingredientsById, store);
+    const aBis = planWeek(RECIPES, basePrefs, { budget: 60, mealTypes: [], seed: 1 }, ingredientsById, store);
+    // Déterministe à seed égal.
+    expect(a.recipes.map((r) => r.id)).toEqual(aBis.recipes.map((r) => r.id));
+    // Toujours sous budget, quelle que soit la graine.
+    expect(a.total).toBeLessThanOrEqual(60 + 0.001);
+  });
+
+  it("régénérer avec une autre graine produit une sélection différente sous budget", () => {
+    const seeds = [1, 2, 3, 4, 5].map(
+      (s) => planWeek(RECIPES, basePrefs, { budget: 80, mealTypes: [], seed: s }, ingredientsById, store),
+    );
+    // Toutes restent valides (sous budget).
+    for (const p of seeds) expect(p.total).toBeLessThanOrEqual(80 + 0.001);
+    // Au moins deux graines donnent une sélection distincte (variété réelle).
+    const sigs = new Set(seeds.map((p) => p.recipes.map((r) => r.id).sort().join(",")));
+    expect(sigs.size).toBeGreaterThan(1);
   });
 });

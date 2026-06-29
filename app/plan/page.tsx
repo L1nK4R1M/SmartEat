@@ -1,25 +1,20 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ShoppingCart, AlertTriangle } from "lucide-react";
 import { repo } from "@/lib/repo";
 import { getPrefs, parseMealIds, parseRequest } from "@/lib/prefs";
 import { bestSubstitute, buildPlanFromIds, planWeek } from "@/lib/matching-engine";
 import { buildShoppingList } from "@/lib/shopping-list";
 import { recipeMealCost } from "@/lib/pricing";
-import { APPLIANCE_LABELS, dayLabel } from "@/lib/labels";
 import { FilterBar } from "@/components/filter-bar";
-import { RecipeCard } from "@/components/recipe-card";
-import { BrandLogo } from "@/components/brand-logo";
-import { buttonClasses } from "@/components/ui/button";
-import { formatEuro } from "@/lib/utils";
+import { PlanView, type PlanViewData } from "@/components/plan-view";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
-function planHref(budget: number, types: string[], meals: string[]) {
+function planHref(budget: number, types: string[], meals: string[], seed?: number) {
   const params = new URLSearchParams();
   params.set("budget", String(budget));
   if (types.length) params.set("types", types.join(","));
   if (meals.length) params.set("meals", meals.join(","));
+  if (seed) params.set("seed", String(seed));
   return `/plan?${params.toString()}`;
 }
 
@@ -53,86 +48,56 @@ export default async function PlanPage({
   }
   const selectedIds = selected.map((r) => r.id);
 
-  const total = buildShoppingList(selected, ingredientsMap, prefs.householdSize, store).total;
-  const overBudget = total > request.budget + 0.001;
+  const list = buildShoppingList(selected, ingredientsMap, prefs.householdSize, store);
   const substitute = bestSubstitute(recipes, prefs, request, ingredientsMap, store, selectedIds);
 
+  // "Régénérer" = nouvelle graine de variété (sélection différente, toujours <= budget).
+  const nextSeed = (request.seed ?? 1) * 7 + 13;
+
+  const viewData: PlanViewData = {
+    store: { name: store.name, domain: store.domain, color: store.color },
+    recipes: selected.map((recipe) => ({
+      id: recipe.id,
+      title: recipe.title,
+      emoji: recipe.emoji,
+      imageUrl: recipe.imageUrl,
+      prepMinutes: recipe.prepMinutes,
+      mealTypes: recipe.mealTypes,
+      mealCost: recipeMealCost(recipe, ingredientsMap, store, prefs.householdSize),
+      swapHref: substitute
+        ? planHref(
+            request.budget,
+            request.mealTypes,
+            selectedIds.map((id) => (id === recipe.id ? substitute.id : id)),
+          )
+        : null,
+    })),
+    selectedIds,
+    total: list.total,
+    budget: request.budget,
+    itemCount: list.itemCount,
+    householdSize: prefs.householdSize,
+    mealsPerWeek: prefs.mealsPerWeek,
+    withinBudget,
+    regenerateHref: planHref(request.budget, request.mealTypes, [], nextSeed),
+    listHref: `/list?meals=${selectedIds.join(",")}`,
+  };
+
   return (
-    <div className="mx-auto w-full max-w-md px-5 pb-32 pt-6">
-      <header className="mb-5 flex items-center gap-3">
-        <BrandLogo domain={store.domain} name={store.name} color={store.color} size={44} />
-        <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight">Vos repas de la semaine</h1>
-          <p className="truncate text-sm text-on-surface-muted">
-            {store.name} · {prefs.equipment.map((e) => APPLIANCE_LABELS[e].label).join(", ")}
-          </p>
-        </div>
-      </header>
-
-      <FilterBar initialBudget={request.budget} initialTypes={request.mealTypes} />
-
-      {/* Avertissement : budget trop serré pour couvrir tous les jours */}
-      {!withinBudget && selected.length > 0 && (
-        <div className="mt-4 flex items-start gap-2 rounded-2xl border border-accent/40 bg-accent/10 p-3 text-sm">
-          <AlertTriangle size={16} className="mt-0.5 shrink-0 text-accent" />
-          <span>
-            Budget atteint avec <b>{selected.length}</b> repas (sur {prefs.mealsPerWeek} souhaités).
-            Augmentez le budget pour en ajouter.
-          </span>
+    <>
+      <PlanView {...viewData} />
+      {/* Ajuster les arbitrages de la semaine (budget + envies). */}
+      {viewData.recipes.length > 0 && (
+        <div className="mx-auto w-full max-w-md px-5 pb-28">
+          <details className="group">
+            <summary className="mb-3 inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-on-surface-muted [&::-webkit-details-marker]:hidden">
+              Ajuster cette semaine
+              <span className="transition-transform group-open:rotate-180">▾</span>
+            </summary>
+            <FilterBar initialBudget={request.budget} initialTypes={request.mealTypes} />
+          </details>
         </div>
       )}
-
-      <div className="mt-5 space-y-3">
-        {selected.length === 0 ? (
-          <div className="rounded-[var(--radius-card)] border border-dashed border-outline bg-surface p-6 text-center">
-            <p className="font-medium">Aucune recette ne rentre dans ce budget.</p>
-            <p className="mt-1 text-sm text-on-surface-muted">
-              Augmentez le budget ou retirez un filtre de type.
-            </p>
-          </div>
-        ) : (
-          selected.map((recipe, i) => (
-            <RecipeCard
-              key={recipe.id}
-              recipe={recipe}
-              day={dayLabel(i)}
-              mealCost={recipeMealCost(recipe, ingredientsMap, store, prefs.householdSize)}
-              swapHref={
-                substitute
-                  ? planHref(
-                      request.budget,
-                      request.mealTypes,
-                      selectedIds.map((id) => (id === recipe.id ? substitute.id : id)),
-                    )
-                  : null
-              }
-            />
-          ))
-        )}
-      </div>
-
-      {selected.length > 0 && (
-        <p className="mt-4 text-center text-sm text-on-surface-muted">
-          Total de la semaine ({store.name}) :{" "}
-          <span className={`tnum font-semibold ${overBudget ? "text-accent" : "text-primary"}`}>
-            {formatEuro(total)}
-          </span>{" "}
-          / {formatEuro(request.budget)}
-        </p>
-      )}
-
-      {selected.length > 0 && (
-        <div className="fixed inset-x-0 bottom-0">
-          <div className="mx-auto max-w-md border-t border-outline bg-background/80 p-5 backdrop-blur">
-            <Link
-              href={`/list?meals=${selectedIds.join(",")}`}
-              className={`${buttonClasses("primary", "lg")} w-full`}
-            >
-              <ShoppingCart size={18} /> Générer la liste de courses
-            </Link>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 }

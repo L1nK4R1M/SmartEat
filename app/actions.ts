@@ -4,9 +4,13 @@ import { redirect } from "next/navigation";
 import { savePrefs } from "@/lib/prefs";
 import type { UserPrefs } from "@/lib/types";
 
-// Fin de l'onboarding : persiste les préférences durables puis envoie vers le
-// dashboard où une sélection est déjà pré-générée (warm start, §1).
+// Fin de l'onboarding : persiste les préférences durables (dont budget +
+// ambiance) puis envoie vers l'écran de génération animé, qui redirige ensuite
+// vers le plan déjà pré-généré (warm start, §1).
 export async function completeOnboarding(prefs: UserPrefs) {
   await savePrefs(prefs);
-  redirect("/plan");
+  const params = new URLSearchParams();
+  params.set("budget", String(prefs.budget));
+  if (prefs.ambiance.length) params.set("types", prefs.ambiance.join(","));
+  redirect(`/generating?${params.toString()}`);
 }

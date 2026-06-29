@@ -57,6 +57,12 @@ export const recipes = pgTable("recipes", {
   prepMinutes: integer("prep_minutes").notNull(),
   // Pas de prix stocké : calculé depuis recipe_ingredients × store_prices.
   defaultServings: integer("default_servings").notNull().default(2),
+  // Nutrition ESTIMÉE par portion (proxy simple, §5) + visuel optionnel.
+  kcal: integer("kcal").notNull().default(0),
+  protein: numeric("protein").notNull().default("0"),
+  carbs: numeric("carbs").notNull().default("0"),
+  fat: numeric("fat").notNull().default("0"),
+  imageUrl: text("image_url"),
 });
 
 export const recipeIngredients = pgTable(

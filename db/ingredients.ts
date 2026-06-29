@@ -71,6 +71,7 @@ export const INGREDIENTS: Ingredient[] = [
   { id: "curry_paste", name: "Pâte de curry", aisle: "epicerie", baseUnit: "g", packSize: 200, packLabel: "pot 200 g", packPrice: 4.0 },
   { id: "pesto", name: "Pesto", aisle: "epicerie", baseUnit: "g", packSize: 190, packLabel: "pot 190 g", packPrice: 2.5 },
   { id: "peanut_butter", name: "Beurre de cacahuète", aisle: "epicerie", baseUnit: "g", packSize: 350, packLabel: "pot 350 g", packPrice: 3.0 },
+  { id: "honey", name: "Miel", aisle: "epicerie", baseUnit: "g", packSize: 250, packLabel: "pot 250 g", packPrice: 4.0 },
 
   // ---------- Boulangerie ----------
   { id: "bread", name: "Pain", aisle: "boulangerie", baseUnit: "piece", packSize: 1, packLabel: "1 pain", packPrice: 0.6 },
