@@ -5,6 +5,7 @@ import { repo } from "@/lib/repo";
 import { getPrefs, parseMealIds } from "@/lib/prefs";
 import { buildShoppingList } from "@/lib/shopping-list";
 import { CopyListButton } from "@/components/copy-list-button";
+import { BrandLogo } from "@/components/brand-logo";
 import { formatEuro, formatQty } from "@/lib/utils";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -51,10 +52,15 @@ export default async function ListPage({
         >
           <ChevronLeft size={16} /> Modifier les repas
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight">Liste de courses</h1>
-        <p className="mt-1 text-sm text-on-surface-muted">
-          {recipes.length} repas · {list.itemCount} articles · {store.emoji} {store.name}
-        </p>
+        <div className="flex items-center gap-3">
+          <BrandLogo domain={store.domain} name={store.name} color={store.color} size={44} />
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold tracking-tight">Liste de courses</h1>
+            <p className="mt-0.5 text-sm text-on-surface-muted">
+              {recipes.length} repas · {list.itemCount} articles · {store.name}
+            </p>
+          </div>
+        </div>
       </header>
 
       <div className="space-y-5">

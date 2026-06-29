@@ -8,6 +8,7 @@ const COOKIE = "smarteat_prefs";
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
 const prefsSchema = z.object({
+  country: z.enum(["FR", "BE"]),
   storeId: z.string().min(1),
   dietTags: z.array(
     z.enum(["halal", "vege", "vegan", "sans_gluten", "sans_lactose"]),

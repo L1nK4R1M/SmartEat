@@ -1,54 +1,50 @@
-import type { GenerationRequest, Recipe, UserPrefs } from "./types";
+import type { GenerationRequest, Ingredient, Recipe, Store, UserPrefs } from "./types";
 import { userCapabilities } from "./capabilities";
+import { recipeCostPerServing } from "./pricing";
+import { buildShoppingList } from "./shopping-list";
 
-// Recipe Matching Engine — §2 du cahier des charges.
-// Deux passes : (1) filtres durs = élimination, (2) scoring doux = classement.
-// Fonctions pures sur des données simples : identique en seed ou en SQL Postgres
-// (où la passe 1 devient des opérateurs d'inclusion de tableaux @> / <@ avec index GIN).
+// Recipe Matching Engine — §2, version "budget-aware".
+// 1) Filtres durs (régime / équipement / type) -> élimination.
+// 2) Scoring doux (type, prix au magasin, rapidité) -> classement.
+// 3) Plan hebdo glouton qui garantit : total du panier de la semaine <= budget.
 
 export interface ScoredRecipe {
   recipe: Recipe;
   score: number;
+  costPerServing: number;
 }
 
-// Budget par portion = budget total / (repas par semaine × taille du foyer).
-// Garantit que la somme des coûts retenus reste <= budget total.
-export function budgetPerServing(prefs: UserPrefs, request: GenerationRequest): number {
+// Part équitable par portion = budget / (repas × foyer). Sert de référence au
+// scoring "prix" (une recette sous cette part marque mieux).
+export function fairSharePerServing(prefs: UserPrefs, request: GenerationRequest): number {
   const servings = Math.max(1, prefs.mealsPerWeek * prefs.householdSize);
   return request.budget / servings;
 }
 
-// ---- Passe 1 : filtres durs (élimination) ----
+// ---- Passe 1 : filtres durs (sans budget : le budget est géré au niveau panier) ----
 export function eligibleRecipes(
   recipes: Recipe[],
   prefs: UserPrefs,
   request: GenerationRequest,
 ): Recipe[] {
   const caps = userCapabilities(prefs.equipment);
-  const maxPerServing = budgetPerServing(prefs, request);
-
   return recipes.filter((r) => {
-    // Régime : la recette doit porter TOUS les tags demandés (r.diet_tags @> user.diet_tags).
     const dietOk = prefs.dietTags.every((d) => r.dietTags.includes(d));
-    // Équipement : capacités requises incluses dans les capacités utilisateur (req <@ user).
     const equipOk = r.reqCapabilities.every((c) => caps.has(c));
-    // Budget : coût par portion sous le plafond.
-    const budgetOk = r.costPerServing <= maxPerServing;
-    // Type : intersection si des envies sont précisées, sinon tout passe.
     const typeOk =
-      request.mealTypes.length === 0 ||
-      r.mealTypes.some((t) => request.mealTypes.includes(t));
-    return dietOk && equipOk && budgetOk && typeOk;
+      request.mealTypes.length === 0 || r.mealTypes.some((t) => request.mealTypes.includes(t));
+    return dietOk && equipOk && typeOk;
   });
 }
 
-// ---- Passe 2 : scoring doux (classement) ----
+// ---- Passe 2 : scoring doux ----
 const WEIGHTS = { type: 0.4, budget: 0.2, time: 0.2, variety: 0.2 };
 
 export function scoreRecipe(
   recipe: Recipe,
   request: GenerationRequest,
-  maxPerServing: number,
+  costPerServing: number,
+  fairShare: number,
 ): number {
   const typeScore =
     request.mealTypes.length === 0
@@ -56,13 +52,10 @@ export function scoreRecipe(
       : recipe.mealTypes.filter((t) => request.mealTypes.includes(t)).length /
         request.mealTypes.length;
 
-  const budgetScore =
-    maxPerServing > 0 ? Math.max(0, 1 - recipe.costPerServing / maxPerServing) : 0;
-
+  // Plus la portion est sous la part équitable, mieux c'est (aide à tenir le budget).
+  const budgetScore = fairShare > 0 ? Math.max(0, Math.min(1, 1 - costPerServing / fairShare)) : 0;
   const timeScore = recipe.prepMinutes <= 25 ? 1 : 0;
-
-  // Variété : nécessite l'historique des dernières semaines -> repoussé en V2 (§5).
-  const varietyScore = 0.5;
+  const varietyScore = 0.5; // historique -> V2
 
   return (
     WEIGHTS.type * typeScore +
@@ -72,41 +65,79 @@ export function scoreRecipe(
   );
 }
 
-// Classement complet des recettes éligibles (utile pour swap & sélection).
 export function rankRecipes(
   recipes: Recipe[],
   prefs: UserPrefs,
   request: GenerationRequest,
+  ingredientsById: Map<string, Ingredient>,
+  store: Store,
 ): ScoredRecipe[] {
-  const maxPerServing = budgetPerServing(prefs, request);
+  const fairShare = fairSharePerServing(prefs, request);
   return eligibleRecipes(recipes, prefs, request)
-    .map((recipe) => ({ recipe, score: scoreRecipe(recipe, request, maxPerServing) }))
-    // Tri par score décroissant, départage stable par id pour des swaps déterministes.
+    .map((recipe) => {
+      const costPerServing = recipeCostPerServing(recipe, ingredientsById, store);
+      return { recipe, costPerServing, score: scoreRecipe(recipe, request, costPerServing, fairShare) };
+    })
     .sort((a, b) => b.score - a.score || a.recipe.id.localeCompare(b.recipe.id));
 }
 
-// Sélection des N meilleurs repas (warm start du dashboard).
-export function selectMeals(
+export interface WeekPlan {
+  recipes: Recipe[];
+  total: number; // coût réel du panier (au magasin) — DOIT être <= budget
+  withinBudget: boolean; // a-t-on pu remplir tous les jours sous le budget ?
+  eligibleCount: number;
+}
+
+// ---- Passe 3 : plan hebdo glouton sous contrainte de budget ----
+// Ajoute les recettes les mieux classées tant que le panier agrégé (dédoublonné)
+// reste <= budget, jusqu'à couvrir `mealsPerWeek` jours.
+export function planWeek(
   recipes: Recipe[],
   prefs: UserPrefs,
   request: GenerationRequest,
-  count: number,
-  excludeIds: string[] = [],
-): Recipe[] {
-  return rankRecipes(recipes, prefs, request)
-    .filter((s) => !excludeIds.includes(s.recipe.id))
-    .slice(0, count)
-    .map((s) => s.recipe);
+  ingredientsById: Map<string, Ingredient>,
+  store: Store,
+): WeekPlan {
+  const ranked = rankRecipes(recipes, prefs, request, ingredientsById, store);
+  const days = prefs.mealsPerWeek;
+  const chosen: Recipe[] = [];
+
+  for (const { recipe } of ranked) {
+    if (chosen.length >= days) break;
+    const tentative = [...chosen, recipe];
+    const total = buildShoppingList(tentative, ingredientsById, prefs.householdSize, store).total;
+    if (total <= request.budget) chosen.push(recipe);
+  }
+
+  const total = buildShoppingList(chosen, ingredientsById, prefs.householdSize, store).total;
+  return {
+    recipes: chosen,
+    total,
+    withinBudget: chosen.length >= days,
+    eligibleCount: ranked.length,
+  };
 }
 
-// Meilleur substitut pour le swap (clic 2) : top 1 éligible hors sélection courante.
+// Plan à partir d'une sélection fixée (après un swap) : conserve l'ordre demandé.
+export function buildPlanFromIds(
+  ids: string[],
+  recipes: Recipe[],
+): Recipe[] {
+  return ids
+    .map((id) => recipes.find((r) => r.id === id))
+    .filter((r): r is Recipe => Boolean(r));
+}
+
+// Meilleur substitut pour le swap : top-1 éligible hors sélection courante.
 export function bestSubstitute(
   recipes: Recipe[],
   prefs: UserPrefs,
   request: GenerationRequest,
+  ingredientsById: Map<string, Ingredient>,
+  store: Store,
   currentIds: string[],
 ): Recipe | null {
-  const ranked = rankRecipes(recipes, prefs, request).filter(
+  const ranked = rankRecipes(recipes, prefs, request, ingredientsById, store).filter(
     (s) => !currentIds.includes(s.recipe.id),
   );
   return ranked[0]?.recipe ?? null;

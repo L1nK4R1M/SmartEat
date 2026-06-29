@@ -19,14 +19,18 @@ import {
 
 export const stores = pgTable("stores", {
   id: text("id").primaryKey(),
+  country: text("country").notNull(), // FR | BE
   name: text("name").notNull(),
-  emoji: text("emoji").notNull().default("🛒"),
+  domain: text("domain").notNull(), // logo (Clearbit)
+  color: text("color").notNull(), // couleur de marque (repli monogramme)
+  kind: text("kind").notNull(), // hyper | super | proxi | discount | bio | surgele
   priceFactor: numeric("price_factor").notNull().default("1"),
 });
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
+  country: text("country").notNull().default("FR"),
   storeId: text("store_id").references(() => stores.id),
   dietTags: text("diet_tags").array().notNull().default([]),
   equipment: text("equipment").array().notNull().default([]),
@@ -51,7 +55,7 @@ export const recipes = pgTable("recipes", {
   dietTags: text("diet_tags").array().notNull().default([]),
   reqCapabilities: text("req_capabilities").array().notNull().default([]),
   prepMinutes: integer("prep_minutes").notNull(),
-  costPerServing: numeric("cost_per_serving").notNull(),
+  // Pas de prix stocké : calculé depuis recipe_ingredients × store_prices.
   defaultServings: integer("default_servings").notNull().default(2),
 });
 

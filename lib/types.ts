@@ -1,6 +1,8 @@
 // Modèle de domaine — reflète le schéma du cahier des charges (§2 Logic Engine).
 // Les types restent identiques que les données viennent du seed ou de Postgres.
 
+export type Country = "FR" | "BE";
+
 export type Appliance = "four" | "airfryer" | "micro" | "poele";
 
 export type Capability =
@@ -50,20 +52,27 @@ export interface Recipe {
   dietTags: DietTag[];
   reqCapabilities: Capability[]; // moteur ensembliste : <= capacités utilisateur
   prepMinutes: number;
-  costPerServing: number; // €
   defaultServings: number;
+  // Le prix N'EST PLUS stocké : il est calculé depuis les ingrédients au prix du
+  // magasin choisi (voir lib/pricing.ts). Garantit "prix = coût réel du panier".
   ingredients: RecipeIngredient[];
 }
 
+export type StoreKind = "hyper" | "super" | "proxi" | "discount" | "bio" | "surgele";
+
 export interface Store {
   id: string;
+  country: Country;
   name: string;
-  emoji: string;
-  priceFactor: number; // multiplie les prix de référence (profil de prix, §4)
+  domain: string; // pour le logo (service Clearbit) — voir BrandLogo
+  color: string; // couleur de marque (repli monogramme si logo absent)
+  kind: StoreKind;
+  priceFactor: number; // profil de prix de l'enseigne (discounter < hyper < proxi < bio)
 }
 
 // Préférences durables capturées une seule fois à l'onboarding (§1).
 export interface UserPrefs {
+  country: Country;
   storeId: string;
   dietTags: DietTag[];
   equipment: Appliance[];
