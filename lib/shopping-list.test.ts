@@ -3,8 +3,8 @@ import { INGREDIENTS, RECIPES, STORES } from "@/db/seed-data";
 import { buildShoppingList } from "./shopping-list";
 
 const ingredientsById = new Map(INGREDIENTS.map((i) => [i.id, i]));
-const central = STORES.find((s) => s.id === "central")!;
-const bio = STORES.find((s) => s.id === "bio")!;
+const central = STORES.find((s) => s.id === "fr_carrefour")!;
+const bio = STORES.find((s) => s.id === "fr_biocoop")!;
 const r03 = RECIPES.find((r) => r.id === "r03")!; // curry pois chiches
 const r09 = RECIPES.find((r) => r.id === "r09")!; // dahl lentilles
 
@@ -25,9 +25,9 @@ describe("buildShoppingList — agrégation & coût", () => {
   });
 
   it("applique le profil de prix du magasin", () => {
-    const a = buildShoppingList([r03], ingredientsById, 2, central); // factor 1.0
-    const b = buildShoppingList([r03], ingredientsById, 2, bio); // factor 1.25
-    expect(b.total).toBeCloseTo(a.total * 1.25, 5);
+    const a = buildShoppingList([r03], ingredientsById, 2, central);
+    const b = buildShoppingList([r03], ingredientsById, 2, bio);
+    expect(b.total).toBeCloseTo(a.total * (bio.priceFactor / central.priceFactor), 5);
   });
 
   it("trie les sections selon l'ordre de parcours en magasin", () => {

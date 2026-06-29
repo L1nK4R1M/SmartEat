@@ -1,4 +1,4 @@
-import type { Appliance, Aisle, Capability, DietTag, MealType } from "./types";
+import type { Appliance, Aisle, Capability, Country, DietTag, MealType, StoreKind } from "./types";
 
 // Libellés FR pour l'UI (séparés du domaine pour rester localisables).
 
@@ -44,3 +44,24 @@ export const CAPABILITY_LABELS: Record<Capability, string> = {
   reheat: "Réchauffer",
   steam: "Vapeur",
 };
+
+export const COUNTRY_LABELS: Record<Country, { label: string; flag: string }> = {
+  FR: { label: "France", flag: "🇫🇷" },
+  BE: { label: "Belgique", flag: "🇧🇪" },
+};
+
+export const STORE_KIND_LABELS: Record<StoreKind, string> = {
+  hyper: "Hypermarché",
+  super: "Supermarché",
+  proxi: "Magasin de proximité",
+  discount: "Hard discount",
+  bio: "Magasin bio",
+  surgele: "Surgelés",
+};
+
+const WEEKDAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+
+// Libellé du jour pour le plan hebdo (au-delà de 7, on numérote).
+export function dayLabel(index: number): string {
+  return WEEKDAYS[index] ?? `Jour ${index + 1}`;
+}

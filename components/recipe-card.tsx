@@ -5,53 +5,59 @@ import { MEAL_TYPE_LABELS } from "@/lib/labels";
 import { formatEuro } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-// RecipeCard (§3). Le swap est une simple navigation (Link) : rendu serveur,
-// robuste sans JS. Le swipe-to-swap est une amélioration V2.
+// RecipeCard (§3). Affiche le jour, la recette et son PRIX CALCULÉ au magasin.
+// Le swap est une navigation (Link) : rendu serveur, robuste sans JS.
 export function RecipeCard({
   recipe,
-  servings,
+  day,
+  mealCost,
   swapHref,
 }: {
   recipe: Recipe;
-  servings: number;
+  day?: string;
+  mealCost: number;
   swapHref: string | null;
 }) {
-  const mealCost = recipe.costPerServing * servings;
   return (
-    <article className="flex items-center gap-4 rounded-[var(--radius-card)] border border-outline bg-surface p-4">
-      <div
-        aria-hidden
-        className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-surface-variant text-3xl"
-      >
-        {recipe.emoji}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <h3 className="truncate text-[15px] font-semibold">{recipe.title}</h3>
-        <div className="mt-1.5 flex flex-wrap gap-1.5">
-          {recipe.mealTypes.slice(0, 2).map((t) => (
-            <Badge key={t} tone="primary">
-              {MEAL_TYPE_LABELS[t].emoji} {MEAL_TYPE_LABELS[t].label}
-            </Badge>
-          ))}
-          <Badge>
-            <Clock size={12} /> {recipe.prepMinutes} min
-          </Badge>
-          <Badge>
-            <Wallet size={12} /> <span className="tnum">{formatEuro(mealCost)}</span>
-          </Badge>
-        </div>
-      </div>
-
-      {swapHref ? (
-        <Link
-          href={swapHref}
-          aria-label={`Remplacer ${recipe.title}`}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-on-surface-muted transition-colors hover:bg-surface-variant hover:text-on-surface"
+    <article className="rounded-[var(--radius-card)] border border-outline bg-surface p-4">
+      {day && (
+        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">{day}</div>
+      )}
+      <div className="flex items-center gap-4">
+        <div
+          aria-hidden
+          className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-surface-variant text-3xl"
         >
-          <RefreshCw size={18} />
-        </Link>
-      ) : null}
+          {recipe.emoji}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-[15px] font-semibold">{recipe.title}</h3>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {recipe.mealTypes.slice(0, 2).map((t) => (
+              <Badge key={t} tone="primary">
+                {MEAL_TYPE_LABELS[t].emoji} {MEAL_TYPE_LABELS[t].label}
+              </Badge>
+            ))}
+            <Badge>
+              <Clock size={12} /> {recipe.prepMinutes} min
+            </Badge>
+            <Badge>
+              <Wallet size={12} /> <span className="tnum">{formatEuro(mealCost)}</span>
+            </Badge>
+          </div>
+        </div>
+
+        {swapHref ? (
+          <Link
+            href={swapHref}
+            aria-label={`Remplacer ${recipe.title}`}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-on-surface-muted transition-colors hover:bg-surface-variant hover:text-on-surface"
+          >
+            <RefreshCw size={18} />
+          </Link>
+        ) : null}
+      </div>
     </article>
   );
 }

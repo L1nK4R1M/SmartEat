@@ -1,4 +1,4 @@
-import type { Ingredient, Recipe, Store } from "./types";
+import type { Country, Ingredient, Recipe, Store } from "./types";
 import { INGREDIENTS, RECIPES, STORES } from "@/db/seed-data";
 
 /**
@@ -19,6 +19,12 @@ export const repo = {
 
   async getStores(): Promise<Store[]> {
     return STORES;
+  },
+
+  async getStoresByCountry(country: Country): Promise<Store[]> {
+    return STORES.filter((s) => s.country === country).sort((a, b) =>
+      a.name.localeCompare(b.name, "fr"),
+    );
   },
 
   async getStore(id: string): Promise<Store | undefined> {
