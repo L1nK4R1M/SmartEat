@@ -1,0 +1,171 @@
+"use client";
+
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { AlertTriangle, ChevronRight, RotateCcw, ShoppingCart } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
+import { CountUpEuro } from "@/components/ui/count-up";
+import { ProgressBar } from "@/components/ui/progress-bar";
+import { Stagger, StaggerItem } from "@/components/ui/motion";
+import { PlanDayCard, type PlanCardRecipe } from "@/components/plan-day-card";
+import { buttonClasses } from "@/components/ui/button";
+import { formatEuro } from "@/lib/utils";
+
+export interface PlanViewData {
+  store: { name: string; domain: string; color: string };
+  recipes: (PlanCardRecipe & { mealCost: number; swapHref: string | null })[];
+  selectedIds: string[];
+  total: number;
+  budget: number;
+  itemCount: number;
+  householdSize: number;
+  mealsPerWeek: number;
+  withinBudget: boolean;
+  regenerateHref: string;
+  listHref: string;
+}
+
+export function PlanView(data: PlanViewData) {
+  const over = data.total > data.budget + 0.001;
+
+  return (
+    <div className="mx-auto w-full max-w-md px-5 pb-32 pt-6">
+      {/* En-tête : titre + badge magasin */}
+      <motion.header
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="mb-5"
+      >
+        <h1 className="text-3xl font-bold tracking-tight">bon appétit ! 🎉</h1>
+        <p className="mt-1 text-on-surface-muted">Ta semaine est prête.</p>
+        <div className="mt-3">
+          <span className="inline-flex items-center gap-2 rounded-full border border-outline bg-surface px-3 py-1.5 text-sm">
+            <BrandLogo
+              domain={data.store.domain}
+              name={data.store.name}
+              color={data.store.color}
+              size={22}
+            />
+            <span className="font-medium">🛒 Prévu pour {data.store.name}</span>
+          </span>
+        </div>
+      </motion.header>
+
+      {data.recipes.length === 0 ? (
+        <div className="rounded-[var(--radius-card)] border border-dashed border-outline bg-surface p-6 text-center">
+          <p className="font-medium">Aucune recette ne rentre dans ce budget.</p>
+          <p className="mt-1 text-sm text-on-surface-muted">
+            Augmente le budget ou régénère la semaine.
+          </p>
+          <Link
+            href={data.regenerateHref}
+            className={`${buttonClasses("secondary", "md")} mt-4 w-full`}
+          >
+            <RotateCcw size={16} /> Régénérer la semaine
+          </Link>
+        </div>
+      ) : (
+        <>
+          {/* Carte COÛT ESTIMÉ avec barre animée */}
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05, duration: 0.4 }}
+            className="rounded-[var(--radius-card)] border border-outline bg-surface p-4"
+          >
+            <div className="flex items-baseline justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wide text-on-surface-muted">
+                Coût estimé
+              </span>
+              <span className="text-sm text-on-surface-muted">
+                budget {formatEuro(data.budget)}
+              </span>
+            </div>
+            <div className="mt-1 flex items-baseline gap-1.5">
+              <CountUpEuro
+                value={data.total}
+                className={`tnum text-3xl font-bold ${over ? "text-accent" : "text-primary"}`}
+              />
+              <span className="text-sm text-on-surface-muted">/ {formatEuro(data.budget)}</span>
+            </div>
+            <ProgressBar value={data.total} max={data.budget} over={over} className="mt-3" />
+          </motion.section>
+
+          {/* Carte "N articles · liste de courses" cliquable */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+            className="mt-3"
+          >
+            <Link
+              href={data.listHref}
+              className="flex items-center gap-3 rounded-[var(--radius-card)] border border-outline bg-surface p-4 transition-colors hover:bg-surface-variant"
+            >
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+                <ShoppingCart size={20} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold">
+                  {data.itemCount} articles · liste de courses
+                </span>
+                <span className="block text-sm text-on-surface-muted">
+                  Groupée par rayon, prête à l&apos;emploi
+                </span>
+              </span>
+              <ChevronRight size={20} className="shrink-0 text-on-surface-muted" />
+            </Link>
+          </motion.div>
+
+          {/* Avertissement budget trop serré */}
+          {!data.withinBudget && (
+            <div className="mt-3 flex items-start gap-2 rounded-2xl border border-accent/40 bg-accent/10 p-3 text-sm">
+              <AlertTriangle size={16} className="mt-0.5 shrink-0 text-accent" />
+              <span>
+                Budget atteint avec <b>{data.recipes.length}</b> repas (sur {data.mealsPerWeek}{" "}
+                souhaités). Augmente le budget pour en ajouter.
+              </span>
+            </div>
+          )}
+
+          {/* Cartes jour en cascade */}
+          <Stagger className="mt-5 space-y-3">
+            {data.recipes.map((r, i) => (
+              <StaggerItem key={r.id}>
+                <PlanDayCard
+                  recipe={r}
+                  dayIndex={i}
+                  householdSize={data.householdSize}
+                  mealCost={r.mealCost}
+                  swapHref={r.swapHref}
+                />
+              </StaggerItem>
+            ))}
+          </Stagger>
+
+          {/* Régénérer la semaine */}
+          <div className="mt-6 text-center">
+            <Link
+              href={data.regenerateHref}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
+              <RotateCcw size={15} /> Régénérer la semaine
+            </Link>
+          </div>
+        </>
+      )}
+
+      {/* CTA sticky */}
+      {data.recipes.length > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-20">
+          <div className="mx-auto max-w-md border-t border-outline bg-background/85 p-5 backdrop-blur">
+            <Link href={data.listHref} className={`${buttonClasses("primary", "lg")} w-full`}>
+              <ShoppingCart size={18} /> Voir la liste de courses
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

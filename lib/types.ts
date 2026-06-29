@@ -16,9 +16,24 @@ export type Capability =
   | "reheat"
   | "steam";
 
-export type MealType = "rapide" | "sain" | "leger" | "proteine";
+// "Ambiances" du repas (inspiré Romi). On ENRICHIT le modèle existant : les 4
+// types historiques restent, on ajoute famille / gourmand / monde pour l'onboarding.
+export type MealType =
+  | "rapide"
+  | "sain"
+  | "leger"
+  | "proteine"
+  | "famille"
+  | "gourmand"
+  | "monde";
 
-export type DietTag = "halal" | "vege" | "vegan" | "sans_gluten" | "sans_lactose";
+export type DietTag =
+  | "halal"
+  | "vege"
+  | "vegan"
+  | "pescetarien"
+  | "sans_gluten"
+  | "sans_lactose";
 
 export type Unit = "g" | "ml" | "piece";
 
@@ -47,6 +62,15 @@ export interface RecipeIngredient {
   unit: Unit;
 }
 
+// Valeurs nutritionnelles ESTIMÉES, par portion (proxy simple, §5 roadmap).
+// Affichées avec la mention "valeurs estimées" dans l'UI.
+export interface Nutrition {
+  kcal: number;
+  protein: number; // g
+  carbs: number; // g
+  fat: number; // g
+}
+
 export interface Recipe {
   id: string;
   title: string;
@@ -60,6 +84,8 @@ export interface Recipe {
   // magasin choisi (voir lib/pricing.ts). Garantit "prix = coût réel du panier".
   ingredients: RecipeIngredient[];
   steps: string[]; // étapes de préparation (recette consultable)
+  nutrition: Nutrition; // valeurs ESTIMÉES par portion
+  imageUrl?: string; // visuel optionnel — fallback dégradé+emoji si absent/échec
 }
 
 export type StoreKind = "hyper" | "super" | "proxi" | "discount" | "bio" | "surgele";
@@ -75,6 +101,8 @@ export interface Store {
 }
 
 // Préférences durables capturées une seule fois à l'onboarding (§1).
+// On y persiste désormais aussi le budget et l'ambiance par défaut (Romi) afin
+// de pré-remplir la génération sans re-poser la question.
 export interface UserPrefs {
   country: Country;
   storeId: string;
@@ -82,10 +110,13 @@ export interface UserPrefs {
   equipment: Appliance[];
   householdSize: number;
   mealsPerWeek: number;
+  budget: number; // budget hebdo par défaut (€)
+  ambiance: MealType[]; // ambiances préférées (envies par défaut)
 }
 
 // Arbitrages ponctuels demandés à chaque génération (§1).
 export interface GenerationRequest {
   budget: number; // € total pour la semaine
   mealTypes: MealType[]; // envies de la semaine (vide = peu importe)
+  seed?: number; // graine de variété pour "régénérer la semaine"
 }

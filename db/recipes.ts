@@ -24,10 +24,11 @@ export const RECIPES: Recipe[] = [
       "Mélanger les légumes et le poulet avec l'huile d'olive, saler et poivrer.",
       "Enfourner 30 min en remuant à mi-cuisson, jusqu'à ce que le poulet soit doré.",
     ],
+    nutrition: { kcal: 485, protein: 47, carbs: 45, fat: 14 },
   },
   {
     id: "r02", title: "Saumon vapeur express", emoji: "🐟",
-    mealTypes: ["sain", "leger", "proteine"], dietTags: ["halal", "sans_gluten", "sans_lactose"],
+    mealTypes: ["sain", "leger", "proteine"], dietTags: ["halal", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["steam"], prepMinutes: 15, defaultServings: 2,
     ingredients: [
       { ingredientId: "salmon", qtyPerServing: 150, unit: "g" },
@@ -41,10 +42,11 @@ export const RECIPES: Recipe[] = [
       "Couvrir et cuire 6 à 8 min à pleine puissance.",
       "Arroser de jus de citron et d'huile d'olive avant de servir.",
     ],
+    nutrition: { kcal: 421, protein: 36, carbs: 17, fat: 25 },
   },
   {
     id: "r03", title: "Curry de pois chiches", emoji: "🍛",
-    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "vegan", "sans_gluten", "sans_lactose"],
+    mealTypes: ["sain", "leger", "monde"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["simmer"], prepMinutes: 25, defaultServings: 2,
     ingredients: [
       { ingredientId: "chickpeas", qtyPerServing: 150, unit: "g" },
@@ -60,10 +62,11 @@ export const RECIPES: Recipe[] = [
       "Verser le lait de coco et laisser mijoter 15 min.",
       "Servir avec le riz cuit à l'eau.",
     ],
+    nutrition: { kcal: 747, protein: 21, carbs: 107, fat: 27 },
   },
   {
     id: "r04", title: "Pâtes bolognaise", emoji: "🍝",
-    mealTypes: ["proteine"], dietTags: ["halal", "sans_lactose"],
+    mealTypes: ["proteine", "famille", "gourmand"], dietTags: ["halal", "sans_lactose"],
     reqCapabilities: ["simmer"], prepMinutes: 30, defaultServings: 2,
     ingredients: [
       { ingredientId: "pasta", qtyPerServing: 100, unit: "g" },
@@ -78,10 +81,11 @@ export const RECIPES: Recipe[] = [
       "Cuire les pâtes al dente dans l'eau bouillante salée.",
       "Mélanger pâtes et sauce, puis servir.",
     ],
+    nutrition: { kcal: 708, protein: 38, carbs: 84, fat: 24 },
   },
   {
     id: "r05", title: "Buddha bowl quinoa", emoji: "🥗",
-    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "vegan", "sans_gluten", "sans_lactose"],
+    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["heat"], prepMinutes: 20, defaultServings: 2,
     ingredients: [
       { ingredientId: "quinoa", qtyPerServing: 80, unit: "g" },
@@ -97,10 +101,11 @@ export const RECIPES: Recipe[] = [
       "Disposer quinoa, pois chiches, épinards et poivron dans un bol.",
       "Assaisonner d'huile d'olive et de jus de citron.",
     ],
+    nutrition: { kcal: 522, protein: 19, carbs: 75, fat: 17 },
   },
   {
     id: "r06", title: "Gratin de courgettes", emoji: "🧀",
-    mealTypes: ["sain"], dietTags: ["halal", "vege", "sans_gluten"],
+    mealTypes: ["sain", "gourmand"], dietTags: ["halal", "vege", "pescetarien", "sans_gluten"],
     reqCapabilities: ["gratin"], prepMinutes: 40, defaultServings: 2,
     ingredients: [
       { ingredientId: "zucchini", qtyPerServing: 250, unit: "g" },
@@ -115,10 +120,11 @@ export const RECIPES: Recipe[] = [
       "Battre l'œuf avec la crème, verser sur les courgettes et couvrir de fromage.",
       "Enfourner 30 min jusqu'à ce que le gratin soit doré.",
     ],
+    nutrition: { kcal: 429, protein: 26, carbs: 11, fat: 33 },
   },
   {
     id: "r07", title: "Wrap poulet croustillant", emoji: "🌯",
-    mealTypes: ["rapide", "proteine"], dietTags: ["halal", "sans_lactose"],
+    mealTypes: ["rapide", "proteine", "famille"], dietTags: ["halal", "sans_lactose"],
     reqCapabilities: ["fry"], prepMinutes: 15, defaultServings: 2,
     ingredients: [
       { ingredientId: "chicken", qtyPerServing: 120, unit: "g" },
@@ -133,10 +139,11 @@ export const RECIPES: Recipe[] = [
       "Garnir la galette de la préparation.",
       "Rouler le wrap et le saisir 1 min de chaque côté.",
     ],
+    nutrition: { kcal: 358, protein: 33, carbs: 33, fat: 11 },
   },
   {
     id: "r08", title: "Omelette express", emoji: "🍳",
-    mealTypes: ["rapide", "proteine", "leger"], dietTags: ["halal", "vege", "sans_gluten", "sans_lactose"],
+    mealTypes: ["rapide", "proteine", "leger"], dietTags: ["halal", "vege", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["fry"], prepMinutes: 10, defaultServings: 2,
     ingredients: [
       { ingredientId: "eggs", qtyPerServing: 3, unit: "piece" },
@@ -150,10 +157,11 @@ export const RECIPES: Recipe[] = [
       "Verser les œufs et cuire à feu moyen.",
       "Plier l'omelette et servir.",
     ],
+    nutrition: { kcal: 278, protein: 21, carbs: 4, fat: 20 },
   },
   {
     id: "r09", title: "Dahl de lentilles corail", emoji: "🍲",
-    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "vegan", "sans_gluten", "sans_lactose"],
+    mealTypes: ["sain", "leger", "monde"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["simmer"], prepMinutes: 30, defaultServings: 2,
     ingredients: [
       { ingredientId: "lentils", qtyPerServing: 100, unit: "g" },
@@ -169,10 +177,11 @@ export const RECIPES: Recipe[] = [
       "Mijoter 18 à 20 min jusqu'à ce que les lentilles soient fondantes.",
       "Servir avec le riz.",
     ],
+    nutrition: { kcal: 587, protein: 18, carbs: 88, fat: 19 },
   },
   {
     id: "r10", title: "Patates douces rôties & tofu", emoji: "🍠",
-    mealTypes: ["sain", "proteine"], dietTags: ["halal", "vege", "vegan", "sans_lactose"],
+    mealTypes: ["sain", "proteine"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_lactose"],
     reqCapabilities: ["roast"], prepMinutes: 35, defaultServings: 2,
     ingredients: [
       { ingredientId: "sweet_potato", qtyPerServing: 200, unit: "g" },
@@ -187,10 +196,11 @@ export const RECIPES: Recipe[] = [
       "Rôtir 25 à 30 min en remuant.",
       "Ajouter le brocoli vapeur et servir.",
     ],
+    nutrition: { kcal: 444, protein: 21, carbs: 50, fat: 19 },
   },
   {
     id: "r11", title: "Steak haché & poêlée", emoji: "🥩",
-    mealTypes: ["rapide", "proteine"], dietTags: ["halal", "sans_gluten", "sans_lactose"],
+    mealTypes: ["rapide", "proteine", "famille"], dietTags: ["halal", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["sear"], prepMinutes: 15, defaultServings: 2,
     ingredients: [
       { ingredientId: "beef", qtyPerServing: 150, unit: "g" },
@@ -203,10 +213,11 @@ export const RECIPES: Recipe[] = [
       "Saler et poivrer.",
       "Dresser et servir.",
     ],
+    nutrition: { kcal: 389, protein: 35, carbs: 14, fat: 21 },
   },
   {
     id: "r12", title: "Riz sauté aux légumes", emoji: "🍚",
-    mealTypes: ["rapide", "sain"], dietTags: ["halal", "vege", "vegan", "sans_lactose"],
+    mealTypes: ["rapide", "sain", "famille"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_lactose"],
     reqCapabilities: ["fry"], prepMinutes: 18, defaultServings: 2,
     ingredients: [
       { ingredientId: "rice", qtyPerServing: 90, unit: "g" },
@@ -221,10 +232,11 @@ export const RECIPES: Recipe[] = [
       "Ajouter le riz et la sauce soja, sauter 5 min à feu vif.",
       "Servir bien chaud.",
     ],
+    nutrition: { kcal: 466, protein: 11, carbs: 83, fat: 9 },
   },
   {
     id: "r13", title: "Saumon rôti & quinoa", emoji: "🐟",
-    mealTypes: ["sain", "proteine"], dietTags: ["halal", "sans_gluten", "sans_lactose"],
+    mealTypes: ["sain", "proteine"], dietTags: ["halal", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["roast"], prepMinutes: 28, defaultServings: 2,
     ingredients: [
       { ingredientId: "salmon", qtyPerServing: 150, unit: "g" },
@@ -239,10 +251,11 @@ export const RECIPES: Recipe[] = [
       "Rôtir 15 à 18 min.",
       "Servir avec le quinoa cuit.",
     ],
+    nutrition: { kcal: 691, protein: 43, carbs: 57, fat: 33 },
   },
   {
     id: "r14", title: "Pâtes sans gluten aux légumes", emoji: "🍝",
-    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "vegan", "sans_gluten", "sans_lactose"],
+    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["simmer"], prepMinutes: 22, defaultServings: 2,
     ingredients: [
       { ingredientId: "gf_pasta", qtyPerServing: 100, unit: "g" },
@@ -257,6 +270,7 @@ export const RECIPES: Recipe[] = [
       "Mijoter 10 min.",
       "Mélanger avec les pâtes et servir.",
     ],
+    nutrition: { kcal: 493, protein: 9, carbs: 87, fat: 12 },
   },
   {
     id: "r15", title: "Bowl poulet & riz (meal prep)", emoji: "🍗",
@@ -275,10 +289,11 @@ export const RECIPES: Recipe[] = [
       "Cuire le riz ; faire le brocoli et les carottes vapeur.",
       "Assembler le bowl et napper de sauce soja.",
     ],
+    nutrition: { kcal: 571, protein: 48, carbs: 87, fat: 4 },
   },
   {
     id: "r16", title: "Soupe de légumes maison", emoji: "🥣",
-    mealTypes: ["leger", "sain"], dietTags: ["halal", "vege", "vegan", "sans_gluten", "sans_lactose"],
+    mealTypes: ["leger", "sain"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["simmer"], prepMinutes: 30, defaultServings: 2,
     ingredients: [
       { ingredientId: "carrot", qtyPerServing: 100, unit: "g" },
@@ -293,10 +308,11 @@ export const RECIPES: Recipe[] = [
       "Mijoter 25 min.",
       "Mixer et assaisonner.",
     ],
+    nutrition: { kcal: 242, protein: 5, carbs: 38, fat: 9 },
   },
   {
     id: "r17", title: "Poulet tikka & riz", emoji: "🍛",
-    mealTypes: ["proteine", "sain"], dietTags: ["halal", "sans_gluten"],
+    mealTypes: ["proteine", "sain", "monde", "gourmand"], dietTags: ["halal", "sans_gluten"],
     reqCapabilities: ["roast"], prepMinutes: 35, defaultServings: 2,
     ingredients: [
       { ingredientId: "chicken", qtyPerServing: 170, unit: "g" },
@@ -312,10 +328,11 @@ export const RECIPES: Recipe[] = [
       "Rôtir le poulet 20 à 25 min.",
       "Servir avec le riz et l'oignon émincé.",
     ],
+    nutrition: { kcal: 607, protein: 52, carbs: 81, fat: 8 },
   },
   {
     id: "r18", title: "Chili sin carne", emoji: "🌶️",
-    mealTypes: ["sain", "proteine"], dietTags: ["halal", "vege", "vegan", "sans_gluten", "sans_lactose"],
+    mealTypes: ["sain", "proteine", "monde"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["simmer"], prepMinutes: 30, defaultServings: 2,
     ingredients: [
       { ingredientId: "red_beans", qtyPerServing: 120, unit: "g" },
@@ -331,10 +348,11 @@ export const RECIPES: Recipe[] = [
       "Mijoter 20 min.",
       "Servir avec le riz.",
     ],
+    nutrition: { kcal: 492, protein: 17, carbs: 99, fat: 2 },
   },
   {
     id: "r19", title: "Saumon teriyaki & nouilles", emoji: "🍜",
-    mealTypes: ["proteine"], dietTags: ["halal", "sans_lactose"],
+    mealTypes: ["proteine", "monde", "gourmand"], dietTags: ["halal", "pescetarien", "sans_lactose"],
     reqCapabilities: ["sear"], prepMinutes: 22, defaultServings: 2,
     ingredients: [
       { ingredientId: "salmon", qtyPerServing: 150, unit: "g" },
@@ -349,10 +367,11 @@ export const RECIPES: Recipe[] = [
       "Faire sauter le brocoli.",
       "Mélanger nouilles, brocoli et saumon.",
     ],
+    nutrition: { kcal: 704, protein: 46, carbs: 81, fat: 21 },
   },
   {
     id: "r20", title: "Couscous végétarien", emoji: "🥘",
-    mealTypes: ["sain"], dietTags: ["halal", "vege", "vegan", "sans_lactose"],
+    mealTypes: ["sain", "monde"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_lactose"],
     reqCapabilities: ["simmer"], prepMinutes: 30, defaultServings: 2,
     ingredients: [
       { ingredientId: "couscous", qtyPerServing: 90, unit: "g" },
@@ -368,10 +387,11 @@ export const RECIPES: Recipe[] = [
       "Préparer la semoule (eau bouillante, couvrir 5 min).",
       "Servir le bouillon de légumes sur la semoule.",
     ],
+    nutrition: { kcal: 531, protein: 21, carbs: 104, fat: 3 },
   },
   {
     id: "r21", title: "Œufs brouillés & toast avocat", emoji: "🥑",
-    mealTypes: ["rapide", "leger"], dietTags: ["halal", "vege", "sans_lactose"],
+    mealTypes: ["rapide", "leger", "gourmand"], dietTags: ["halal", "vege", "pescetarien", "sans_lactose"],
     reqCapabilities: ["fry"], prepMinutes: 12, defaultServings: 2,
     ingredients: [
       { ingredientId: "eggs", qtyPerServing: 3, unit: "piece" },
@@ -385,10 +405,11 @@ export const RECIPES: Recipe[] = [
       "Cuire les œufs brouillés à feu doux avec un peu d'huile.",
       "Servir sur le toast.",
     ],
+    nutrition: { kcal: 540, protein: 26, carbs: 37, fat: 33 },
   },
   {
     id: "r22", title: "Bowl pois chiches rôtis", emoji: "🥗",
-    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "vegan", "sans_gluten", "sans_lactose"],
+    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["roast"], prepMinutes: 30, defaultServings: 2,
     ingredients: [
       { ingredientId: "chickpeas", qtyPerServing: 120, unit: "g" },
@@ -404,10 +425,11 @@ export const RECIPES: Recipe[] = [
       "Préparer épinards et concombre.",
       "Assembler le bol, arroser d'huile et de citron.",
     ],
+    nutrition: { kcal: 408, protein: 13, carbs: 62, fat: 14 },
   },
   {
     id: "r23", title: "Gratin de chou-fleur", emoji: "🧀",
-    mealTypes: ["sain"], dietTags: ["halal", "vege", "sans_gluten"],
+    mealTypes: ["sain", "gourmand"], dietTags: ["halal", "vege", "pescetarien", "sans_gluten"],
     reqCapabilities: ["gratin"], prepMinutes: 40, defaultServings: 2,
     ingredients: [
       { ingredientId: "cauliflower", qtyPerServing: 250, unit: "g" },
@@ -421,10 +443,11 @@ export const RECIPES: Recipe[] = [
       "Disposer dans un plat, napper de crème et d'ail, couvrir de fromage.",
       "Gratiner 20 min.",
     ],
+    nutrition: { kcal: 397, protein: 22, carbs: 16, fat: 30 },
   },
   {
     id: "r24", title: "Pâtes pesto & tomates cerises", emoji: "🍝",
-    mealTypes: ["rapide", "sain"], dietTags: ["halal", "vege"],
+    mealTypes: ["rapide", "sain", "famille", "gourmand"], dietTags: ["halal", "vege", "pescetarien"],
     reqCapabilities: ["simmer"], prepMinutes: 18, defaultServings: 2,
     ingredients: [
       { ingredientId: "pasta", qtyPerServing: 100, unit: "g" },
@@ -438,10 +461,11 @@ export const RECIPES: Recipe[] = [
       "Mélanger pâtes, pesto et tomates.",
       "Parsemer de parmesan.",
     ],
+    nutrition: { kcal: 573, protein: 20, carbs: 79, fat: 19 },
   },
   {
     id: "r25", title: "Cabillaud rôti & légumes", emoji: "🐟",
-    mealTypes: ["sain", "leger", "proteine"], dietTags: ["halal", "sans_gluten", "sans_lactose"],
+    mealTypes: ["sain", "leger", "proteine"], dietTags: ["halal", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["roast"], prepMinutes: 28, defaultServings: 2,
     ingredients: [
       { ingredientId: "cod", qtyPerServing: 150, unit: "g" },
@@ -456,10 +480,11 @@ export const RECIPES: Recipe[] = [
       "Rôtir 15 à 18 min.",
       "Servir.",
     ],
+    nutrition: { kcal: 236, protein: 30, carbs: 9, fat: 10 },
   },
   {
     id: "r26", title: "Wok de tofu & légumes", emoji: "🥡",
-    mealTypes: ["sain", "rapide"], dietTags: ["halal", "vege", "vegan", "sans_lactose"],
+    mealTypes: ["sain", "rapide", "monde"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_lactose"],
     reqCapabilities: ["fry"], prepMinutes: 18, defaultServings: 2,
     ingredients: [
       { ingredientId: "tofu", qtyPerServing: 150, unit: "g" },
@@ -474,10 +499,11 @@ export const RECIPES: Recipe[] = [
       "Déglacer à la sauce soja.",
       "Servir avec le riz.",
     ],
+    nutrition: { kcal: 570, protein: 30, carbs: 82, fat: 12 },
   },
   {
     id: "r27", title: "Tortilla de pommes de terre", emoji: "🍳",
-    mealTypes: ["proteine", "sain"], dietTags: ["halal", "vege", "sans_gluten", "sans_lactose"],
+    mealTypes: ["proteine", "sain"], dietTags: ["halal", "vege", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["fry"], prepMinutes: 25, defaultServings: 2,
     ingredients: [
       { ingredientId: "eggs", qtyPerServing: 4, unit: "piece" },
@@ -491,10 +517,11 @@ export const RECIPES: Recipe[] = [
       "Cuire la tortilla à la poêle 5 min par face.",
       "Laisser tiédir et couper en parts.",
     ],
+    nutrition: { kcal: 554, protein: 30, carbs: 41, fat: 30 },
   },
   {
     id: "r28", title: "Soupe de lentilles", emoji: "🍲",
-    mealTypes: ["leger", "sain"], dietTags: ["halal", "vege", "vegan", "sans_gluten", "sans_lactose"],
+    mealTypes: ["leger", "sain"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["simmer"], prepMinutes: 30, defaultServings: 2,
     ingredients: [
       { ingredientId: "lentils", qtyPerServing: 100, unit: "g" },
@@ -509,10 +536,11 @@ export const RECIPES: Recipe[] = [
       "Mijoter 20 à 25 min.",
       "Mixer partiellement et assaisonner.",
     ],
+    nutrition: { kcal: 204, protein: 12, carbs: 40, fat: 1 },
   },
   {
     id: "r29", title: "Burger maison & potatoes", emoji: "🍔",
-    mealTypes: ["proteine"], dietTags: ["halal"],
+    mealTypes: ["proteine", "famille", "gourmand"], dietTags: ["halal"],
     reqCapabilities: ["roast"], prepMinutes: 30, defaultServings: 2,
     ingredients: [
       { ingredientId: "beef", qtyPerServing: 150, unit: "g" },
@@ -527,10 +555,11 @@ export const RECIPES: Recipe[] = [
       "Toaster le pain, ajouter steak, fromage et tomate.",
       "Servir avec les potatoes.",
     ],
+    nutrition: { kcal: 648, protein: 45, carbs: 66, fat: 22 },
   },
   {
     id: "r30", title: "Curry de légumes & riz", emoji: "🍛",
-    mealTypes: ["sain"], dietTags: ["halal", "vege", "vegan", "sans_gluten", "sans_lactose"],
+    mealTypes: ["sain", "monde"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["simmer"], prepMinutes: 28, defaultServings: 2,
     ingredients: [
       { ingredientId: "frozen_veg", qtyPerServing: 200, unit: "g" },
@@ -545,10 +574,11 @@ export const RECIPES: Recipe[] = [
       "Mijoter 18 min.",
       "Servir avec le riz.",
     ],
+    nutrition: { kcal: 689, protein: 15, carbs: 95, fat: 28 },
   },
   {
     id: "r31", title: "Salade de quinoa & feta", emoji: "🥗",
-    mealTypes: ["leger", "sain"], dietTags: ["halal", "vege", "sans_gluten"],
+    mealTypes: ["leger", "sain", "gourmand"], dietTags: ["halal", "vege", "pescetarien", "sans_gluten"],
     reqCapabilities: ["heat"], prepMinutes: 20, defaultServings: 2,
     ingredients: [
       { ingredientId: "quinoa", qtyPerServing: 90, unit: "g" },
@@ -564,10 +594,11 @@ export const RECIPES: Recipe[] = [
       "Mélanger le tout.",
       "Assaisonner d'huile et de citron.",
     ],
+    nutrition: { kcal: 593, protein: 21, carbs: 70, fat: 26 },
   },
   {
     id: "r32", title: "Porridge protéiné", emoji: "🥣",
-    mealTypes: ["rapide", "leger"], dietTags: ["halal", "vege", "sans_lactose"],
+    mealTypes: ["rapide", "leger"], dietTags: ["halal", "vege", "pescetarien", "sans_lactose"],
     reqCapabilities: ["heat"], prepMinutes: 8, defaultServings: 2,
     ingredients: [
       { ingredientId: "oats", qtyPerServing: 80, unit: "g" },
@@ -580,10 +611,11 @@ export const RECIPES: Recipe[] = [
       "Napper de miel.",
       "Servir chaud.",
     ],
+    nutrition: { kcal: 459, protein: 15, carbs: 64, fat: 16 },
   },
   {
     id: "r33", title: "Crevettes sautées & riz", emoji: "🍤",
-    mealTypes: ["proteine", "leger"], dietTags: ["halal", "sans_gluten", "sans_lactose"],
+    mealTypes: ["proteine", "leger", "monde", "famille"], dietTags: ["halal", "pescetarien", "sans_gluten", "sans_lactose"],
     reqCapabilities: ["fry"], prepMinutes: 18, defaultServings: 2,
     ingredients: [
       { ingredientId: "shrimp", qtyPerServing: 120, unit: "g" },
@@ -598,10 +630,11 @@ export const RECIPES: Recipe[] = [
       "Ajouter les haricots verts.",
       "Servir sur le riz.",
     ],
+    nutrition: { kcal: 544, protein: 34, carbs: 79, fat: 10 },
   },
   {
     id: "r34", title: "Aubergines rôties & boulgour", emoji: "🍆",
-    mealTypes: ["sain"], dietTags: ["halal", "vege", "vegan", "sans_lactose"],
+    mealTypes: ["sain", "monde"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_lactose"],
     reqCapabilities: ["roast"], prepMinutes: 32, defaultServings: 2,
     ingredients: [
       { ingredientId: "eggplant", qtyPerServing: 250, unit: "g" },
@@ -616,10 +649,11 @@ export const RECIPES: Recipe[] = [
       "Cuire le boulgour ; faire revenir oignon et tomate.",
       "Assembler et servir.",
     ],
+    nutrition: { kcal: 493, protein: 15, carbs: 91, fat: 12 },
   },
   {
     id: "r35", title: "Thon & pâtes express", emoji: "🐟",
-    mealTypes: ["rapide", "proteine"], dietTags: ["halal", "sans_lactose"],
+    mealTypes: ["rapide", "proteine", "famille"], dietTags: ["halal", "pescetarien", "sans_lactose"],
     reqCapabilities: ["simmer"], prepMinutes: 15, defaultServings: 2,
     ingredients: [
       { ingredientId: "pasta", qtyPerServing: 100, unit: "g" },
@@ -634,6 +668,7 @@ export const RECIPES: Recipe[] = [
       "Mijoter 8 min.",
       "Mélanger avec les pâtes.",
     ],
+    nutrition: { kcal: 592, protein: 40, carbs: 81, fat: 11 },
   },
   {
     id: "r36", title: "Dinde grillée & purée patate douce", emoji: "🦃",
@@ -651,5 +686,6 @@ export const RECIPES: Recipe[] = [
       "Faire les haricots verts vapeur.",
       "Dresser et servir.",
     ],
+    nutrition: { kcal: 439, protein: 41, carbs: 47, fat: 11 },
   },
 ];

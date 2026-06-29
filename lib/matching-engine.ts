@@ -40,6 +40,21 @@ export function eligibleRecipes(
 // ---- Passe 2 : scoring doux ----
 const WEIGHTS = { type: 0.4, budget: 0.2, time: 0.2, variety: 0.2 };
 
+// Bruit déterministe et stable dans [0,1) à partir d'une (id, seed). Sert la
+// "variété" : à seed différent, classement différent — mais toujours reproductible.
+function hashNoise(id: string, seed: number): number {
+  let h = 2166136261 ^ seed;
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  // xorshift final pour mieux disperser
+  h ^= h >>> 13;
+  h = Math.imul(h, 0x5bd1e995);
+  h ^= h >>> 15;
+  return ((h >>> 0) % 100000) / 100000;
+}
+
 export function scoreRecipe(
   recipe: Recipe,
   request: GenerationRequest,
@@ -55,7 +70,9 @@ export function scoreRecipe(
   // Plus la portion est sous la part équitable, mieux c'est (aide à tenir le budget).
   const budgetScore = fairShare > 0 ? Math.max(0, Math.min(1, 1 - costPerServing / fairShare)) : 0;
   const timeScore = recipe.prepMinutes <= 25 ? 1 : 0;
-  const varietyScore = 0.5; // historique -> V2
+  // Sans seed : score de variété neutre (comportement historique conservé).
+  // Avec seed : bruit déterministe qui rebrasse les recettes ~équivalentes.
+  const varietyScore = request.seed ? hashNoise(recipe.id, request.seed) : 0.5;
 
   return (
     WEIGHTS.type * typeScore +

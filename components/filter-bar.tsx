@@ -8,7 +8,7 @@ import { MEAL_TYPE_LABELS } from "@/lib/labels";
 import { Button } from "@/components/ui/button";
 import { cn, formatEuro } from "@/lib/utils";
 
-const TYPES: MealType[] = ["rapide", "sain", "leger", "proteine"];
+const TYPES: MealType[] = ["rapide", "sain", "leger", "proteine", "famille", "gourmand", "monde"];
 
 // FilterSheet simplifié (§3) : les seuls arbitrages de la semaine = type + budget.
 // « Appliquer » régénère la sélection (on retire le param `meals` de l'URL).
@@ -75,8 +75,8 @@ export function FilterBar({
         <input
           id="budget"
           type="range"
-          min={30}
-          max={150}
+          min={25}
+          max={120}
           step={5}
           value={budget}
           onChange={(e) => setBudget(Number(e.target.value))}

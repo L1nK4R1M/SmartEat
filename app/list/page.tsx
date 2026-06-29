@@ -6,6 +6,8 @@ import { getPrefs, parseMealIds } from "@/lib/prefs";
 import { buildShoppingList } from "@/lib/shopping-list";
 import { CopyListButton } from "@/components/copy-list-button";
 import { BrandLogo } from "@/components/brand-logo";
+import { ShoppingSections } from "@/components/shopping-sections";
+import { CountUpEuro } from "@/components/ui/count-up";
 import { formatEuro, formatQty } from "@/lib/utils";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -67,44 +69,8 @@ export default async function ListPage({
         </div>
       </header>
 
-      {/* Liste de courses (produits entiers) */}
-      <div className="space-y-5">
-        {list.sections.map((section) => (
-          <section key={section.aisle}>
-            <div className="mb-2 flex items-baseline justify-between">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-on-surface-muted">
-                {section.label}
-              </h2>
-              <span className="tnum text-xs text-on-surface-muted">
-                {formatEuro(section.subtotal)}
-              </span>
-            </div>
-            <ul className="overflow-hidden rounded-[var(--radius-card)] border border-outline bg-surface">
-              {section.lines.map((line) => (
-                <li
-                  key={line.ingredient.id}
-                  className="flex items-center justify-between gap-3 border-b border-outline px-4 py-3 last:border-b-0"
-                >
-                  <div className="min-w-0">
-                    <span className="block truncate font-medium">{line.ingredient.name}</span>
-                    <span className="block text-xs text-on-surface-muted">
-                      besoin {formatQty(line.neededQty, line.ingredient.baseUnit)}
-                    </span>
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <span className="block text-sm font-medium">
-                      {line.packs} × {line.ingredient.packLabel}
-                    </span>
-                    <span className="tnum block text-xs text-on-surface-muted">
-                      {formatEuro(line.cost)}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
-      </div>
+      {/* Liste de courses (produits entiers) — sections révélées en cascade */}
+      <ShoppingSections sections={list.sections} />
 
       {/* Recettes de la semaine avec toutes les étapes */}
       <section className="mt-8">
@@ -157,7 +123,7 @@ export default async function ListPage({
         <div className="mx-auto max-w-md border-t border-outline bg-background/80 p-5 backdrop-blur">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-on-surface-muted">Total estimé · produits entiers</span>
-            <span className="tnum text-xl font-bold">{formatEuro(list.total)}</span>
+            <CountUpEuro value={list.total} className="tnum text-xl font-bold" />
           </div>
           <CopyListButton text={plainText} />
         </div>
