@@ -3,8 +3,11 @@ import type { Ingredient, Recipe, Store } from "./types";
 // Prix calculé depuis les ingrédients au profil de prix du magasin choisi.
 // "Le prix DOIT correspondre au prix des aliments" -> une seule source de vérité.
 
+// Prix INDICATIF par unité de base = prix du paquet / contenance, × profil magasin.
+// Sert au coût "par portion" affiché sur les cartes et au scoring. Le coût RÉEL
+// du panier (au produit entier, dédoublonné) est calculé dans lib/shopping-list.ts.
 export function ingredientUnitPrice(ingredient: Ingredient, store: Store): number {
-  return ingredient.refPrice * store.priceFactor;
+  return (ingredient.packPrice / ingredient.packSize) * store.priceFactor;
 }
 
 // Coût d'une portion d'une recette dans un magasin donné.

@@ -35,6 +35,10 @@ export const repo = {
     return new Map(INGREDIENTS.map((i) => [i.id, i]));
   },
 
+  async getRecipe(id: string): Promise<Recipe | undefined> {
+    return RECIPES.find((r) => r.id === id);
+  },
+
   async getRecipesByIds(ids: string[]): Promise<Recipe[]> {
     const set = new Set(ids);
     // Conserve l'ordre demandé (important pour une sélection stable).

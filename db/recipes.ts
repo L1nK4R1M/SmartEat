@@ -1,8 +1,8 @@
 import type { Recipe } from "@/lib/types";
 
-// Catalogue curaté (FR/BE). Le moteur de matching y "cherche" les recettes
-// adaptées (régime + équipement + type), une par jour. Pas de prix stocké :
-// le coût est calculé depuis les ingrédients au prix du magasin (lib/pricing.ts).
+// Catalogue curaté (FR/BE). Le moteur "cherche" les recettes adaptées (régime +
+// équipement + type), une par jour. Pas de prix stocké : calculé depuis les
+// ingrédients au prix du magasin (lib/pricing.ts). Chaque recette a ses étapes.
 //
 // Rappel capacités : four=roast,bake,gratin,heat · airfryer=roast,fry,heat
 //                    poele=fry,sear,simmer,heat · micro=heat,reheat,steam
@@ -18,6 +18,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "olive_oil", qtyPerServing: 10, unit: "ml" },
       { ingredientId: "garlic", qtyPerServing: 1, unit: "piece" },
     ],
+    steps: [
+      "Préchauffer le four (ou l'Air Fryer) à 200°C.",
+      "Couper pommes de terre et carottes en morceaux, émincer l'ail.",
+      "Mélanger les légumes et le poulet avec l'huile d'olive, saler et poivrer.",
+      "Enfourner 30 min en remuant à mi-cuisson, jusqu'à ce que le poulet soit doré.",
+    ],
   },
   {
     id: "r02", title: "Saumon vapeur express", emoji: "🐟",
@@ -28,6 +34,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "broccoli", qtyPerServing: 200, unit: "g" },
       { ingredientId: "lemon", qtyPerServing: 0.5, unit: "piece" },
       { ingredientId: "olive_oil", qtyPerServing: 5, unit: "ml" },
+    ],
+    steps: [
+      "Détailler le brocoli en bouquets.",
+      "Déposer saumon et brocoli dans un plat adapté au micro-ondes avec un filet d'eau.",
+      "Couvrir et cuire 6 à 8 min à pleine puissance.",
+      "Arroser de jus de citron et d'huile d'olive avant de servir.",
     ],
   },
   {
@@ -42,6 +54,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "curry_paste", qtyPerServing: 20, unit: "g" },
       { ingredientId: "rice", qtyPerServing: 80, unit: "g" },
     ],
+    steps: [
+      "Faire revenir l'oignon émincé dans un peu d'huile.",
+      "Ajouter la pâte de curry, puis les pois chiches égouttés et les tomates.",
+      "Verser le lait de coco et laisser mijoter 15 min.",
+      "Servir avec le riz cuit à l'eau.",
+    ],
   },
   {
     id: "r04", title: "Pâtes bolognaise", emoji: "🍝",
@@ -53,6 +71,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "tomato_canned", qtyPerServing: 150, unit: "g" },
       { ingredientId: "onion", qtyPerServing: 50, unit: "g" },
       { ingredientId: "olive_oil", qtyPerServing: 10, unit: "ml" },
+    ],
+    steps: [
+      "Faire revenir l'oignon, ajouter le bœuf haché et le saisir.",
+      "Ajouter les tomates concassées et laisser mijoter 20 min.",
+      "Cuire les pâtes al dente dans l'eau bouillante salée.",
+      "Mélanger pâtes et sauce, puis servir.",
     ],
   },
   {
@@ -67,6 +91,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "olive_oil", qtyPerServing: 10, unit: "ml" },
       { ingredientId: "lemon", qtyPerServing: 0.5, unit: "piece" },
     ],
+    steps: [
+      "Cuire le quinoa 12 min à l'eau bouillante, puis égoutter.",
+      "Égoutter les pois chiches, couper le poivron.",
+      "Disposer quinoa, pois chiches, épinards et poivron dans un bol.",
+      "Assaisonner d'huile d'olive et de jus de citron.",
+    ],
   },
   {
     id: "r06", title: "Gratin de courgettes", emoji: "🧀",
@@ -78,6 +108,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "cream", qtyPerServing: 50, unit: "ml" },
       { ingredientId: "eggs", qtyPerServing: 1, unit: "piece" },
       { ingredientId: "garlic", qtyPerServing: 1, unit: "piece" },
+    ],
+    steps: [
+      "Préchauffer le four à 190°C.",
+      "Émincer les courgettes et l'ail, disposer dans un plat.",
+      "Battre l'œuf avec la crème, verser sur les courgettes et couvrir de fromage.",
+      "Enfourner 30 min jusqu'à ce que le gratin soit doré.",
     ],
   },
   {
@@ -91,6 +127,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "onion", qtyPerServing: 40, unit: "g" },
       { ingredientId: "olive_oil", qtyPerServing: 5, unit: "ml" },
     ],
+    steps: [
+      "Couper le poulet en lamelles, émincer poivron et oignon.",
+      "Poêler le poulet à l'huile jusqu'à coloration, ajouter les légumes.",
+      "Garnir la galette de la préparation.",
+      "Rouler le wrap et le saisir 1 min de chaque côté.",
+    ],
   },
   {
     id: "r08", title: "Omelette express", emoji: "🍳",
@@ -101,6 +143,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "mushroom", qtyPerServing: 50, unit: "g" },
       { ingredientId: "spinach", qtyPerServing: 30, unit: "g" },
       { ingredientId: "olive_oil", qtyPerServing: 5, unit: "ml" },
+    ],
+    steps: [
+      "Battre les œufs, saler et poivrer.",
+      "Faire suer champignons et épinards à l'huile.",
+      "Verser les œufs et cuire à feu moyen.",
+      "Plier l'omelette et servir.",
     ],
   },
   {
@@ -115,6 +163,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "curry_paste", qtyPerServing: 15, unit: "g" },
       { ingredientId: "rice", qtyPerServing: 70, unit: "g" },
     ],
+    steps: [
+      "Faire revenir l'oignon, ajouter la pâte de curry.",
+      "Ajouter lentilles, tomates et lait de coco.",
+      "Mijoter 18 à 20 min jusqu'à ce que les lentilles soient fondantes.",
+      "Servir avec le riz.",
+    ],
   },
   {
     id: "r10", title: "Patates douces rôties & tofu", emoji: "🍠",
@@ -127,6 +181,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "olive_oil", qtyPerServing: 10, unit: "ml" },
       { ingredientId: "soy_sauce", qtyPerServing: 10, unit: "ml" },
     ],
+    steps: [
+      "Préchauffer le four ou l'Air Fryer à 200°C.",
+      "Couper patates douces et tofu en cubes, arroser d'huile et de sauce soja.",
+      "Rôtir 25 à 30 min en remuant.",
+      "Ajouter le brocoli vapeur et servir.",
+    ],
   },
   {
     id: "r11", title: "Steak haché & poêlée", emoji: "🥩",
@@ -136,6 +196,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "beef", qtyPerServing: 150, unit: "g" },
       { ingredientId: "frozen_veg", qtyPerServing: 200, unit: "g" },
       { ingredientId: "olive_oil", qtyPerServing: 5, unit: "ml" },
+    ],
+    steps: [
+      "Saisir les steaks hachés à la poêle 2 à 3 min par face.",
+      "Dans une autre poêle, faire revenir la poêlée de légumes à l'huile.",
+      "Saler et poivrer.",
+      "Dresser et servir.",
     ],
   },
   {
@@ -149,6 +215,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "garlic", qtyPerServing: 1, unit: "piece" },
       { ingredientId: "olive_oil", qtyPerServing: 8, unit: "ml" },
     ],
+    steps: [
+      "Cuire le riz et le laisser tiédir.",
+      "Faire sauter l'ail et les légumes surgelés à l'huile.",
+      "Ajouter le riz et la sauce soja, sauter 5 min à feu vif.",
+      "Servir bien chaud.",
+    ],
   },
   {
     id: "r13", title: "Saumon rôti & quinoa", emoji: "🐟",
@@ -160,6 +232,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "zucchini", qtyPerServing: 100, unit: "g" },
       { ingredientId: "lemon", qtyPerServing: 0.5, unit: "piece" },
       { ingredientId: "olive_oil", qtyPerServing: 8, unit: "ml" },
+    ],
+    steps: [
+      "Préchauffer le four à 200°C.",
+      "Déposer le saumon et les courgettes, arroser d'huile et de citron.",
+      "Rôtir 15 à 18 min.",
+      "Servir avec le quinoa cuit.",
     ],
   },
   {
@@ -173,6 +251,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "garlic", qtyPerServing: 1, unit: "piece" },
       { ingredientId: "olive_oil", qtyPerServing: 10, unit: "ml" },
     ],
+    steps: [
+      "Cuire les pâtes sans gluten selon le paquet.",
+      "Faire revenir l'ail et les courgettes, ajouter les tomates.",
+      "Mijoter 10 min.",
+      "Mélanger avec les pâtes et servir.",
+    ],
   },
   {
     id: "r15", title: "Bowl poulet & riz (meal prep)", emoji: "🍗",
@@ -185,6 +269,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "carrot", qtyPerServing: 80, unit: "g" },
       { ingredientId: "soy_sauce", qtyPerServing: 10, unit: "ml" },
     ],
+    steps: [
+      "Préchauffer le four ou l'Air Fryer à 200°C.",
+      "Rôtir le poulet avec un filet d'huile 20 à 25 min.",
+      "Cuire le riz ; faire le brocoli et les carottes vapeur.",
+      "Assembler le bowl et napper de sauce soja.",
+    ],
   },
   {
     id: "r16", title: "Soupe de légumes maison", emoji: "🥣",
@@ -196,6 +286,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "onion", qtyPerServing: 60, unit: "g" },
       { ingredientId: "zucchini", qtyPerServing: 80, unit: "g" },
       { ingredientId: "olive_oil", qtyPerServing: 8, unit: "ml" },
+    ],
+    steps: [
+      "Éplucher et couper tous les légumes.",
+      "Faire suer l'oignon à l'huile, ajouter les légumes et couvrir d'eau.",
+      "Mijoter 25 min.",
+      "Mixer et assaisonner.",
     ],
   },
   {
@@ -210,6 +306,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "curry_paste", qtyPerServing: 20, unit: "g" },
       { ingredientId: "garlic", qtyPerServing: 1, unit: "piece" },
     ],
+    steps: [
+      "Mélanger yaourt, pâte de curry et ail ; y faire mariner le poulet 10 min.",
+      "Préchauffer le four à 210°C.",
+      "Rôtir le poulet 20 à 25 min.",
+      "Servir avec le riz et l'oignon émincé.",
+    ],
   },
   {
     id: "r18", title: "Chili sin carne", emoji: "🌶️",
@@ -223,6 +325,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "rice", qtyPerServing: 80, unit: "g" },
       { ingredientId: "garlic", qtyPerServing: 1, unit: "piece" },
     ],
+    steps: [
+      "Faire revenir oignon, poivron et ail.",
+      "Ajouter haricots rouges et tomates, épicer.",
+      "Mijoter 20 min.",
+      "Servir avec le riz.",
+    ],
   },
   {
     id: "r19", title: "Saumon teriyaki & nouilles", emoji: "🍜",
@@ -234,6 +342,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "soy_sauce", qtyPerServing: 20, unit: "ml" },
       { ingredientId: "broccoli", qtyPerServing: 100, unit: "g" },
       { ingredientId: "ginger", qtyPerServing: 10, unit: "g" },
+    ],
+    steps: [
+      "Saisir le saumon à la poêle, ajouter sauce soja et gingembre pour glacer.",
+      "Cuire les nouilles.",
+      "Faire sauter le brocoli.",
+      "Mélanger nouilles, brocoli et saumon.",
     ],
   },
   {
@@ -248,6 +362,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "tomato_canned", qtyPerServing: 80, unit: "g" },
       { ingredientId: "onion", qtyPerServing: 50, unit: "g" },
     ],
+    steps: [
+      "Faire revenir oignon, carottes et courgettes.",
+      "Ajouter pois chiches et tomates, mijoter 15 min.",
+      "Préparer la semoule (eau bouillante, couvrir 5 min).",
+      "Servir le bouillon de légumes sur la semoule.",
+    ],
   },
   {
     id: "r21", title: "Œufs brouillés & toast avocat", emoji: "🥑",
@@ -258,6 +378,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "avocado", qtyPerServing: 0.5, unit: "piece" },
       { ingredientId: "bread", qtyPerServing: 1, unit: "piece" },
       { ingredientId: "olive_oil", qtyPerServing: 5, unit: "ml" },
+    ],
+    steps: [
+      "Toaster le pain et écraser l'avocat dessus.",
+      "Battre les œufs.",
+      "Cuire les œufs brouillés à feu doux avec un peu d'huile.",
+      "Servir sur le toast.",
     ],
   },
   {
@@ -272,6 +398,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "olive_oil", qtyPerServing: 10, unit: "ml" },
       { ingredientId: "lemon", qtyPerServing: 0.5, unit: "piece" },
     ],
+    steps: [
+      "Préchauffer le four à 200°C.",
+      "Rôtir pois chiches et patate douce en cubes 25 min.",
+      "Préparer épinards et concombre.",
+      "Assembler le bol, arroser d'huile et de citron.",
+    ],
   },
   {
     id: "r23", title: "Gratin de chou-fleur", emoji: "🧀",
@@ -283,6 +415,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "cream", qtyPerServing: 60, unit: "ml" },
       { ingredientId: "garlic", qtyPerServing: 1, unit: "piece" },
     ],
+    steps: [
+      "Préchauffer le four à 190°C.",
+      "Cuire le chou-fleur 8 min à l'eau, puis égoutter.",
+      "Disposer dans un plat, napper de crème et d'ail, couvrir de fromage.",
+      "Gratiner 20 min.",
+    ],
   },
   {
     id: "r24", title: "Pâtes pesto & tomates cerises", emoji: "🍝",
@@ -293,6 +431,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "pesto", qtyPerServing: 30, unit: "g" },
       { ingredientId: "cherry_tomato", qtyPerServing: 100, unit: "g" },
       { ingredientId: "parmesan", qtyPerServing: 15, unit: "g" },
+    ],
+    steps: [
+      "Cuire les pâtes al dente.",
+      "Couper les tomates cerises en deux.",
+      "Mélanger pâtes, pesto et tomates.",
+      "Parsemer de parmesan.",
     ],
   },
   {
@@ -306,6 +450,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "olive_oil", qtyPerServing: 8, unit: "ml" },
       { ingredientId: "garlic", qtyPerServing: 1, unit: "piece" },
     ],
+    steps: [
+      "Préchauffer le four à 200°C.",
+      "Déposer cabillaud, courgettes et tomates cerises, ajouter ail et huile.",
+      "Rôtir 15 à 18 min.",
+      "Servir.",
+    ],
   },
   {
     id: "r26", title: "Wok de tofu & légumes", emoji: "🥡",
@@ -318,6 +468,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "ginger", qtyPerServing: 10, unit: "g" },
       { ingredientId: "rice", qtyPerServing: 80, unit: "g" },
     ],
+    steps: [
+      "Couper le tofu en cubes et le saisir au wok.",
+      "Ajouter les légumes et le gingembre, sauter à feu vif.",
+      "Déglacer à la sauce soja.",
+      "Servir avec le riz.",
+    ],
   },
   {
     id: "r27", title: "Tortilla de pommes de terre", emoji: "🍳",
@@ -328,6 +484,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "potato", qtyPerServing: 200, unit: "g" },
       { ingredientId: "onion", qtyPerServing: 60, unit: "g" },
       { ingredientId: "olive_oil", qtyPerServing: 10, unit: "ml" },
+    ],
+    steps: [
+      "Émincer pommes de terre et oignon, cuire doucement à l'huile.",
+      "Battre les œufs et y mélanger les pommes de terre.",
+      "Cuire la tortilla à la poêle 5 min par face.",
+      "Laisser tiédir et couper en parts.",
     ],
   },
   {
@@ -341,6 +503,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "tomato_canned", qtyPerServing: 80, unit: "g" },
       { ingredientId: "garlic", qtyPerServing: 1, unit: "piece" },
     ],
+    steps: [
+      "Faire revenir oignon, carottes et ail.",
+      "Ajouter lentilles et tomates, couvrir d'eau.",
+      "Mijoter 20 à 25 min.",
+      "Mixer partiellement et assaisonner.",
+    ],
   },
   {
     id: "r29", title: "Burger maison & potatoes", emoji: "🍔",
@@ -353,6 +521,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "potato", qtyPerServing: 200, unit: "g" },
       { ingredientId: "tomato", qtyPerServing: 50, unit: "g" },
     ],
+    steps: [
+      "Préchauffer le four à 200°C et rôtir les pommes de terre en quartiers 30 min.",
+      "Former et saisir les steaks hachés.",
+      "Toaster le pain, ajouter steak, fromage et tomate.",
+      "Servir avec les potatoes.",
+    ],
   },
   {
     id: "r30", title: "Curry de légumes & riz", emoji: "🍛",
@@ -364,6 +538,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "curry_paste", qtyPerServing: 20, unit: "g" },
       { ingredientId: "rice", qtyPerServing: 90, unit: "g" },
       { ingredientId: "onion", qtyPerServing: 50, unit: "g" },
+    ],
+    steps: [
+      "Faire revenir l'oignon et ajouter la pâte de curry.",
+      "Ajouter les légumes et le lait de coco.",
+      "Mijoter 18 min.",
+      "Servir avec le riz.",
     ],
   },
   {
@@ -378,6 +558,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "olive_oil", qtyPerServing: 10, unit: "ml" },
       { ingredientId: "lemon", qtyPerServing: 0.5, unit: "piece" },
     ],
+    steps: [
+      "Cuire le quinoa et le laisser refroidir.",
+      "Couper concombre, tomates cerises et feta.",
+      "Mélanger le tout.",
+      "Assaisonner d'huile et de citron.",
+    ],
   },
   {
     id: "r32", title: "Porridge protéiné", emoji: "🥣",
@@ -387,6 +573,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "oats", qtyPerServing: 80, unit: "g" },
       { ingredientId: "peanut_butter", qtyPerServing: 20, unit: "g" },
       { ingredientId: "honey", qtyPerServing: 15, unit: "g" },
+    ],
+    steps: [
+      "Chauffer les flocons d'avoine avec de l'eau ou du lait 3 min.",
+      "Incorporer le beurre de cacahuète.",
+      "Napper de miel.",
+      "Servir chaud.",
     ],
   },
   {
@@ -400,6 +592,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "green_beans", qtyPerServing: 100, unit: "g" },
       { ingredientId: "olive_oil", qtyPerServing: 8, unit: "ml" },
     ],
+    steps: [
+      "Cuire le riz.",
+      "Saisir l'ail et les crevettes à l'huile 3 à 4 min.",
+      "Ajouter les haricots verts.",
+      "Servir sur le riz.",
+    ],
   },
   {
     id: "r34", title: "Aubergines rôties & boulgour", emoji: "🍆",
@@ -411,6 +609,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "tomato", qtyPerServing: 80, unit: "g" },
       { ingredientId: "onion", qtyPerServing: 50, unit: "g" },
       { ingredientId: "olive_oil", qtyPerServing: 10, unit: "ml" },
+    ],
+    steps: [
+      "Préchauffer le four à 200°C.",
+      "Couper les aubergines, arroser d'huile et rôtir 25 min.",
+      "Cuire le boulgour ; faire revenir oignon et tomate.",
+      "Assembler et servir.",
     ],
   },
   {
@@ -424,6 +628,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "onion", qtyPerServing: 40, unit: "g" },
       { ingredientId: "olive_oil", qtyPerServing: 8, unit: "ml" },
     ],
+    steps: [
+      "Cuire les pâtes.",
+      "Faire revenir l'oignon, ajouter tomates et thon égoutté.",
+      "Mijoter 8 min.",
+      "Mélanger avec les pâtes.",
+    ],
   },
   {
     id: "r36", title: "Dinde grillée & purée patate douce", emoji: "🦃",
@@ -434,6 +644,12 @@ export const RECIPES: Recipe[] = [
       { ingredientId: "sweet_potato", qtyPerServing: 200, unit: "g" },
       { ingredientId: "green_beans", qtyPerServing: 100, unit: "g" },
       { ingredientId: "olive_oil", qtyPerServing: 8, unit: "ml" },
+    ],
+    steps: [
+      "Cuire les patates douces à l'eau et les écraser en purée.",
+      "Saisir les escalopes de dinde à la poêle.",
+      "Faire les haricots verts vapeur.",
+      "Dresser et servir.",
     ],
   },
 ];

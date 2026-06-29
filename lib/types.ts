@@ -35,7 +35,10 @@ export interface Ingredient {
   name: string;
   aisle: Aisle;
   baseUnit: Unit;
-  refPrice: number; // € par baseUnit
+  // On achète le PRODUIT ENTIER (conditionnement), pas une fraction de portion.
+  packSize: number; // contenance d'un conditionnement, en baseUnit
+  packLabel: string; // libellé du conditionnement, ex "1 kg", "boîte 400 g", "x6"
+  packPrice: number; // prix moyen du conditionnement (€, vérifié/estimé sur le marché FR/BE)
 }
 
 export interface RecipeIngredient {
@@ -56,6 +59,7 @@ export interface Recipe {
   // Le prix N'EST PLUS stocké : il est calculé depuis les ingrédients au prix du
   // magasin choisi (voir lib/pricing.ts). Garantit "prix = coût réel du panier".
   ingredients: RecipeIngredient[];
+  steps: string[]; // étapes de préparation (recette consultable)
 }
 
 export type StoreKind = "hyper" | "super" | "proxi" | "discount" | "bio" | "surgele";
