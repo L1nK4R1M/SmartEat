@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/* Design tokens — voir docs/CAHIER_DES_CHARGES.md §3 (UX/UI Guidelines).
+   On mappe les tokens Tailwind v4 vers des variables CSS surchargées en dark. */
+@theme inline {
+  --color-background: var(--background);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-surface: var(--surface);
+  --color-surface-variant: var(--surface-variant);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-muted: var(--on-surface-muted);
+  --color-outline: var(--outline);
+  --color-accent: var(--accent);
+  --color-error: var(--error);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 1rem;
+}
+
+:root {
+  --primary: #16a34a;
+  --on-primary: #ffffff;
+  --surface: #ffffff;
+  --surface-variant: #f1f5f3;
+  --on-surface: #0f172a;
+  --on-surface-muted: #5b6b66;
+  --outline: #d6dedb;
+  --accent: #f59e0b;
+  --error: #dc2626;
+  --background: #f7faf9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #22c55e;
+    --on-primary: #062b12;
+    --surface: #0b0f0e;
+    --surface-variant: #1a211f;
+    --on-surface: #e7ecea;
+    --on-surface-muted: #9aa8a3;
+    --outline: #2a332f;
+    --accent: #fbbf24;
+    --error: #f87171;
+    --background: #060908;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Chiffres tabulaires pour prix & quantités (§3 typographie). */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
