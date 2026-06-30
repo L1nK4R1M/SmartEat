@@ -1,6 +1,6 @@
 import type { GenerationRequest, Ingredient, MealSlot, Recipe, Store, UserPrefs } from "./types";
 import { userCapabilities } from "./capabilities";
-import { PROTEIN_MIN } from "./labels";
+import { MEAL_SLOT_ORDER, PROTEIN_MIN } from "./labels";
 import { recipeCostPerServing } from "./pricing";
 import { buildShoppingList } from "./shopping-list";
 
@@ -11,9 +11,12 @@ import { buildShoppingList } from "./shopping-list";
 
 const DEFAULT_SLOTS: MealSlot[] = ["dejeuner", "diner"];
 
-// Moments effectivement demandés (repli midi + soir si rien n'est précisé).
-function requestedSlots(prefs: UserPrefs): MealSlot[] {
-  return prefs.mealSlots?.length ? prefs.mealSlots : DEFAULT_SLOTS;
+// Moments demandés, TRIÉS dans l'ordre canonique (matin -> soir). L'ordre fixe
+// garantit que le petit-déj n'est pas affamé par l'ordre de sélection : il passe
+// en premier au tourniquet du plan. Repli midi + soir si rien n'est précisé.
+export function requestedSlots(prefs: UserPrefs): MealSlot[] {
+  const sel = prefs.mealSlots?.length ? prefs.mealSlots : DEFAULT_SLOTS;
+  return MEAL_SLOT_ORDER.filter((s) => sel.includes(s));
 }
 
 // Moment d'affichage d'une recette = premier moment demandé qu'elle couvre.
