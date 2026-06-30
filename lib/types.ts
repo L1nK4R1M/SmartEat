@@ -112,6 +112,7 @@ export interface UserPrefs {
   mealsPerWeek: number;
   budget: number; // budget hebdo par défaut (€)
   ambiance: MealType[]; // ambiances préférées (envies par défaut)
+  excludedIngredients?: string[]; // allergènes / aliments à éviter (ids d'ingrédients)
 }
 
 // Arbitrages ponctuels demandés à chaque génération (§1).

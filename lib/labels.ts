@@ -55,6 +55,25 @@ export const AMBIANCES: AmbianceConfig[] = [
   { type: "monde", label: "Saveurs du monde", emoji: "🌍", tint: "bg-violet-50 border-violet-100", tintActive: "bg-violet-100 border-violet-300 ring-violet-300" },
 ];
 
+// Allergènes / aliments à éviter proposés à l'onboarding. Chaque groupe mappe
+// vers des ids d'ingrédients du catalogue ; sélectionner exclut ces ingrédients.
+export interface ExclusionConfig {
+  key: string;
+  label: string;
+  emoji: string;
+  ingredientIds: string[];
+}
+
+export const EXCLUSIONS: ExclusionConfig[] = [
+  { key: "arachide", label: "Arachide", emoji: "🥜", ingredientIds: ["peanut_butter"] },
+  { key: "poisson", label: "Poisson", emoji: "🐟", ingredientIds: ["salmon", "cod", "tuna_canned"] },
+  { key: "crustaces", label: "Crustacés", emoji: "🦐", ingredientIds: ["shrimp"] },
+  { key: "oeufs", label: "Œufs", emoji: "🥚", ingredientIds: ["eggs"] },
+  { key: "champignons", label: "Champignons", emoji: "🍄", ingredientIds: ["mushroom"] },
+  { key: "soja", label: "Soja", emoji: "🫛", ingredientIds: ["tofu", "soy_sauce"] },
+  { key: "boeuf", label: "Bœuf", emoji: "🥩", ingredientIds: ["beef", "beef_steak"] },
+];
+
 export const AISLE_LABELS: Record<Aisle, { label: string; order: number }> = {
   fruits_legumes: { label: "Fruits & Légumes", order: 1 },
   boucherie: { label: "Boucherie / Poissonnerie", order: 2 },

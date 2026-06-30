@@ -51,6 +51,7 @@ export default async function RecipePage({
       <div className="relative">
         <RecipeImage
           src={recipe.imageUrl}
+          query={recipe.title}
           emoji={recipe.emoji}
           seed={recipe.id}
           alt={recipe.title}

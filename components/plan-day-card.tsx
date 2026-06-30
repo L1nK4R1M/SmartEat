@@ -49,6 +49,7 @@ export function PlanDayCard({
       <Link href={`/recipe/${recipe.id}`} className="flex min-w-0 flex-1 items-center gap-3 p-3 pr-11">
         <RecipeImage
           src={recipe.imageUrl}
+          query={recipe.title}
           emoji={recipe.emoji}
           seed={recipe.id}
           alt={recipe.title}

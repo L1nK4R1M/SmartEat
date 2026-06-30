@@ -140,6 +140,7 @@ export function Landing({
               <div className="overflow-hidden rounded-2xl border border-outline bg-surface">
                 <RecipeImage
                   src={r.imageUrl}
+                  query={r.title}
                   emoji={r.emoji}
                   seed={r.id}
                   alt={r.title}
