@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { AlertTriangle, ChevronRight, RotateCcw, ShoppingCart } from "lucide-react";
+import { AlertTriangle, ChevronLeft, ChevronRight, RotateCcw, ShoppingCart } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { CountUpEuro } from "@/components/ui/count-up";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -23,6 +23,8 @@ export interface PlanViewData {
   withinBudget: boolean;
   regenerateHref: string;
   listHref: string;
+  homeHref: string;
+  homeLabel: string;
 }
 
 export function PlanView(data: PlanViewData) {
@@ -30,6 +32,14 @@ export function PlanView(data: PlanViewData) {
 
   return (
     <div className="mx-auto w-full max-w-md px-5 pb-32 pt-6">
+      {/* Navigation : retour au compte (connecté) ou à l'accueil (invité) */}
+      <Link
+        href={data.homeHref}
+        className="mb-3 inline-flex items-center gap-1 text-sm text-on-surface-muted hover:text-on-surface"
+      >
+        <ChevronLeft size={16} /> {data.homeLabel}
+      </Link>
+
       {/* En-tête : titre + badge magasin */}
       <motion.header
         initial={{ opacity: 0, y: 12 }}

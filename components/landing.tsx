@@ -8,7 +8,9 @@ import { MEAL_TYPE_LABELS } from "@/lib/labels";
 import { buttonClasses } from "@/components/ui/button";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
 import { RecipeImage } from "@/components/recipe-image";
+import { PrefsSummary } from "@/components/prefs-summary";
 import { Badge } from "@/components/ui/badge";
+import type { PrefsSummary as Summary } from "@/lib/summary";
 import { formatEuro } from "@/lib/utils";
 
 export interface ShowcaseRecipe {
@@ -42,9 +44,11 @@ const STEPS = [
 export function Landing({
   hasPrefs,
   showcase,
+  summary,
 }: {
   hasPrefs: boolean;
   showcase: ShowcaseRecipe[];
+  summary?: Summary | null;
 }) {
   return (
     <main className="mx-auto w-full max-w-md px-6 pb-28">
@@ -112,6 +116,24 @@ export function Landing({
         <span className="font-semibold text-on-surface">+1000 foyers</span> cuisinent déjà sans se
         poser la question
       </Reveal>
+
+      {/* Récap pour un utilisateur qui revient : ses choix + accès au menu */}
+      {summary && (
+        <Reveal className="mt-8">
+          <div className="rounded-[var(--radius-card)] border border-primary/30 bg-primary/5 p-4">
+            <p className="mb-3 font-semibold">👋 Content de te revoir ! Voici tes choix.</p>
+            <PrefsSummary summary={summary} />
+            <div className="mt-4 grid gap-2">
+              <Link href="/plan" className={`${buttonClasses("primary", "md")} w-full`}>
+                Voir mon menu
+              </Link>
+              <Link href="/onboarding" className={`${buttonClasses("ghost", "md")} w-full`}>
+                Modifier mes préférences
+              </Link>
+            </div>
+          </div>
+        </Reveal>
+      )}
 
       {/* ---------- COMMENT ÇA MARCHE ---------- */}
       <section className="mt-12">
