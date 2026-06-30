@@ -111,10 +111,10 @@ export function Landing({
         </motion.div>
       </motion.section>
 
-      {/* preuve sociale */}
-      <Reveal className="mt-6 flex items-center justify-center gap-2 text-sm text-on-surface-muted">
-        <span className="font-semibold text-on-surface">+1000 foyers</span> cuisinent déjà sans se
-        poser la question
+      {/* Note honnête : appli perso, gratuite, sans pub */}
+      <Reveal className="mt-6 text-center text-sm text-on-surface-muted">
+        Une petite appli faite maison — <span className="font-medium text-on-surface">gratuite</span>{" "}
+        et sans pub.
       </Reveal>
 
       {/* Récap pour un utilisateur qui revient : ses choix + accès au menu */}

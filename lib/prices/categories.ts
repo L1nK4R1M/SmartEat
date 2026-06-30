@@ -41,4 +41,8 @@ export const PRICE_CATEGORIES: Record<string, PriceCategory> = {
   mushroom: { tag: "en:mushrooms", per: "kg" },
   tomato: { tag: "en:tomatoes", per: "kg" },
   green_beans: { tag: "en:green-beans", per: "kg" },
+  milk: { tag: "en:milks", per: "l" },
+  berries: { tag: "en:frozen-red-berries", per: "kg" },
+  // NB : pas d'ingrédient en "piece" ici (banane, œufs…) : le prix Open Prices
+  // est au kg/L et serait mal interprété sur une unité "pièce".
 };

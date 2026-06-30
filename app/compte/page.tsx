@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronLeft, LogOut, Pencil, UtensilsCrossed } from "lucide-react";
+import { ChevronLeft, ListChecks, LogOut, Pencil, UtensilsCrossed } from "lucide-react";
 import { getPrefs } from "@/lib/prefs";
 import { getCurrentUser } from "@/lib/supabase/server";
 import { repo } from "@/lib/repo";
@@ -49,6 +49,9 @@ export default async function ComptePage() {
             </Link>
             <Link href="/onboarding" className={`${buttonClasses("secondary", "md")} w-full`}>
               <Pencil size={16} /> Modifier mes préférences
+            </Link>
+            <Link href="/listes" className={`${buttonClasses("ghost", "md")} w-full`}>
+              <ListChecks size={16} /> Mes listes de courses
             </Link>
           </div>
         </>

@@ -9,6 +9,7 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { Stagger, StaggerItem } from "@/components/ui/motion";
 import { PlanDayCard, type PlanCardRecipe } from "@/components/plan-day-card";
 import { buttonClasses } from "@/components/ui/button";
+import { MEAL_SLOT_LABELS, MEAL_SLOT_ORDER } from "@/lib/labels";
 import { formatEuro } from "@/lib/utils";
 
 export interface PlanViewData {
@@ -31,6 +32,14 @@ export interface PlanViewData {
 
 export function PlanView(data: PlanViewData) {
   const over = data.total > data.budget + 0.001;
+
+  // Regroupement par moment de la journée (matin -> soir). En-têtes seulement
+  // si plusieurs moments sont planifiés.
+  const groups = MEAL_SLOT_ORDER.map((slot) => ({
+    slot,
+    items: data.recipes.filter((r) => r.slot === slot),
+  })).filter((g) => g.items.length > 0);
+  const showSlotHeaders = groups.length > 1;
 
   return (
     <div className="mx-auto w-full max-w-md px-5 pb-32 pt-6">
@@ -149,20 +158,32 @@ export function PlanView(data: PlanViewData) {
             </div>
           )}
 
-          {/* Cartes jour en cascade */}
-          <Stagger className="mt-5 space-y-3">
-            {data.recipes.map((r, i) => (
-              <StaggerItem key={r.id}>
-                <PlanDayCard
-                  recipe={r}
-                  dayIndex={i}
-                  householdSize={data.householdSize}
-                  mealCost={r.mealCost}
-                  swapHref={r.swapHref}
-                />
-              </StaggerItem>
+          {/* Repas, regroupés par moment de la journée */}
+          <div className="mt-5 space-y-6">
+            {groups.map((g) => (
+              <section key={g.slot}>
+                {showSlotHeaders && (
+                  <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-on-surface-muted">
+                    <span aria-hidden>{MEAL_SLOT_LABELS[g.slot].emoji}</span>
+                    {MEAL_SLOT_LABELS[g.slot].label}
+                    <span className="font-normal">· {g.items.length}</span>
+                  </h2>
+                )}
+                <Stagger className="space-y-3">
+                  {g.items.map((r) => (
+                    <StaggerItem key={r.id}>
+                      <PlanDayCard
+                        recipe={r}
+                        householdSize={data.householdSize}
+                        mealCost={r.mealCost}
+                        swapHref={r.swapHref}
+                      />
+                    </StaggerItem>
+                  ))}
+                </Stagger>
+              </section>
             ))}
-          </Stagger>
+          </div>
 
           {/* Régénérer la semaine */}
           <div className="mt-6 text-center">

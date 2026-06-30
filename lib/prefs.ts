@@ -30,6 +30,10 @@ const prefsSchema = z.object({
   // Rétrocompat : les cookies plus anciens n'avaient ni budget ni ambiance.
   budget: z.number().min(15).max(300).default(35),
   ambiance: z.array(z.enum(MEAL_TYPE_ENUM)).default([]),
+  // Moments à planifier (petit-déj / déjeuner / dîner). Défaut : midi + soir.
+  mealSlots: z
+    .array(z.enum(["petit_dej", "dejeuner", "diner"]))
+    .default(["dejeuner", "diner"]),
   // Allergènes / aliments à éviter (ids d'ingrédients) — exclus du moteur.
   excludedIngredients: z.array(z.string()).default([]),
 });
@@ -71,8 +75,10 @@ export async function savePrefs(prefs: UserPrefs): Promise<void> {
       data: { user },
     } = await supabase.auth.getUser();
     if (user) {
-      await upsertProfile(supabase, user.id, validated);
-      return;
+      const ok = await upsertProfile(supabase, user.id, validated);
+      // Repli cookie si l'écriture Supabase échoue (schéma incomplet, réseau…) :
+      // l'onboarding ne doit jamais casser.
+      if (ok) return;
     }
   }
   await savePrefsCookie(validated);
@@ -109,6 +115,7 @@ interface ProfileRow {
   meals_per_week: number | null;
   budget: number | string | null;
   ambiance: string[] | null;
+  meal_slots: string[] | null;
   excluded_ingredients: string[] | null;
 }
 
@@ -122,6 +129,8 @@ function rowToPrefs(row: ProfileRow): UserPrefs | null {
     mealsPerWeek: row.meals_per_week ?? 5,
     budget: Number(row.budget ?? 35),
     ambiance: row.ambiance ?? [],
+    // Colonne ajoutée plus tard : si absente -> défaut (midi + soir) via le schéma.
+    mealSlots: row.meal_slots ?? undefined,
     excludedIngredients: row.excluded_ingredients ?? [],
   });
   return parsed.success ? parsed.data : null;
@@ -129,20 +138,32 @@ function rowToPrefs(row: ProfileRow): UserPrefs | null {
 
 type SupabaseServer = NonNullable<Awaited<ReturnType<typeof getSupabaseServer>>>;
 
-async function upsertProfile(supabase: SupabaseServer, id: string, p: UserPrefs): Promise<void> {
-  await supabase.from("profiles").upsert({
-    id,
-    country: p.country,
-    store_id: p.storeId,
-    diet_tags: p.dietTags,
-    equipment: p.equipment,
-    household_size: p.householdSize,
-    meals_per_week: p.mealsPerWeek,
-    budget: p.budget,
-    ambiance: p.ambiance,
-    excluded_ingredients: p.excludedIngredients ?? [],
-    updated_at: new Date().toISOString(),
-  });
+// Renvoie true si l'écriture a réussi. Toute erreur (colonne manquante, réseau)
+// est avalée -> l'appelant peut alors retomber sur le cookie.
+async function upsertProfile(
+  supabase: SupabaseServer,
+  id: string,
+  p: UserPrefs,
+): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("profiles").upsert({
+      id,
+      country: p.country,
+      store_id: p.storeId,
+      diet_tags: p.dietTags,
+      equipment: p.equipment,
+      household_size: p.householdSize,
+      meals_per_week: p.mealsPerWeek,
+      budget: p.budget,
+      ambiance: p.ambiance,
+      meal_slots: p.mealSlots,
+      excluded_ingredients: p.excludedIngredients ?? [],
+      updated_at: new Date().toISOString(),
+    });
+    return !error;
+  } catch {
+    return false;
+  }
 }
 
 // ---- Arbitrages ponctuels lus depuis l'URL (budget + types de la semaine) ----

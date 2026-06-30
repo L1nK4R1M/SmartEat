@@ -27,6 +27,11 @@ export type MealType =
   | "gourmand"
   | "monde";
 
+// Moment de la journée auquel un repas a du sens. L'utilisateur choisit les
+// moments à planifier (petit-déj / déjeuner / dîner) et le moteur ne propose
+// que des recettes adaptées au moment, en équilibrant la semaine entre eux.
+export type MealSlot = "petit_dej" | "dejeuner" | "diner";
+
 export type DietTag =
   | "halal"
   | "vege"
@@ -76,6 +81,7 @@ export interface Recipe {
   title: string;
   emoji: string;
   mealTypes: MealType[];
+  slots: MealSlot[]; // moments de la journée adaptés (petit-déj / déjeuner / dîner)
   dietTags: DietTag[];
   reqCapabilities: Capability[]; // moteur ensembliste : <= capacités utilisateur
   prepMinutes: number;
@@ -112,6 +118,7 @@ export interface UserPrefs {
   mealsPerWeek: number;
   budget: number; // budget hebdo par défaut (€)
   ambiance: MealType[]; // ambiances préférées (envies par défaut)
+  mealSlots: MealSlot[]; // moments à planifier (petit-déj / déjeuner / dîner)
   excludedIngredients?: string[]; // allergènes / aliments à éviter (ids d'ingrédients)
 }
 
