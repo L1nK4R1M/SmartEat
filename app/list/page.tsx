@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { repo } from "@/lib/repo";
 import { getPrefs, parseMealIds } from "@/lib/prefs";
 import { buildShoppingList } from "@/lib/shopping-list";
+import { getCurrentUser } from "@/lib/supabase/server";
+import { loadPantry } from "@/app/pantry-actions";
 import { BrandLogo } from "@/components/brand-logo";
 import { ShoppingList } from "@/components/shopping-list";
 
@@ -30,6 +32,10 @@ export default async function ListPage({
 
   const list = buildShoppingList(recipes, ingredientsMap, prefs.householdSize, store);
 
+  // Placard : connecté -> Supabase, invité -> localStorage (côté client).
+  const user = await getCurrentUser();
+  const initialOwned = user ? await loadPantry() : [];
+
   return (
     <div className="mx-auto w-full max-w-md px-5 pb-40 pt-6">
       <header className="mb-5">
@@ -55,7 +61,12 @@ export default async function ListPage({
       </p>
 
       {/* Liste interactive (produits entiers + placard) */}
-      <ShoppingList sections={list.sections} storeName={store.name} />
+      <ShoppingList
+        sections={list.sections}
+        storeName={store.name}
+        authed={!!user}
+        initialOwned={initialOwned}
+      />
 
       {/* Recettes de la semaine avec toutes les étapes */}
       <section className="mt-8">

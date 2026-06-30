@@ -55,11 +55,19 @@ export function Landing({
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="pt-12"
       >
-        <div className="flex items-center gap-2 text-lg font-bold tracking-tight">
-          <span className="text-2xl" aria-hidden>
-            🥗
-          </span>
-          SmartEat
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-lg font-bold tracking-tight">
+            <span className="text-2xl" aria-hidden>
+              🥗
+            </span>
+            SmartEat
+          </div>
+          <Link
+            href="/login"
+            className="text-sm font-medium text-on-surface-muted hover:text-on-surface"
+          >
+            Se connecter
+          </Link>
         </div>
 
         <h1 className="mt-10 text-[2.1rem] font-bold leading-[1.1] tracking-tight">

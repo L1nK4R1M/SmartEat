@@ -5,43 +5,53 @@ import { Check } from "lucide-react";
 import type { ShoppingSection } from "@/lib/shopping-list";
 import { Stagger, StaggerItem } from "@/components/ui/motion";
 import { CopyListButton } from "@/components/copy-list-button";
+import { setPantryItem } from "@/app/pantry-actions";
 import { cn, formatEuro, formatQty } from "@/lib/utils";
 
 // Liste de courses interactive avec PLACARD : cocher « j'ai déjà » retire l'article
-// du panier (et du total), sans le racheter. L'état du placard est persisté en
-// localStorage (par id d'ingrédient) -> il reste coché d'une semaine à l'autre.
+// du panier (et du total), sans le racheter. Connecté -> placard persisté dans
+// Supabase (multi-appareils) ; invité -> localStorage (reste d'une semaine à l'autre).
 const PANTRY_KEY = "smarteat_pantry";
 
 export function ShoppingList({
   sections,
   storeName,
+  authed = false,
+  initialOwned = [],
 }: {
   sections: ShoppingSection[];
   storeName: string;
+  authed?: boolean;
+  initialOwned?: string[];
 }) {
-  const [owned, setOwned] = useState<Set<string>>(new Set());
+  const [owned, setOwned] = useState<Set<string>>(() => new Set(authed ? initialOwned : []));
 
-  // Chargé côté client après hydratation (SSR rend tout "à acheter").
+  // Invité : on hydrate depuis localStorage après le montage (SSR rend tout "à acheter").
   useEffect(() => {
+    if (authed) return; // connecté : la source est Supabase (initialOwned)
     try {
       const raw = localStorage.getItem(PANTRY_KEY);
-      // Hydratation client-only depuis le placard (lecture unique au montage).
       // eslint-disable-next-line react-hooks/set-state-in-effect
       if (raw) setOwned(new Set(JSON.parse(raw) as string[]));
     } catch {
       /* localStorage indisponible — on ignore */
     }
-  }, []);
+  }, [authed]);
 
   function toggle(id: string) {
     setOwned((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      try {
-        localStorage.setItem(PANTRY_KEY, JSON.stringify([...next]));
-      } catch {
-        /* ignore */
+      const willOwn = !next.has(id);
+      if (willOwn) next.add(id);
+      else next.delete(id);
+      if (authed) {
+        void setPantryItem(id, willOwn); // persistance Supabase (optimiste)
+      } else {
+        try {
+          localStorage.setItem(PANTRY_KEY, JSON.stringify([...next]));
+        } catch {
+          /* ignore */
+        }
       }
       return next;
     });
