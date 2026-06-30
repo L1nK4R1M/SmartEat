@@ -2,39 +2,84 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Mail, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ChevronLeft, Mail, Check, Lock } from "lucide-react";
 import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-type Status = "idle" | "loading" | "sent" | "error" | "unconfigured";
+type Mode = "signin" | "signup";
 
 export default function LoginPage() {
+  const router = useRouter();
   const supabase = useMemo(() => getSupabaseBrowser(), []);
+  const configured = !!supabase;
+
+  const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<Status>(supabase ? "idle" : "unconfigured");
+  const [password, setPassword] = useState("");
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ kind: "error" | "info"; text: string } | null>(null);
 
   useEffect(() => {
     if (!supabase) return;
     supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? null));
   }, [supabase]);
 
-  async function sendLink(e: React.FormEvent) {
+  async function withPassword(e: React.FormEvent) {
     e.preventDefault();
     if (!supabase) return;
-    setStatus("loading");
+    setBusy(true);
+    setMsg(null);
+    if (mode === "signup") {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      });
+      setBusy(false);
+      if (error) return setMsg({ kind: "error", text: error.message });
+      if (data.session) {
+        router.push("/compte");
+        router.refresh();
+      } else {
+        setMsg({ kind: "info", text: "Compte créé ! Vérifie ton e-mail pour le confirmer, puis connecte-toi." });
+        setMode("signin");
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setBusy(false);
+      if (error) return setMsg({ kind: "error", text: "E-mail ou mot de passe incorrect." });
+      router.push("/compte");
+      router.refresh();
+    }
+  }
+
+  async function magicLink() {
+    if (!supabase || !email) {
+      setMsg({ kind: "error", text: "Saisis ton e-mail d'abord." });
+      return;
+    }
+    setBusy(true);
+    setMsg(null);
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
-    setStatus(error ? "error" : "sent");
+    setBusy(false);
+    setMsg(
+      error
+        ? { kind: "error", text: error.message }
+        : { kind: "info", text: `Lien magique envoyé à ${email}.` },
+    );
   }
 
-  async function signOut() {
+  async function logout() {
     if (!supabase) return;
     await supabase.auth.signOut();
     setUserEmail(null);
-    setStatus("idle");
+    router.refresh();
   }
 
   return (
@@ -50,66 +95,107 @@ export default function LoginPage() {
         <span className="text-5xl" aria-hidden>
           🥗
         </span>
-        <h1 className="mt-6 text-3xl font-bold tracking-tight">Connexion</h1>
-        <p className="mt-2 text-on-surface-muted">
-          Reçois un lien magique par e-mail. Tes repas, ton placard et ton budget te suivront sur
-          tous tes appareils.
-        </p>
 
-        {status === "unconfigured" && (
-          <p className="mt-8 rounded-2xl border border-outline bg-surface-variant p-4 text-sm text-on-surface-muted">
-            La connexion n&apos;est pas encore configurée sur cet environnement. L&apos;app reste
-            utilisable en mode invité.
-          </p>
-        )}
-
-        {status !== "unconfigured" && userEmail && (
-          <div className="mt-8 space-y-3">
+        {!configured ? (
+          <>
+            <h1 className="mt-6 text-3xl font-bold tracking-tight">Connexion</h1>
+            <p className="mt-6 rounded-2xl border border-outline bg-surface-variant p-4 text-sm text-on-surface-muted">
+              La connexion n&apos;est pas encore configurée sur cet environnement. L&apos;app reste
+              utilisable en mode invité.
+            </p>
+          </>
+        ) : userEmail ? (
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold tracking-tight">Te voilà connecté</h1>
             <div className="flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/8 p-4 text-sm">
-              <Check size={16} className="text-primary" /> Connecté en tant que{" "}
-              <span className="font-medium">{userEmail}</span>
+              <Check size={16} className="text-primary" /> {userEmail}
             </div>
-            <Link href="/plan" className="block">
+            <Link href="/compte" className="block">
               <Button size="lg" className="w-full">
-                Voir mes repas
+                Mon compte
               </Button>
             </Link>
-            <Button onClick={signOut} variant="ghost" size="md" className="w-full">
+            <Button onClick={logout} variant="ghost" size="md" className="w-full">
               Se déconnecter
             </Button>
           </div>
-        )}
+        ) : (
+          <>
+            <h1 className="mt-6 text-3xl font-bold tracking-tight">
+              {mode === "signin" ? "Connexion" : "Créer un compte"}
+            </h1>
+            <p className="mt-2 text-on-surface-muted">
+              Tes repas, ton placard et ton budget te suivent sur tous tes appareils.
+            </p>
 
-        {status !== "unconfigured" && !userEmail && status !== "sent" && (
-          <form onSubmit={sendLink} className="mt-8 space-y-3">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="ton@email.com"
-              autoComplete="email"
-              className="h-12 w-full rounded-2xl border border-outline bg-surface px-4 outline-none focus:border-primary focus:ring-2 focus:ring-primary"
-            />
-            <Button size="lg" className="w-full" disabled={status === "loading"}>
-              <Mail size={18} /> {status === "loading" ? "Envoi…" : "Recevoir le lien"}
-            </Button>
-            {status === "error" && (
-              <p className="text-sm text-error">Échec de l&apos;envoi. Réessaie.</p>
+            {/* Onglets connexion / inscription */}
+            <div className="mt-6 grid grid-cols-2 rounded-full border border-outline p-1 text-sm font-medium">
+              {(["signin", "signup"] as Mode[]).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => {
+                    setMode(m);
+                    setMsg(null);
+                  }}
+                  className={cn(
+                    "rounded-full py-2 transition-colors",
+                    mode === m ? "bg-primary text-on-primary" : "text-on-surface-muted",
+                  )}
+                >
+                  {m === "signin" ? "Connexion" : "Inscription"}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={withPassword} className="mt-4 space-y-3">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ton@email.com"
+                autoComplete="email"
+                className="h-12 w-full rounded-2xl border border-outline bg-surface px-4 outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mot de passe (6 caractères min.)"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                className="h-12 w-full rounded-2xl border border-outline bg-surface px-4 outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+              />
+              <Button size="lg" className="w-full" disabled={busy}>
+                <Lock size={16} />
+                {busy ? "…" : mode === "signin" ? "Se connecter" : "Créer mon compte"}
+              </Button>
+            </form>
+
+            <button
+              type="button"
+              onClick={magicLink}
+              disabled={busy}
+              className="mt-3 inline-flex w-full items-center justify-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
+              <Mail size={15} /> Recevoir plutôt un lien magique
+            </button>
+
+            {msg && (
+              <p
+                className={cn(
+                  "mt-4 rounded-2xl p-3 text-sm",
+                  msg.kind === "error"
+                    ? "bg-error/10 text-error"
+                    : "border border-primary/30 bg-primary/8",
+                )}
+              >
+                {msg.text}
+              </p>
             )}
-          </form>
-        )}
-
-        {status === "sent" && (
-          <div className="mt-8 rounded-2xl border border-primary/30 bg-primary/8 p-4">
-            <p className="flex items-center gap-2 font-medium">
-              <Mail size={18} className="text-primary" /> Lien envoyé !
-            </p>
-            <p className="mt-1 text-sm text-on-surface-muted">
-              Ouvre l&apos;e-mail envoyé à <span className="font-medium">{email}</span> et clique sur
-              le lien pour te connecter.
-            </p>
-          </div>
+          </>
         )}
       </div>
     </main>

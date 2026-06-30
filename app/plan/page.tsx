@@ -4,6 +4,7 @@ import { getPrefs, parseMealIds, parseRequest } from "@/lib/prefs";
 import { bestSubstitute, buildPlanFromIds, planWeek } from "@/lib/matching-engine";
 import { buildShoppingList } from "@/lib/shopping-list";
 import { recipeMealCost } from "@/lib/pricing";
+import { getCurrentUser } from "@/lib/supabase/server";
 import { FilterBar } from "@/components/filter-bar";
 import { PlanView, type PlanViewData } from "@/components/plan-view";
 
@@ -54,6 +55,12 @@ export default async function PlanPage({
   // "Régénérer" = nouvelle graine de variété (sélection différente, toujours <= budget).
   const nextSeed = (request.seed ?? 1) * 7 + 13;
 
+  // Navigation : connecté -> dashboard compte ; invité -> accueil. Jamais bloqué.
+  const user = await getCurrentUser();
+  const home = user
+    ? { href: "/compte", label: "Mon compte" }
+    : { href: "/", label: "Accueil" };
+
   const viewData: PlanViewData = {
     store: { name: store.name, domain: store.domain, color: store.color },
     recipes: selected.map((recipe) => ({
@@ -81,6 +88,8 @@ export default async function PlanPage({
     withinBudget,
     regenerateHref: planHref(request.budget, request.mealTypes, [], nextSeed),
     listHref: `/list?meals=${selectedIds.join(",")}`,
+    homeHref: home.href,
+    homeLabel: home.label,
   };
 
   return (
