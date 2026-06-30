@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { AlertTriangle, ChevronLeft, ChevronRight, RotateCcw, ShoppingCart } from "lucide-react";
+import type { MealSlot } from "@/lib/types";
 import { BrandLogo } from "@/components/brand-logo";
 import { CountUpEuro } from "@/components/ui/count-up";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -28,18 +29,21 @@ export interface PlanViewData {
   homeLabel: string;
   priceLive: number;
   priceStatus: "catalog" | "mixed" | "unavailable";
+  requestedSlots: MealSlot[];
 }
 
 export function PlanView(data: PlanViewData) {
   const over = data.total > data.budget + 0.001;
 
-  // Regroupement par moment de la journée (matin -> soir). En-têtes seulement
-  // si plusieurs moments sont planifiés.
-  const groups = MEAL_SLOT_ORDER.map((slot) => ({
+  // Une section par moment DEMANDÉ (matin -> soir), même vide : si un moment
+  // n'a aucune recette (budget/régime trop serrés), on l'affiche quand même avec
+  // une note, pour que l'utilisateur comprenne pourquoi il manque.
+  const requested = data.requestedSlots.length ? data.requestedSlots : MEAL_SLOT_ORDER;
+  const groups = MEAL_SLOT_ORDER.filter((s) => requested.includes(s)).map((slot) => ({
     slot,
     items: data.recipes.filter((r) => r.slot === slot),
-  })).filter((g) => g.items.length > 0);
-  const showSlotHeaders = groups.length > 1;
+  }));
+  const showSlotHeaders = requested.length > 1;
 
   return (
     <div className="mx-auto w-full max-w-md px-5 pb-32 pt-6">
@@ -169,18 +173,25 @@ export function PlanView(data: PlanViewData) {
                     <span className="font-normal">· {g.items.length}</span>
                   </h2>
                 )}
-                <Stagger className="space-y-3">
-                  {g.items.map((r) => (
-                    <StaggerItem key={r.id}>
-                      <PlanDayCard
-                        recipe={r}
-                        householdSize={data.householdSize}
-                        mealCost={r.mealCost}
-                        swapHref={r.swapHref}
-                      />
-                    </StaggerItem>
-                  ))}
-                </Stagger>
+                {g.items.length > 0 ? (
+                  <Stagger className="space-y-3">
+                    {g.items.map((r) => (
+                      <StaggerItem key={r.id}>
+                        <PlanDayCard
+                          recipe={r}
+                          householdSize={data.householdSize}
+                          mealCost={r.mealCost}
+                          swapHref={r.swapHref}
+                        />
+                      </StaggerItem>
+                    ))}
+                  </Stagger>
+                ) : (
+                  <div className="rounded-[var(--radius-card)] border border-dashed border-outline bg-surface p-4 text-sm text-on-surface-muted">
+                    Aucune recette ne correspond pour ce moment (budget ou régime trop
+                    serré). Augmente le budget, ajoute un équipement ou régénère.
+                  </div>
+                )}
               </section>
             ))}
           </div>

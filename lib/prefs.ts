@@ -54,7 +54,16 @@ export async function getPrefs(): Promise<UserPrefs | null> {
         .eq("id", user.id)
         .maybeSingle();
       const fromDb = data?.store_id ? rowToPrefs(data as ProfileRow) : null;
-      if (fromDb) return fromDb;
+      if (fromDb) {
+        // Colonnes pas encore migrées (ex. meal_slots absent de la table) : la
+        // valeur revient nulle -> on récupère le choix depuis le cookie miroir,
+        // pour que la fonctionnalité marche même avant d'avoir lancé le SQL.
+        if (data && (data as ProfileRow).meal_slots == null) {
+          const guest = await getPrefsCookie();
+          if (guest?.mealSlots?.length) fromDb.mealSlots = guest.mealSlots;
+        }
+        return fromDb;
+      }
       const guest = await getPrefsCookie();
       if (guest) {
         await upsertProfile(supabase, user.id, guest);
@@ -75,10 +84,12 @@ export async function savePrefs(prefs: UserPrefs): Promise<void> {
       data: { user },
     } = await supabase.auth.getUser();
     if (user) {
-      const ok = await upsertProfile(supabase, user.id, validated);
-      // Repli cookie si l'écriture Supabase échoue (schéma incomplet, réseau…) :
-      // l'onboarding ne doit jamais casser.
-      if (ok) return;
+      await upsertProfile(supabase, user.id, validated);
+      // On garde TOUJOURS un miroir cookie : il conserve les champs que la table
+      // n'a pas encore (ex. meal_slots avant migration) et sert de repli réseau.
+      // L'onboarding ne doit jamais casser.
+      await savePrefsCookie(validated);
+      return;
     }
   }
   await savePrefsCookie(validated);

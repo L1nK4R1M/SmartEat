@@ -2,7 +2,13 @@ import { redirect } from "next/navigation";
 import type { MealSlot } from "@/lib/types";
 import { repo } from "@/lib/repo";
 import { getPrefs, parseMealIds, parseRequest } from "@/lib/prefs";
-import { assignSlots, bestSubstitute, buildPlanFromIds, planWeek } from "@/lib/matching-engine";
+import {
+  assignSlots,
+  bestSubstitute,
+  buildPlanFromIds,
+  planWeek,
+  requestedSlots,
+} from "@/lib/matching-engine";
 import { buildShoppingList } from "@/lib/shopping-list";
 import { recipeMealCost } from "@/lib/pricing";
 import { getPriceBook } from "@/lib/prices/price-book";
@@ -54,11 +60,9 @@ export default async function PlanPage({
   }
   const selectedIds = selected.map((r) => r.id);
 
-  // Moments demandés (repli midi + soir) — sert à étiqueter chaque repas.
-  const selectedSlots: MealSlot[] = prefs.mealSlots?.length
-    ? prefs.mealSlots
-    : ["dejeuner", "diner"];
-  // Répartition équilibrée des repas entre les moments (déjeuner / dîner / petit-déj).
+  // Moments demandés (ordre matin -> soir, repli midi + soir) — étiquetage + sections.
+  const selectedSlots: MealSlot[] = requestedSlots(prefs);
+  // Répartition équilibrée des repas entre les moments (petit-déj / déjeuner / dîner).
   const slotByRecipe = assignSlots(selected, selectedSlots);
 
   const list = buildShoppingList(selected, ingredientsMap, prefs.householdSize, store, priceBook.unit);
@@ -113,6 +117,7 @@ export default async function PlanPage({
     homeLabel: home.label,
     priceLive: priceBook.liveCount,
     priceStatus: priceBook.status,
+    requestedSlots: selectedSlots,
   };
 
   return (
