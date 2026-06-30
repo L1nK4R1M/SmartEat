@@ -1,12 +1,16 @@
 import type { Ingredient, Recipe, Store } from "./types";
 
-// Prix calculé depuis les ingrédients au profil de prix du magasin choisi.
-// "Le prix DOIT correspondre au prix des aliments" -> une seule source de vérité.
-
-// Prix INDICATIF par unité de base = prix du paquet / contenance, × profil magasin.
-// Sert au coût "par portion" affiché sur les cartes et au scoring. Le coût RÉEL
-// du panier (au produit entier, dédoublonné) est calculé dans lib/shopping-list.ts.
-export function ingredientUnitPrice(ingredient: Ingredient, store: Store): number {
+// Prix par unité de base. Source : prix RÉEL (Open Prices) si fourni dans le
+// `priceBook` pour cet ingrédient, sinon repli sur le prix catalogue × profil
+// magasin. Le priceBook (Map ingredientId -> €/unité de base) est résolu une
+// fois par requête côté serveur (voir lib/prices/price-book.ts).
+export function ingredientUnitPrice(
+  ingredient: Ingredient,
+  store: Store,
+  priceBook?: Map<string, number>,
+): number {
+  const live = priceBook?.get(ingredient.id);
+  if (live !== undefined && live > 0) return live;
   return (ingredient.packPrice / ingredient.packSize) * store.priceFactor;
 }
 
@@ -15,11 +19,12 @@ export function recipeCostPerServing(
   recipe: Recipe,
   ingredientsById: Map<string, Ingredient>,
   store: Store,
+  priceBook?: Map<string, number>,
 ): number {
   return recipe.ingredients.reduce((sum, ri) => {
     const ingredient = ingredientsById.get(ri.ingredientId);
     if (!ingredient) return sum;
-    return sum + ri.qtyPerServing * ingredientUnitPrice(ingredient, store);
+    return sum + ri.qtyPerServing * ingredientUnitPrice(ingredient, store, priceBook);
   }, 0);
 }
 
@@ -29,6 +34,7 @@ export function recipeMealCost(
   ingredientsById: Map<string, Ingredient>,
   store: Store,
   householdSize: number,
+  priceBook?: Map<string, number>,
 ): number {
-  return recipeCostPerServing(recipe, ingredientsById, store) * householdSize;
+  return recipeCostPerServing(recipe, ingredientsById, store, priceBook) * householdSize;
 }

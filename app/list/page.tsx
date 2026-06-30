@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { repo } from "@/lib/repo";
 import { getPrefs, parseMealIds } from "@/lib/prefs";
 import { buildShoppingList } from "@/lib/shopping-list";
+import { getPriceBook } from "@/lib/prices/price-book";
 import { getCurrentUser } from "@/lib/supabase/server";
 import { loadPantry } from "@/app/pantry-actions";
 import { BrandLogo } from "@/components/brand-logo";
@@ -30,7 +31,9 @@ export default async function ListPage({
   ]);
   const store = stores.find((s) => s.id === prefs.storeId) ?? stores[0];
 
-  const list = buildShoppingList(recipes, ingredientsMap, prefs.householdSize, store);
+  // Prix réels (Open Prices) là où dispo, sinon repli catalogue.
+  const priceBook = await getPriceBook([...ingredientsMap.values()], store);
+  const list = buildShoppingList(recipes, ingredientsMap, prefs.householdSize, store, priceBook.unit);
 
   // Placard : connecté -> Supabase, invité -> localStorage (côté client).
   const user = await getCurrentUser();
