@@ -5,11 +5,13 @@ import { repo } from "@/lib/repo";
 import { getPrefs, DEFAULT_BUDGET } from "@/lib/prefs";
 import { recipeCostPerServing } from "@/lib/pricing";
 import { bestSubstitute } from "@/lib/matching-engine";
-import { CAPABILITY_LABELS, DIET_LABELS, MEAL_TYPE_LABELS } from "@/lib/labels";
+import { APPLIANCE_LABELS, CAPABILITY_LABELS, DIET_LABELS, MEAL_TYPE_LABELS } from "@/lib/labels";
 import { Badge } from "@/components/ui/badge";
 import { RecipeImage } from "@/components/recipe-image";
 import { NutritionCard } from "@/components/nutrition-card";
 import { RecipeSteps } from "@/components/recipe-steps";
+import { AiNotice } from "@/components/ai-notice";
+import { getDetailedRecipe } from "@/lib/ai/recipe-detail";
 import { formatQty } from "@/lib/utils";
 import type { DietTag } from "@/lib/types";
 
@@ -31,6 +33,24 @@ export default async function RecipePage({
   const householdSize = prefs?.householdSize ?? 2;
   const store = stores.find((s) => s.id === prefs?.storeId) ?? stores[0];
   const costPerServing = recipeCostPerServing(recipe, ingredientsMap, store);
+
+  // Recette DÉTAILLÉE par IA, adaptée aux choix (repli sur la version standard).
+  const detailed = await getDetailedRecipe({
+    id: recipe.id,
+    title: recipe.title,
+    ingredients: recipe.ingredients.map((ri) => {
+      const ing = ingredientsMap.get(ri.ingredientId);
+      return {
+        name: ing?.name ?? ri.ingredientId,
+        qty: formatQty(ri.qtyPerServing * householdSize, ing?.baseUnit ?? "g"),
+      };
+    }),
+    equipment: (prefs?.equipment ?? []).map((e) => APPLIANCE_LABELS[e].label),
+    dietTags: (prefs?.dietTags ?? []).map((d) => DIET_LABELS[d].label),
+    householdSize,
+    ambiance: (prefs?.ambiance ?? []).map((a) => MEAL_TYPE_LABELS[a].label),
+    fallbackSteps: recipe.steps,
+  });
 
   // "Changer" : meilleur substitut éligible (même équipement/régime), hors recette courante.
   let swap: { id: string } | null = null;
@@ -78,9 +98,12 @@ export default async function RecipePage({
       </div>
 
       <div className="px-5">
-        <h1 className="mt-5 text-2xl font-semibold tracking-tight">{recipe.title}</h1>
+        <h1 className="mt-5 text-2xl font-semibold tracking-tight">{detailed.title}</h1>
+
+        <AiNotice status={detailed.status} />
 
         <div className="mt-3 flex flex-wrap gap-1.5">
+          {detailed.status === "ok" && <Badge tone="primary">✨ Détaillée par IA</Badge>}
           {recipe.mealTypes.map((t) => (
             <Badge key={t} tone="primary">
               {MEAL_TYPE_LABELS[t].emoji} {MEAL_TYPE_LABELS[t].label}
@@ -135,7 +158,13 @@ export default async function RecipePage({
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-on-surface-muted">
             Préparation
           </h2>
-          <RecipeSteps steps={recipe.steps} />
+          <RecipeSteps steps={detailed.steps} />
+          {detailed.tip && (
+            <div className="mt-4 rounded-2xl border border-primary/30 bg-primary/8 p-4 text-sm">
+              <span className="font-semibold">💡 Astuce du chef · </span>
+              {detailed.tip}
+            </div>
+          )}
         </section>
       </div>
     </div>
