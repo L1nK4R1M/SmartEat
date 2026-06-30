@@ -25,6 +25,8 @@ export interface PlanViewData {
   listHref: string;
   homeHref: string;
   homeLabel: string;
+  priceLive: number;
+  priceStatus: "catalog" | "mixed" | "unavailable";
 }
 
 export function PlanView(data: PlanViewData) {
@@ -101,6 +103,14 @@ export function PlanView(data: PlanViewData) {
             </div>
             <ProgressBar value={data.total} max={data.budget} over={over} className="mt-3" />
           </motion.section>
+
+          {data.priceStatus !== "catalog" && (
+            <p className="mt-2 text-center text-xs text-on-surface-muted">
+              {data.priceStatus === "unavailable"
+                ? "Prix réels momentanément indisponibles — estimations affichées."
+                : `💰 ${data.priceLive} prix réels (Open Prices) · le reste estimé`}
+            </p>
+          )}
 
           {/* Carte "N articles · liste de courses" cliquable */}
           <motion.div

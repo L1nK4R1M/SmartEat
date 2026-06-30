@@ -4,6 +4,7 @@ import { getPrefs, parseMealIds, parseRequest } from "@/lib/prefs";
 import { bestSubstitute, buildPlanFromIds, planWeek } from "@/lib/matching-engine";
 import { buildShoppingList } from "@/lib/shopping-list";
 import { recipeMealCost } from "@/lib/pricing";
+import { getPriceBook } from "@/lib/prices/price-book";
 import { getCurrentUser } from "@/lib/supabase/server";
 import { FilterBar } from "@/components/filter-bar";
 import { PlanView, type PlanViewData } from "@/components/plan-view";
@@ -37,20 +38,31 @@ export default async function PlanPage({
   ]);
   const store = stores.find((s) => s.id === prefs.storeId) ?? stores[0];
 
+  // Prix RÉELS (Open Prices) là où dispo, sinon repli catalogue. Résolu une fois.
+  const priceBook = await getPriceBook([...ingredientsMap.values()], store);
+
   // Sélection : ids fournis (après swap) sinon plan hebdo budget-aware.
   const presetIds = parseMealIds(sp);
   const preset = presetIds.length ? buildPlanFromIds(presetIds, recipes) : [];
   let selected = preset;
   let withinBudget = true;
   if (preset.length === 0) {
-    const plan = planWeek(recipes, prefs, request, ingredientsMap, store);
+    const plan = planWeek(recipes, prefs, request, ingredientsMap, store, priceBook.unit);
     selected = plan.recipes;
     withinBudget = plan.withinBudget;
   }
   const selectedIds = selected.map((r) => r.id);
 
-  const list = buildShoppingList(selected, ingredientsMap, prefs.householdSize, store);
-  const substitute = bestSubstitute(recipes, prefs, request, ingredientsMap, store, selectedIds);
+  const list = buildShoppingList(selected, ingredientsMap, prefs.householdSize, store, priceBook.unit);
+  const substitute = bestSubstitute(
+    recipes,
+    prefs,
+    request,
+    ingredientsMap,
+    store,
+    selectedIds,
+    priceBook.unit,
+  );
 
   // "Régénérer" = nouvelle graine de variété (sélection différente, toujours <= budget).
   const nextSeed = (request.seed ?? 1) * 7 + 13;
@@ -70,7 +82,7 @@ export default async function PlanPage({
       imageUrl: recipe.imageUrl,
       prepMinutes: recipe.prepMinutes,
       mealTypes: recipe.mealTypes,
-      mealCost: recipeMealCost(recipe, ingredientsMap, store, prefs.householdSize),
+      mealCost: recipeMealCost(recipe, ingredientsMap, store, prefs.householdSize, priceBook.unit),
       swapHref: substitute
         ? planHref(
             request.budget,
@@ -90,6 +102,8 @@ export default async function PlanPage({
     listHref: `/list?meals=${selectedIds.join(",")}`,
     homeHref: home.href,
     homeLabel: home.label,
+    priceLive: priceBook.liveCount,
+    priceStatus: priceBook.status,
   };
 
   return (

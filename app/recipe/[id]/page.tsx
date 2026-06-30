@@ -4,6 +4,7 @@ import { ChevronLeft, RefreshCw } from "lucide-react";
 import { repo } from "@/lib/repo";
 import { getPrefs, DEFAULT_BUDGET } from "@/lib/prefs";
 import { recipeCostPerServing } from "@/lib/pricing";
+import { getPriceBook } from "@/lib/prices/price-book";
 import { bestSubstitute } from "@/lib/matching-engine";
 import { APPLIANCE_LABELS, CAPABILITY_LABELS, DIET_LABELS, MEAL_TYPE_LABELS } from "@/lib/labels";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,13 @@ export default async function RecipePage({
 
   const householdSize = prefs?.householdSize ?? 2;
   const store = stores.find((s) => s.id === prefs?.storeId) ?? stores[0];
-  const costPerServing = recipeCostPerServing(recipe, ingredientsMap, store);
+
+  // Prix réels (Open Prices) pour les ingrédients de cette recette, sinon catalogue.
+  const recipeIngredients = recipe.ingredients
+    .map((ri) => ingredientsMap.get(ri.ingredientId))
+    .filter((x): x is NonNullable<typeof x> => Boolean(x));
+  const priceBook = await getPriceBook(recipeIngredients, store);
+  const costPerServing = recipeCostPerServing(recipe, ingredientsMap, store, priceBook.unit);
 
   // Recette DÉTAILLÉE par IA, adaptée aux choix (repli sur la version standard).
   const detailed = await getDetailedRecipe({

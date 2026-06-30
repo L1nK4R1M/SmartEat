@@ -1,5 +1,6 @@
 import type { Aisle, Ingredient, Recipe, Store } from "./types";
 import { AISLE_LABELS } from "./labels";
+import { ingredientUnitPrice } from "./pricing";
 
 // Génération de la liste de courses — §2, version "produit entier".
 // On agrège les besoins de la semaine, puis on achète des CONDITIONNEMENTS
@@ -31,6 +32,7 @@ export function buildShoppingList(
   ingredientsById: Map<string, Ingredient>,
   householdSize: number,
   store: Store,
+  priceBook?: Map<string, number>,
 ): ShoppingList {
   // 1+2. Agrégation/dédoublonnage des BESOINS par ingrédient (× taille du foyer).
   const needed = new Map<string, number>();
@@ -49,7 +51,8 @@ export function buildShoppingList(
     const ingredient = ingredientsById.get(ingredientId);
     if (!ingredient || neededQty <= 0) continue;
     const packs = Math.ceil(neededQty / ingredient.packSize);
-    const cost = packs * ingredient.packPrice * store.priceFactor;
+    // Coût = nb de paquets × prix d'un paquet (prix réel Open Prices si dispo, sinon catalogue).
+    const cost = packs * ingredientUnitPrice(ingredient, store, priceBook) * ingredient.packSize;
     total += cost;
     itemCount += 1;
     const line: ShoppingLine = { ingredient, neededQty, packs, cost };

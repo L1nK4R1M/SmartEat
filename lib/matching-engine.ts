@@ -91,11 +91,12 @@ export function rankRecipes(
   request: GenerationRequest,
   ingredientsById: Map<string, Ingredient>,
   store: Store,
+  priceBook?: Map<string, number>,
 ): ScoredRecipe[] {
   const fairShare = fairSharePerServing(prefs, request);
   return eligibleRecipes(recipes, prefs, request)
     .map((recipe) => {
-      const costPerServing = recipeCostPerServing(recipe, ingredientsById, store);
+      const costPerServing = recipeCostPerServing(recipe, ingredientsById, store, priceBook);
       return { recipe, costPerServing, score: scoreRecipe(recipe, request, costPerServing, fairShare) };
     })
     .sort((a, b) => b.score - a.score || a.recipe.id.localeCompare(b.recipe.id));
@@ -117,19 +118,20 @@ export function planWeek(
   request: GenerationRequest,
   ingredientsById: Map<string, Ingredient>,
   store: Store,
+  priceBook?: Map<string, number>,
 ): WeekPlan {
-  const ranked = rankRecipes(recipes, prefs, request, ingredientsById, store);
+  const ranked = rankRecipes(recipes, prefs, request, ingredientsById, store, priceBook);
   const days = prefs.mealsPerWeek;
   const chosen: Recipe[] = [];
 
   for (const { recipe } of ranked) {
     if (chosen.length >= days) break;
     const tentative = [...chosen, recipe];
-    const total = buildShoppingList(tentative, ingredientsById, prefs.householdSize, store).total;
+    const total = buildShoppingList(tentative, ingredientsById, prefs.householdSize, store, priceBook).total;
     if (total <= request.budget) chosen.push(recipe);
   }
 
-  const total = buildShoppingList(chosen, ingredientsById, prefs.householdSize, store).total;
+  const total = buildShoppingList(chosen, ingredientsById, prefs.householdSize, store, priceBook).total;
   return {
     recipes: chosen,
     total,
@@ -156,8 +158,9 @@ export function bestSubstitute(
   ingredientsById: Map<string, Ingredient>,
   store: Store,
   currentIds: string[],
+  priceBook?: Map<string, number>,
 ): Recipe | null {
-  const ranked = rankRecipes(recipes, prefs, request, ingredientsById, store).filter(
+  const ranked = rankRecipes(recipes, prefs, request, ingredientsById, store, priceBook).filter(
     (s) => !currentIds.includes(s.recipe.id),
   );
   return ranked[0]?.recipe ?? null;
