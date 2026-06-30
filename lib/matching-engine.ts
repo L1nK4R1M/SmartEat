@@ -28,12 +28,15 @@ export function eligibleRecipes(
   request: GenerationRequest,
 ): Recipe[] {
   const caps = userCapabilities(prefs.equipment);
+  const excluded = new Set(prefs.excludedIngredients ?? []);
   return recipes.filter((r) => {
     const dietOk = prefs.dietTags.every((d) => r.dietTags.includes(d));
     const equipOk = r.reqCapabilities.every((c) => caps.has(c));
     const typeOk =
       request.mealTypes.length === 0 || r.mealTypes.some((t) => request.mealTypes.includes(t));
-    return dietOk && equipOk && typeOk;
+    // Allergènes / aliments à éviter : aucune recette contenant un ingrédient exclu.
+    const excludeOk = excluded.size === 0 || !r.ingredients.some((ri) => excluded.has(ri.ingredientId));
+    return dietOk && equipOk && typeOk && excludeOk;
   });
 }
 

@@ -4,11 +4,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { repo } from "@/lib/repo";
 import { getPrefs, parseMealIds } from "@/lib/prefs";
 import { buildShoppingList } from "@/lib/shopping-list";
-import { CopyListButton } from "@/components/copy-list-button";
 import { BrandLogo } from "@/components/brand-logo";
-import { ShoppingSections } from "@/components/shopping-sections";
-import { CountUpEuro } from "@/components/ui/count-up";
-import { formatEuro, formatQty } from "@/lib/utils";
+import { ShoppingList } from "@/components/shopping-list";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -33,22 +30,6 @@ export default async function ListPage({
 
   const list = buildShoppingList(recipes, ingredientsMap, prefs.householdSize, store);
 
-  // Export texte : on indique les produits ENTIERS à acheter (paquets).
-  const plainText = [
-    `SmartEat — Liste de courses (${store.name})`,
-    "",
-    ...list.sections.flatMap((section) => [
-      `${section.label}`,
-      ...section.lines.map(
-        (l) =>
-          `- ${l.ingredient.name} : ${l.packs} × ${l.ingredient.packLabel}` +
-          ` (besoin ${formatQty(l.neededQty, l.ingredient.baseUnit)})`,
-      ),
-      "",
-    ]),
-    `Total estimé : ${formatEuro(list.total)}`,
-  ].join("\n");
-
   return (
     <div className="mx-auto w-full max-w-md px-5 pb-40 pt-6">
       <header className="mb-5">
@@ -69,8 +50,12 @@ export default async function ListPage({
         </div>
       </header>
 
-      {/* Liste de courses (produits entiers) — sections révélées en cascade */}
-      <ShoppingSections sections={list.sections} />
+      <p className="mb-3 text-xs text-on-surface-muted">
+        Coche « j&apos;ai déjà » pour ce que tu as dans ton placard — on l&apos;enlève du total.
+      </p>
+
+      {/* Liste interactive (produits entiers + placard) */}
+      <ShoppingList sections={list.sections} storeName={store.name} />
 
       {/* Recettes de la semaine avec toutes les étapes */}
       <section className="mt-8">
@@ -117,17 +102,6 @@ export default async function ListPage({
           ))}
         </div>
       </section>
-
-      {/* Total + export, sticky en thumb-zone */}
-      <div className="fixed inset-x-0 bottom-0">
-        <div className="mx-auto max-w-md border-t border-outline bg-background/80 p-5 backdrop-blur">
-          <div className="mb-3 flex items-center justify-between">
-            <span className="text-on-surface-muted">Total estimé · produits entiers</span>
-            <CountUpEuro value={list.total} className="tnum text-xl font-bold" />
-          </div>
-          <CopyListButton text={plainText} />
-        </div>
-      </div>
     </div>
   );
 }

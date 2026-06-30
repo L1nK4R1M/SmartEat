@@ -9,6 +9,7 @@ import {
   APPLIANCE_LABELS,
   COUNTRY_LABELS,
   DIET_LABELS,
+  EXCLUSIONS,
   STORE_KIND_LABELS,
 } from "@/lib/labels";
 import { completeOnboarding } from "@/app/actions";
@@ -31,6 +32,7 @@ const STEPS = [
   "Personnes",
   "Ambiance",
   "Besoins",
+  "Éviter",
   "Cuisine",
 ] as const;
 const MAX_AMBIANCE = 3;
@@ -47,6 +49,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
   const [ambiance, setAmbiance] = useState<MealType[]>([]);
   const [diets, setDiets] = useState<DietTag[]>([]);
   const [equipment, setEquipment] = useState<Appliance[]>([]);
+  const [excluded, setExcluded] = useState<string[]>([]);
   const [mealsPerWeek] = useState(5);
 
   const storesForCountry = useMemo(
@@ -64,7 +67,8 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
     step === 3 ||
     step === 4 ||
     step === 5 ||
-    (step === 6 && equipment.length > 0);
+    step === 6 ||
+    (step === 7 && equipment.length > 0);
 
   function go(delta: number) {
     setDir(delta);
@@ -86,6 +90,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
         mealsPerWeek,
         budget,
         ambiance,
+        excludedIngredients: excluded,
       }),
     );
   }
@@ -95,6 +100,13 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
       if (prev.includes(t)) return prev.filter((x) => x !== t);
       if (prev.length >= MAX_AMBIANCE) return prev; // plafond à 3
       return [...prev, t];
+    });
+  }
+
+  function toggleExclusion(ids: string[]) {
+    setExcluded((prev) => {
+      const has = ids.every((id) => prev.includes(id));
+      return has ? prev.filter((id) => !ids.includes(id)) : [...new Set([...prev, ...ids])];
     });
   }
 
@@ -320,6 +332,25 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
             )}
 
             {step === 6 && (
+              <Step
+                title="à éviter ?"
+                subtitle="Allergènes ou aliments que tu ne veux pas. (facultatif)"
+              >
+                <div className="grid grid-cols-2 gap-3">
+                  {EXCLUSIONS.map((ex) => (
+                    <ChoiceCard
+                      key={ex.key}
+                      emoji={ex.emoji}
+                      label={ex.label}
+                      selected={ex.ingredientIds.every((id) => excluded.includes(id))}
+                      onClick={() => toggleExclusion(ex.ingredientIds)}
+                    />
+                  ))}
+                </div>
+              </Step>
+            )}
+
+            {step === 7 && (
               <Step
                 title="quel équipement as-tu ?"
                 subtitle="On exclut les recettes que tu ne peux pas cuisiner."

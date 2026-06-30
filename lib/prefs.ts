@@ -29,6 +29,8 @@ const prefsSchema = z.object({
   // Rétrocompat : les cookies plus anciens n'avaient ni budget ni ambiance.
   budget: z.number().min(15).max(300).default(35),
   ambiance: z.array(z.enum(MEAL_TYPE_ENUM)).default([]),
+  // Allergènes / aliments à éviter (ids d'ingrédients) — exclus du moteur.
+  excludedIngredients: z.array(z.string()).default([]),
 });
 
 export async function getPrefs(): Promise<UserPrefs | null> {

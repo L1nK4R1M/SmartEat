@@ -53,6 +53,17 @@ describe("Recipe Matching Engine — combinatoire intelligente", () => {
     expect(eligible.find((r) => r.id === "r04")).toBeUndefined(); // bolognaise (viande, gluten)
   });
 
+  it("exclut les recettes contenant un aliment à éviter (allergène/dégoût)", () => {
+    const prefs: UserPrefs = { ...basePrefs, excludedIngredients: ["salmon", "cod", "tuna_canned"] };
+    const eligible = eligibleRecipes(RECIPES, prefs, wideRequest);
+    // r02 & r13 contiennent du saumon -> exclues.
+    expect(eligible.find((r) => r.id === "r02")).toBeUndefined();
+    expect(eligible.find((r) => r.id === "r13")).toBeUndefined();
+    // aucune recette éligible ne contient un ingrédient exclu.
+    const banned = new Set(prefs.excludedIngredients);
+    expect(eligible.every((r) => !r.ingredients.some((i) => banned.has(i.ingredientId)))).toBe(true);
+  });
+
   it("le coût d'une recette suit le profil de prix du magasin", () => {
     const bio = STORES.find((s) => s.id === "fr_biocoop")!;
     const r = RECIPES.find((x) => x.id === "r03")!;

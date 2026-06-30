@@ -27,3 +27,14 @@ export function formatQty(qty: number, unit: "g" | "ml" | "piece"): string {
   }
   return `${Math.round(qty)} ${unit}`;
 }
+
+// URL d'image "photo" déterministe par plat, via un service génératif sans clé
+// (Pollinations). Elle s'affiche PAR-DESSUS le fallback dégradé+emoji : si elle
+// est lente ou indisponible, le dégradé reste visible (cf. RecipeImage).
+// Images générées (placeholder) — à remplacer par de vraies photos curatées ensuite.
+export function foodPhotoUrl(query: string, w = 600, h = 450): string {
+  const prompt = `${query}, plat cuisiné dans une assiette, photographie culinaire, appétissant, lumière naturelle`;
+  let s = 0;
+  for (let i = 0; i < query.length; i++) s = (s * 31 + query.charCodeAt(i)) >>> 0;
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&nologo=true&seed=${s % 100000}`;
+}
