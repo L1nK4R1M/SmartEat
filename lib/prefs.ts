@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { z } from "zod";
 import type { GenerationRequest, MealType, UserPrefs } from "./types";
+import { getSupabaseServer } from "./supabase/server";
 
 // Préférences durables persistées en cookie (MVP, §4 : alternative simple à
 // Supabase Auth + table users, qui reste le chemin de production).
@@ -33,7 +34,52 @@ const prefsSchema = z.object({
   excludedIngredients: z.array(z.string()).default([]),
 });
 
+// Source des préférences : si l'utilisateur est connecté -> profil Supabase
+// (multi-appareils) ; sinon -> cookie (mode invité). Migre les prefs invité
+// vers le profil au premier accès connecté.
 export async function getPrefs(): Promise<UserPrefs | null> {
+  const supabase = await getSupabaseServer();
+  if (supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+      const fromDb = data?.store_id ? rowToPrefs(data as ProfileRow) : null;
+      if (fromDb) return fromDb;
+      const guest = await getPrefsCookie();
+      if (guest) {
+        await upsertProfile(supabase, user.id, guest);
+        return guest;
+      }
+      return null;
+    }
+  }
+  return getPrefsCookie();
+}
+
+// À appeler depuis une Server Action / Route Handler uniquement.
+export async function savePrefs(prefs: UserPrefs): Promise<void> {
+  const validated = prefsSchema.parse(prefs);
+  const supabase = await getSupabaseServer();
+  if (supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      await upsertProfile(supabase, user.id, validated);
+      return;
+    }
+  }
+  await savePrefsCookie(validated);
+}
+
+// ---- Persistance cookie (mode invité) ----
+async function getPrefsCookie(): Promise<UserPrefs | null> {
   const raw = (await cookies()).get(COOKIE)?.value;
   if (!raw) return null;
   try {
@@ -44,14 +90,58 @@ export async function getPrefs(): Promise<UserPrefs | null> {
   }
 }
 
-// À appeler depuis une Server Action / Route Handler uniquement.
-export async function savePrefs(prefs: UserPrefs): Promise<void> {
-  const validated = prefsSchema.parse(prefs);
-  (await cookies()).set(COOKIE, JSON.stringify(validated), {
+async function savePrefsCookie(prefs: UserPrefs): Promise<void> {
+  (await cookies()).set(COOKIE, JSON.stringify(prefs), {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
     maxAge: ONE_YEAR,
+  });
+}
+
+// ---- Mapping profil Supabase <-> UserPrefs ----
+interface ProfileRow {
+  country: string | null;
+  store_id: string | null;
+  diet_tags: string[] | null;
+  equipment: string[] | null;
+  household_size: number | null;
+  meals_per_week: number | null;
+  budget: number | string | null;
+  ambiance: string[] | null;
+  excluded_ingredients: string[] | null;
+}
+
+function rowToPrefs(row: ProfileRow): UserPrefs | null {
+  const parsed = prefsSchema.safeParse({
+    country: row.country,
+    storeId: row.store_id,
+    dietTags: row.diet_tags ?? [],
+    equipment: row.equipment ?? [],
+    householdSize: row.household_size ?? 2,
+    mealsPerWeek: row.meals_per_week ?? 5,
+    budget: Number(row.budget ?? 35),
+    ambiance: row.ambiance ?? [],
+    excludedIngredients: row.excluded_ingredients ?? [],
+  });
+  return parsed.success ? parsed.data : null;
+}
+
+type SupabaseServer = NonNullable<Awaited<ReturnType<typeof getSupabaseServer>>>;
+
+async function upsertProfile(supabase: SupabaseServer, id: string, p: UserPrefs): Promise<void> {
+  await supabase.from("profiles").upsert({
+    id,
+    country: p.country,
+    store_id: p.storeId,
+    diet_tags: p.dietTags,
+    equipment: p.equipment,
+    household_size: p.householdSize,
+    meals_per_week: p.mealsPerWeek,
+    budget: p.budget,
+    ambiance: p.ambiance,
+    excluded_ingredients: p.excludedIngredients ?? [],
+    updated_at: new Date().toISOString(),
   });
 }
 
