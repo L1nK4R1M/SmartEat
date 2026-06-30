@@ -1,4 +1,4 @@
-import { MapPin, Store, Wallet, Users, Salad, Flame, Sparkles, Ban } from "lucide-react";
+import { MapPin, Store, Wallet, Users, Salad, Flame, Sparkles, Ban, Clock } from "lucide-react";
 import type { PrefsSummary as Summary } from "@/lib/summary";
 import { formatEuro } from "@/lib/utils";
 
@@ -12,6 +12,11 @@ export function PrefsSummary({ summary }: { summary: Summary }) {
       icon: <Users size={15} />,
       label: "Foyer",
       value: `${summary.householdSize} pers · ${summary.mealsPerWeek} repas/sem`,
+    },
+    {
+      icon: <Clock size={15} />,
+      label: "Repas",
+      value: summary.mealSlots.length ? summary.mealSlots.join(", ") : "—",
     },
     { icon: <Salad size={15} />, label: "Régime", value: summary.diets.length ? summary.diets.join(", ") : "Aucun" },
     { icon: <Flame size={15} />, label: "Équipement", value: summary.equipment.join(", ") || "—" },

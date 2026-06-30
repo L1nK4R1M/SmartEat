@@ -28,6 +28,7 @@ export const INGREDIENTS: Ingredient[] = [
   { id: "cream", name: "Crème fraîche", aisle: "cremerie", baseUnit: "ml", packSize: 200, packLabel: "pot 20 cl", packPrice: 1.2 },
   { id: "yogurt", name: "Yaourt grec", aisle: "cremerie", baseUnit: "g", packSize: 400, packLabel: "pot 400 g", packPrice: 2.0 },
   { id: "butter", name: "Beurre", aisle: "cremerie", baseUnit: "g", packSize: 250, packLabel: "plaquette 250 g", packPrice: 2.0 },
+  { id: "milk", name: "Lait demi-écrémé", aisle: "cremerie", baseUnit: "ml", packSize: 1000, packLabel: "brique 1 L", packPrice: 1.1 },
 
   // ---------- Fruits & Légumes ----------
   { id: "potato", name: "Pommes de terre", aisle: "fruits_legumes", baseUnit: "g", packSize: 1000, packLabel: "filet 1 kg", packPrice: 2.0 },
@@ -50,6 +51,7 @@ export const INGREDIENTS: Ingredient[] = [
   { id: "avocado", name: "Avocat", aisle: "fruits_legumes", baseUnit: "piece", packSize: 2, packLabel: "filet x2", packPrice: 1.8 },
   { id: "lemon", name: "Citron", aisle: "fruits_legumes", baseUnit: "piece", packSize: 4, packLabel: "filet x4", packPrice: 1.4 },
   { id: "green_beans", name: "Haricots verts", aisle: "fruits_legumes", baseUnit: "g", packSize: 400, packLabel: "400 g", packPrice: 2.4 },
+  { id: "banana", name: "Bananes", aisle: "fruits_legumes", baseUnit: "piece", packSize: 6, packLabel: "régime ≈6", packPrice: 1.5 },
 
   // ---------- Épicerie ----------
   { id: "tofu", name: "Tofu nature", aisle: "epicerie", baseUnit: "g", packSize: 200, packLabel: "bloc 200 g", packPrice: 1.8 },
@@ -80,4 +82,5 @@ export const INGREDIENTS: Ingredient[] = [
   // ---------- Surgelé ----------
   { id: "frozen_veg", name: "Poêlée de légumes surgelés", aisle: "surgele", baseUnit: "g", packSize: 750, packLabel: "sachet 750 g", packPrice: 2.5 },
   { id: "peas", name: "Petits pois surgelés", aisle: "surgele", baseUnit: "g", packSize: 1000, packLabel: "sachet 1 kg", packPrice: 2.0 },
+  { id: "berries", name: "Fruits rouges surgelés", aisle: "surgele", baseUnit: "g", packSize: 450, packLabel: "sachet 450 g", packPrice: 3.5 },
 ];

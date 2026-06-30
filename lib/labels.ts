@@ -4,6 +4,7 @@ import type {
   Capability,
   Country,
   DietTag,
+  MealSlot,
   MealType,
   StoreKind,
 } from "./types";
@@ -36,19 +37,38 @@ export const MEAL_TYPE_LABELS: Record<MealType, { label: string; emoji: string }
   monde: { label: "Saveurs du monde", emoji: "🌍" },
 };
 
+// Protéines minimales par portion exigées quand l'ambiance "Riche en protéines"
+// est demandée (le moteur ne retient alors que des repas >= ce seuil).
+export const PROTEIN_MIN = 40; // g / portion
+
+// Moments de la journée. `short` sert l'onglet vertical de la carte jour ;
+// `color` reprend la palette pastel pour distinguer les sections du plan.
+export const MEAL_SLOT_LABELS: Record<
+  MealSlot,
+  { label: string; short: string; emoji: string; color: string }
+> = {
+  petit_dej: { label: "Petit-déjeuner", short: "P-déj", emoji: "🥐", color: "#f59e0b" },
+  dejeuner: { label: "Déjeuner", short: "Déj", emoji: "🍽️", color: "#16a34a" },
+  diner: { label: "Dîner", short: "Dîner", emoji: "🌙", color: "#6366f1" },
+};
+
+// Ordre d'affichage des moments dans le plan (matin -> soir).
+export const MEAL_SLOT_ORDER: MealSlot[] = ["petit_dej", "dejeuner", "diner"];
+
 // Ambiances de l'onboarding (cartes PASTEL façon Romi). On mappe vers les
 // MealType du moteur. `tint` = classes de fond/accent pastel (jusqu'à 3 choix).
 export interface AmbianceConfig {
   type: MealType;
   label: string;
   emoji: string;
+  hint?: string; // précision affichée sous le libellé
   tint: string; // fond pastel au repos
   tintActive: string; // fond + bordure quand sélectionné
 }
 
 export const AMBIANCES: AmbianceConfig[] = [
   { type: "rapide", label: "Rapide & facile", emoji: "⚡", tint: "bg-amber-50 border-amber-100", tintActive: "bg-amber-100 border-amber-300 ring-amber-300" },
-  { type: "proteine", label: "Riche en protéines", emoji: "💪", tint: "bg-rose-50 border-rose-100", tintActive: "bg-rose-100 border-rose-300 ring-rose-300" },
+  { type: "proteine", label: "Riche en protéines", emoji: "💪", hint: `≥ ${PROTEIN_MIN} g / repas`, tint: "bg-rose-50 border-rose-100", tintActive: "bg-rose-100 border-rose-300 ring-rose-300" },
   { type: "famille", label: "En famille", emoji: "👨‍👩‍👧", tint: "bg-sky-50 border-sky-100", tintActive: "bg-sky-100 border-sky-300 ring-sky-300" },
   { type: "sain", label: "Healthy", emoji: "🥗", tint: "bg-emerald-50 border-emerald-100", tintActive: "bg-emerald-100 border-emerald-300 ring-emerald-300" },
   { type: "gourmand", label: "Gourmand", emoji: "😋", tint: "bg-orange-50 border-orange-100", tintActive: "bg-orange-100 border-orange-300 ring-orange-300" },

@@ -4,6 +4,7 @@ import {
   pgTable,
   primaryKey,
   text,
+  timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -36,6 +37,8 @@ export const users = pgTable("users", {
   equipment: text("equipment").array().notNull().default([]),
   householdSize: integer("household_size").notNull().default(2),
   mealsPerWeek: integer("meals_per_week").notNull().default(5),
+  // Moments planifiés (petit_dej | dejeuner | diner).
+  mealSlots: text("meal_slots").array().notNull().default(["dejeuner", "diner"]),
 });
 
 export const ingredients = pgTable("ingredients", {
@@ -52,6 +55,8 @@ export const recipes = pgTable("recipes", {
   emoji: text("emoji").notNull().default("🍽️"),
   // Tableaux Postgres -> index GIN -> opérateurs @> / <@ (voir migrations).
   mealTypes: text("meal_types").array().notNull().default([]),
+  // Moments de la journée adaptés (petit_dej | dejeuner | diner).
+  slots: text("slots").array().notNull().default(["dejeuner", "diner"]),
   dietTags: text("diet_tags").array().notNull().default([]),
   reqCapabilities: text("req_capabilities").array().notNull().default([]),
   prepMinutes: integer("prep_minutes").notNull(),
@@ -79,6 +84,20 @@ export const recipeIngredients = pgTable(
   },
   (t) => [primaryKey({ columns: [t.recipeId, t.ingredientId] })],
 );
+
+// Listes de courses sauvegardées (l'utilisateur peut en garder plusieurs).
+export const shoppingLists = pgTable("shopping_lists", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  storeName: text("store_name"),
+  mealIds: text("meal_ids").array().notNull().default([]),
+  itemCount: integer("item_count").notNull().default(0),
+  total: numeric("total").notNull().default("0"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
 
 // Override de prix par magasin (optionnel) — profil de prix du §4.
 export const storePrices = pgTable(

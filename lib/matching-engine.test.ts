@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { INGREDIENTS, RECIPES, STORES } from "@/db/seed-data";
+import { PROTEIN_MIN } from "./labels";
 import { canCook } from "./capabilities";
-import { eligibleRecipes, planWeek } from "./matching-engine";
+import { displaySlot, eligibleRecipes, planWeek } from "./matching-engine";
 import { recipeCostPerServing } from "./pricing";
 import type { GenerationRequest, Ingredient, UserPrefs } from "./types";
 
@@ -17,6 +18,7 @@ const basePrefs: UserPrefs = {
   mealsPerWeek: 5,
   budget: 35,
   ambiance: [],
+  mealSlots: ["petit_dej", "dejeuner", "diner"],
 };
 
 const wideRequest: GenerationRequest = { budget: 200, mealTypes: [] };
@@ -104,5 +106,33 @@ describe("Recipe Matching Engine — combinatoire intelligente", () => {
     // Au moins deux graines donnent une sélection distincte (variété réelle).
     const sigs = new Set(seeds.map((p) => p.recipes.map((r) => r.id).sort().join(",")));
     expect(sigs.size).toBeGreaterThan(1);
+  });
+
+  it("ne propose que des recettes du moment demandé (petit-déj seul)", () => {
+    const prefs: UserPrefs = { ...basePrefs, mealSlots: ["petit_dej"] };
+    const eligible = eligibleRecipes(RECIPES, prefs, wideRequest);
+    expect(eligible.length).toBeGreaterThan(0);
+    expect(eligible.every((r) => r.slots.includes("petit_dej"))).toBe(true);
+    // Un plat de dîner pur (ex. bolognaise) ne doit jamais apparaître au petit-déj.
+    expect(eligible.find((r) => r.id === "r04")).toBeUndefined();
+  });
+
+  it("ambiance protéinée : chaque repas retenu a >= 40 g de protéines", () => {
+    const prefs: UserPrefs = { ...basePrefs, mealSlots: ["dejeuner", "diner"] };
+    const request: GenerationRequest = { budget: 200, mealTypes: ["proteine"] };
+    const eligible = eligibleRecipes(RECIPES, prefs, request);
+    expect(eligible.length).toBeGreaterThan(0);
+    expect(eligible.every((r) => r.nutrition.protein >= PROTEIN_MIN)).toBe(true);
+    const plan = planWeek(RECIPES, prefs, request, ingredientsById, store);
+    expect(plan.recipes.every((r) => r.nutrition.protein >= PROTEIN_MIN)).toBe(true);
+  });
+
+  it("équilibre la semaine entre les moments demandés", () => {
+    const prefs: UserPrefs = { ...basePrefs, mealSlots: ["petit_dej", "dejeuner"], mealsPerWeek: 4 };
+    const plan = planWeek(RECIPES, prefs, { budget: 120, mealTypes: [] }, ingredientsById, store);
+    const slots = plan.recipes.map((r) => displaySlot(r, prefs.mealSlots));
+    // Avec deux moments demandés et un budget large, les deux sont représentés.
+    expect(slots).toContain("petit_dej");
+    expect(slots).toContain("dejeuner");
   });
 });

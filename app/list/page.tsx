@@ -7,8 +7,10 @@ import { buildShoppingList } from "@/lib/shopping-list";
 import { getPriceBook } from "@/lib/prices/price-book";
 import { getCurrentUser } from "@/lib/supabase/server";
 import { loadPantry } from "@/app/pantry-actions";
+import { defaultListName } from "@/lib/saved-lists";
 import { BrandLogo } from "@/components/brand-logo";
 import { ShoppingList } from "@/components/shopping-list";
+import { SaveListButton } from "@/components/save-list-button";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -70,6 +72,20 @@ export default async function ListPage({
         authed={!!user}
         initialOwned={initialOwned}
       />
+
+      {/* Sauvegarder — pour garder plusieurs listes de courses */}
+      <div className="mt-6">
+        <SaveListButton
+          authed={!!user}
+          input={{
+            name: defaultListName(store.name),
+            storeName: store.name,
+            mealIds: ids,
+            itemCount: list.itemCount,
+            total: list.total,
+          }}
+        />
+      </div>
 
       {/* Recettes de la semaine avec toutes les étapes */}
       <section className="mt-8">

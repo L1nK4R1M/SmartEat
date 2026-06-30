@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
+import type { MealSlot } from "@/lib/types";
 import { repo } from "@/lib/repo";
 import { getPrefs, parseMealIds, parseRequest } from "@/lib/prefs";
-import { bestSubstitute, buildPlanFromIds, planWeek } from "@/lib/matching-engine";
+import { assignSlots, bestSubstitute, buildPlanFromIds, planWeek } from "@/lib/matching-engine";
 import { buildShoppingList } from "@/lib/shopping-list";
 import { recipeMealCost } from "@/lib/pricing";
 import { getPriceBook } from "@/lib/prices/price-book";
@@ -53,6 +54,13 @@ export default async function PlanPage({
   }
   const selectedIds = selected.map((r) => r.id);
 
+  // Moments demandés (repli midi + soir) — sert à étiqueter chaque repas.
+  const selectedSlots: MealSlot[] = prefs.mealSlots?.length
+    ? prefs.mealSlots
+    : ["dejeuner", "diner"];
+  // Répartition équilibrée des repas entre les moments (déjeuner / dîner / petit-déj).
+  const slotByRecipe = assignSlots(selected, selectedSlots);
+
   const list = buildShoppingList(selected, ingredientsMap, prefs.householdSize, store, priceBook.unit);
   const substitute = bestSubstitute(
     recipes,
@@ -82,6 +90,7 @@ export default async function PlanPage({
       imageUrl: recipe.imageUrl,
       prepMinutes: recipe.prepMinutes,
       mealTypes: recipe.mealTypes,
+      slot: slotByRecipe.get(recipe.id) ?? selectedSlots[0],
       mealCost: recipeMealCost(recipe, ingredientsMap, store, prefs.householdSize, priceBook.unit),
       swapHref: substitute
         ? planHref(

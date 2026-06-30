@@ -1,12 +1,12 @@
-import type { Recipe } from "@/lib/types";
+import type { MealSlot, Recipe } from "@/lib/types";
 
 // Catalogue curaté (FR/BE). Le moteur "cherche" les recettes adaptées (régime +
-// équipement + type), une par jour. Pas de prix stocké : calculé depuis les
-// ingrédients au prix du magasin (lib/pricing.ts). Chaque recette a ses étapes.
+// équipement + moment + ambiance), réparties sur la semaine. Pas de prix stocké :
+// calculé depuis les ingrédients au prix du magasin (lib/pricing.ts).
 //
 // Rappel capacités : four=roast,bake,gratin,heat · airfryer=roast,fry,heat
 //                    poele=fry,sear,simmer,heat · micro=heat,reheat,steam
-export const RECIPES: Recipe[] = [
+const BASE_RECIPES: Omit<Recipe, "slots">[] = [
   {
     id: "r01", title: "Poulet rôti & légumes", emoji: "🍗",
     mealTypes: ["proteine", "sain"], dietTags: ["halal", "sans_gluten", "sans_lactose"],
@@ -688,4 +688,145 @@ export const RECIPES: Recipe[] = [
     ],
     nutrition: { kcal: 439, protein: 41, carbs: 47, fat: 11 },
   },
+
+  // ---------- Petit-déjeuner ----------
+  {
+    id: "b01", title: "Bowl yaourt, avoine & miel", emoji: "🥣",
+    mealTypes: ["rapide", "sain"], dietTags: ["halal", "vege", "pescetarien"],
+    reqCapabilities: ["heat"], prepMinutes: 5, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "yogurt", qtyPerServing: 150, unit: "g" },
+      { ingredientId: "oats", qtyPerServing: 40, unit: "g" },
+      { ingredientId: "honey", qtyPerServing: 15, unit: "g" },
+      { ingredientId: "banana", qtyPerServing: 1, unit: "piece" },
+    ],
+    steps: [
+      "Verser le yaourt grec dans un bol.",
+      "Ajouter les flocons d'avoine et la banane en rondelles.",
+      "Napper de miel.",
+      "Mélanger et déguster.",
+    ],
+    nutrition: { kcal: 372, protein: 18, carbs: 60, fat: 7 },
+  },
+  {
+    id: "b02", title: "Pancakes flocons d'avoine", emoji: "🥞",
+    mealTypes: ["gourmand", "famille"], dietTags: ["halal", "vege", "pescetarien"],
+    reqCapabilities: ["fry"], prepMinutes: 15, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "oats", qtyPerServing: 60, unit: "g" },
+      { ingredientId: "eggs", qtyPerServing: 2, unit: "piece" },
+      { ingredientId: "milk", qtyPerServing: 100, unit: "ml" },
+      { ingredientId: "banana", qtyPerServing: 1, unit: "piece" },
+      { ingredientId: "honey", qtyPerServing: 10, unit: "g" },
+    ],
+    steps: [
+      "Mixer flocons d'avoine, œufs, lait et banane en une pâte lisse.",
+      "Chauffer une poêle légèrement huilée à feu moyen.",
+      "Cuire de petites louches de pâte 2 min par face.",
+      "Empiler et napper de miel.",
+    ],
+    nutrition: { kcal: 421, protein: 21, carbs: 58, fat: 11 },
+  },
+  {
+    id: "b03", title: "Tartines avocat & œuf", emoji: "🥑",
+    mealTypes: ["sain", "rapide"], dietTags: ["halal", "vege", "pescetarien", "sans_lactose"],
+    reqCapabilities: ["fry"], prepMinutes: 12, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "bread", qtyPerServing: 1, unit: "piece" },
+      { ingredientId: "avocado", qtyPerServing: 0.5, unit: "piece" },
+      { ingredientId: "eggs", qtyPerServing: 2, unit: "piece" },
+      { ingredientId: "cherry_tomato", qtyPerServing: 60, unit: "g" },
+    ],
+    steps: [
+      "Toaster le pain.",
+      "Écraser l'avocat et l'étaler sur les tranches.",
+      "Cuire les œufs au plat à la poêle.",
+      "Déposer l'œuf et les tomates cerises sur la tartine.",
+    ],
+    nutrition: { kcal: 398, protein: 19, carbs: 32, fat: 22 },
+  },
+  {
+    id: "b04", title: "Porridge banane & cacahuète", emoji: "🍌",
+    mealTypes: ["rapide", "sain"], dietTags: ["halal", "vege", "pescetarien"],
+    reqCapabilities: ["heat"], prepMinutes: 8, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "oats", qtyPerServing: 60, unit: "g" },
+      { ingredientId: "milk", qtyPerServing: 200, unit: "ml" },
+      { ingredientId: "banana", qtyPerServing: 1, unit: "piece" },
+      { ingredientId: "peanut_butter", qtyPerServing: 15, unit: "g" },
+    ],
+    steps: [
+      "Chauffer les flocons d'avoine avec le lait 4 à 5 min en remuant.",
+      "Ajouter la banane écrasée.",
+      "Incorporer le beurre de cacahuète.",
+      "Servir chaud.",
+    ],
+    nutrition: { kcal: 449, protein: 19, carbs: 62, fat: 15 },
+  },
+  {
+    id: "b05", title: "Smoothie bowl fruits rouges", emoji: "🫐",
+    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "pescetarien", "sans_gluten"],
+    reqCapabilities: ["heat"], prepMinutes: 8, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "berries", qtyPerServing: 120, unit: "g" },
+      { ingredientId: "banana", qtyPerServing: 1, unit: "piece" },
+      { ingredientId: "yogurt", qtyPerServing: 120, unit: "g" },
+      { ingredientId: "oats", qtyPerServing: 30, unit: "g" },
+    ],
+    steps: [
+      "Mixer fruits rouges, banane et yaourt jusqu'à obtenir une crème épaisse.",
+      "Verser dans un bol.",
+      "Parsemer de flocons d'avoine.",
+      "Déguster aussitôt.",
+    ],
+    nutrition: { kcal: 318, protein: 14, carbs: 56, fat: 5 },
+  },
+  {
+    id: "b06", title: "Œufs brouillés & pain grillé", emoji: "🍳",
+    mealTypes: ["proteine", "rapide"], dietTags: ["halal", "vege", "pescetarien"],
+    reqCapabilities: ["fry"], prepMinutes: 10, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "eggs", qtyPerServing: 3, unit: "piece" },
+      { ingredientId: "bread", qtyPerServing: 1, unit: "piece" },
+      { ingredientId: "milk", qtyPerServing: 20, unit: "ml" },
+      { ingredientId: "butter", qtyPerServing: 10, unit: "g" },
+    ],
+    steps: [
+      "Battre les œufs avec le lait, saler.",
+      "Faire fondre le beurre à la poêle à feu doux.",
+      "Cuire les œufs en remuant pour les garder crémeux.",
+      "Servir avec le pain grillé.",
+    ],
+    nutrition: { kcal: 372, protein: 24, carbs: 22, fat: 21 },
+  },
 ];
+
+// Moments de la journée par recette. Par défaut une recette convient au déjeuner
+// ET au dîner ; on précise ici les exceptions (petit-déj, plats midi-only…).
+const SLOT_OVERRIDES: Record<string, MealSlot[]> = {
+  // Petits-déjeuners dédiés
+  b01: ["petit_dej"],
+  b02: ["petit_dej"],
+  b04: ["petit_dej"],
+  b05: ["petit_dej"],
+  // Œufs : petit-déj ou déjeuner léger
+  b03: ["petit_dej", "dejeuner"],
+  b06: ["petit_dej", "dejeuner"],
+  r08: ["petit_dej", "dejeuner"], // omelette
+  r21: ["petit_dej", "dejeuner"], // œufs brouillés & toast avocat
+  r32: ["petit_dej", "dejeuner"], // porridge protéiné
+  // Salades / bowls / soupes : plutôt déjeuner
+  r05: ["dejeuner"],
+  r22: ["dejeuner"],
+  r31: ["dejeuner"],
+  r16: ["dejeuner", "diner"],
+  r28: ["dejeuner", "diner"],
+};
+
+const DEFAULT_SLOTS: MealSlot[] = ["dejeuner", "diner"];
+
+// Catalogue final : on attache les moments (slots) à chaque recette.
+export const RECIPES: Recipe[] = BASE_RECIPES.map((r) => ({
+  ...r,
+  slots: SLOT_OVERRIDES[r.id] ?? DEFAULT_SLOTS,
+}));

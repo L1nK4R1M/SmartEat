@@ -3,13 +3,15 @@
 import { useMemo, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronLeft, Minus, Plus } from "lucide-react";
-import type { Appliance, Country, DietTag, MealType, Store } from "@/lib/types";
+import type { Appliance, Country, DietTag, MealSlot, MealType, Store } from "@/lib/types";
 import {
   AMBIANCES,
   APPLIANCE_LABELS,
   COUNTRY_LABELS,
   DIET_LABELS,
   EXCLUSIONS,
+  MEAL_SLOT_LABELS,
+  MEAL_SLOT_ORDER,
   STORE_KIND_LABELS,
 } from "@/lib/labels";
 import { completeOnboarding } from "@/app/actions";
@@ -21,7 +23,7 @@ import { ApplianceIcon } from "@/components/appliance-icon";
 import { cn, formatEuro } from "@/lib/utils";
 
 // Onboarding façon Romi — une question par écran, transitions animées.
-// Pays -> Magasin -> Budget -> Personnes -> Ambiance -> Besoins -> Cuisine.
+// Pays -> Magasin -> Budget -> Personnes -> Repas -> Ambiance -> Besoins -> Éviter -> Cuisine.
 const COUNTRIES = Object.keys(COUNTRY_LABELS) as Country[];
 const DIETS = Object.keys(DIET_LABELS) as DietTag[];
 const APPLIANCES = Object.keys(APPLIANCE_LABELS) as Appliance[];
@@ -30,6 +32,7 @@ const STEPS = [
   "Magasin",
   "Budget",
   "Personnes",
+  "Repas",
   "Ambiance",
   "Besoins",
   "Éviter",
@@ -46,6 +49,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
   const [storeId, setStoreId] = useState("");
   const [budget, setBudget] = useState(35);
   const [householdSize, setHouseholdSize] = useState(2);
+  const [mealSlots, setMealSlots] = useState<MealSlot[]>(["dejeuner", "diner"]);
   const [ambiance, setAmbiance] = useState<MealType[]>([]);
   const [diets, setDiets] = useState<DietTag[]>([]);
   const [equipment, setEquipment] = useState<Appliance[]>([]);
@@ -65,10 +69,11 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
     (step === 1 && !!storeId) ||
     step === 2 ||
     step === 3 ||
-    step === 4 ||
+    (step === 4 && mealSlots.length > 0) ||
     step === 5 ||
     step === 6 ||
-    (step === 7 && equipment.length > 0);
+    step === 7 ||
+    (step === 8 && equipment.length > 0);
 
   function go(delta: number) {
     setDir(delta);
@@ -90,9 +95,14 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
         mealsPerWeek,
         budget,
         ambiance,
+        mealSlots,
         excludedIngredients: excluded,
       }),
     );
+  }
+
+  function toggleSlot(s: MealSlot) {
+    setMealSlots((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
   }
 
   function toggleAmbiance(t: MealType) {
@@ -267,6 +277,44 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
 
             {step === 4 && (
               <Step
+                title="quels repas planifier ?"
+                subtitle="On génère des recettes adaptées à chaque moment."
+              >
+                <div className="space-y-3">
+                  {MEAL_SLOT_ORDER.map((s) => {
+                    const selected = mealSlots.includes(s);
+                    return (
+                      <Tappable key={s}>
+                        <button
+                          type="button"
+                          aria-pressed={selected}
+                          onClick={() => toggleSlot(s)}
+                          className={cn(
+                            "relative flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-colors",
+                            selected
+                              ? "border-primary bg-primary/8 ring-2 ring-primary"
+                              : "border-outline bg-surface hover:bg-surface-variant",
+                          )}
+                        >
+                          <span className="text-2xl" aria-hidden>
+                            {MEAL_SLOT_LABELS[s].emoji}
+                          </span>
+                          <span className="font-medium">{MEAL_SLOT_LABELS[s].label}</span>
+                          {selected && (
+                            <span className="absolute right-3 top-1/2 grid h-5 w-5 -translate-y-1/2 place-items-center rounded-full bg-primary text-on-primary">
+                              <Check size={13} strokeWidth={3} />
+                            </span>
+                          )}
+                        </button>
+                      </Tappable>
+                    );
+                  })}
+                </div>
+              </Step>
+            )}
+
+            {step === 5 && (
+              <Step
                 title="quelle ambiance ?"
                 subtitle={`Choisis jusqu'à ${MAX_AMBIANCE} options. (facultatif)`}
               >
@@ -295,6 +343,9 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
                           <span className="font-semibold leading-tight text-slate-800">
                             {a.label}
                           </span>
+                          {a.hint && (
+                            <span className="text-xs font-medium text-slate-600">{a.hint}</span>
+                          )}
                           {selected && (
                             <span className="absolute right-3 top-3 grid h-5 w-5 place-items-center rounded-full bg-primary text-on-primary">
                               <Check size={13} strokeWidth={3} />
@@ -308,7 +359,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
               </Step>
             )}
 
-            {step === 5 && (
+            {step === 6 && (
               <Step
                 title="des besoins alimentaires ?"
                 subtitle="Plusieurs choix possibles. Laisse vide sinon."
@@ -331,7 +382,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
               </Step>
             )}
 
-            {step === 6 && (
+            {step === 7 && (
               <Step
                 title="à éviter ?"
                 subtitle="Allergènes ou aliments que tu ne veux pas. (facultatif)"
@@ -350,7 +401,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
               </Step>
             )}
 
-            {step === 7 && (
+            {step === 8 && (
               <Step
                 title="quel équipement as-tu ?"
                 subtitle="On exclut les recettes que tu ne peux pas cuisiner."

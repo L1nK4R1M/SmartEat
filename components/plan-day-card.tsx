@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { RefreshCw, Clock, Users, Wallet } from "lucide-react";
-import type { MealType } from "@/lib/types";
-import { MEAL_TYPE_LABELS, dayLabel, dayColor } from "@/lib/labels";
+import type { MealSlot, MealType } from "@/lib/types";
+import { MEAL_SLOT_LABELS, MEAL_TYPE_LABELS } from "@/lib/labels";
 import { formatEuro } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { RecipeImage } from "@/components/recipe-image";
@@ -15,34 +15,33 @@ export interface PlanCardRecipe {
   imageUrl?: string;
   prepMinutes: number;
   mealTypes: MealType[];
+  slot: MealSlot;
 }
 
-// Carte jour enrichie (plan, façon Romi) : onglet jour coloré à gauche, visuel,
-// nom, temps, nb personnes, prix calculé, tags d'ambiance. Cliquable -> détail.
+// Carte repas enrichie (plan, façon Romi) : onglet "moment" coloré à gauche,
+// visuel, nom, temps, nb personnes, prix calculé, tags d'ambiance. -> détail.
 export function PlanDayCard({
   recipe,
-  dayIndex,
   householdSize,
   mealCost,
   swapHref,
 }: {
   recipe: PlanCardRecipe;
-  dayIndex: number;
   householdSize: number;
   mealCost: number;
   swapHref: string | null;
 }) {
-  const color = dayColor(dayIndex);
+  const slot = MEAL_SLOT_LABELS[recipe.slot];
   return (
     <article className="relative flex overflow-hidden rounded-[var(--radius-card)] border border-outline bg-surface">
-      {/* Onglet jour coloré */}
+      {/* Onglet moment coloré */}
       <div
         className="flex w-9 shrink-0 items-center justify-center"
-        style={{ backgroundColor: color }}
+        style={{ backgroundColor: slot.color }}
         aria-hidden
       >
         <span className="rotate-180 text-[11px] font-bold uppercase tracking-wider text-white [writing-mode:vertical-rl]">
-          {dayLabel(dayIndex)}
+          {slot.short}
         </span>
       </div>
 
