@@ -5288,6 +5288,70 @@ const BASE_RECIPES: Omit<Recipe, "slots">[] = [
     ],
     nutrition: { kcal: 260, protein: 14, carbs: 38, fat: 6 },
   },
+  {
+    id: "b41", title: "Omelette poulet & fromage blanc", emoji: "🍗",
+    mealTypes: ["proteine", "sain"], dietTags: ["halal", "sans_gluten"],
+    reqCapabilities: ["fry"], prepMinutes: 15, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "eggs", qtyPerServing: 3, unit: "piece" },
+      { ingredientId: "chicken", qtyPerServing: 100, unit: "g" },
+      { ingredientId: "fromage_blanc", qtyPerServing: 150, unit: "g" },
+      { ingredientId: "spinach", qtyPerServing: 40, unit: "g" },
+    ],
+    steps: [
+      "Couper le blanc de poulet en petits dés.",
+      "Le saisir dans une poêle chaude 4 min jusqu'à cuisson.",
+      "Battre les œufs, saler et poivrer.",
+      "Ajouter les épinards et faire tomber 1 min.",
+      "Verser les œufs sur le poulet et les épinards.",
+      "Cuire à feu doux 3-4 min jusqu'à ce que l'omelette soit prise.",
+      "Servir avec le fromage blanc nature en accompagnement.",
+    ],
+    nutrition: { kcal: 480, protein: 45, carbs: 8, fat: 28 },
+  },
+  {
+    id: "b42", title: "Bowl skyr, avoine & beurre de cacahuète", emoji: "💪",
+    mealTypes: ["proteine", "rapide"], dietTags: ["halal", "vege", "pescetarien"],
+    reqCapabilities: ["heat"], prepMinutes: 5, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "yogurt", qtyPerServing: 250, unit: "g" },
+      { ingredientId: "oats", qtyPerServing: 60, unit: "g" },
+      { ingredientId: "peanut_butter", qtyPerServing: 30, unit: "g" },
+      { ingredientId: "banana", qtyPerServing: 1, unit: "piece" },
+      { ingredientId: "honey", qtyPerServing: 10, unit: "g" },
+    ],
+    steps: [
+      "Verser le skyr (yaourt grec) dans deux bols.",
+      "Ajouter les flocons d'avoine.",
+      "Bien mélanger pour homogénéiser.",
+      "Trancher la banane en rondelles.",
+      "La disposer sur le skyr.",
+      "Ajouter le beurre de cacahuète en cœur fondant.",
+      "Napper de miel et servir aussitôt.",
+    ],
+    nutrition: { kcal: 560, protein: 38, carbs: 62, fat: 20 },
+  },
+  {
+    id: "b43", title: "Œufs mollets & jambon", emoji: "🥚",
+    mealTypes: ["proteine", "rapide"], dietTags: ["halal", "sans_gluten"],
+    reqCapabilities: ["heat"], prepMinutes: 12, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "eggs", qtyPerServing: 3, unit: "piece" },
+      { ingredientId: "ham", qtyPerServing: 80, unit: "g" },
+      { ingredientId: "fromage_blanc", qtyPerServing: 100, unit: "g" },
+      { ingredientId: "cherry_tomato", qtyPerServing: 80, unit: "g" },
+    ],
+    steps: [
+      "Porter une casserole d'eau à ébullition.",
+      "Plonger les œufs délicatement et cuire 6 min.",
+      "Rafraîchir sous l'eau froide et écaler.",
+      "Couper les tomates cerises en deux.",
+      "Assaisonner le fromage blanc avec sel, poivre et ciboulette.",
+      "Disposer œufs coupés en deux, tranches de jambon et tomates.",
+      "Servir avec le fromage blanc en accompagnement.",
+    ],
+    nutrition: { kcal: 380, protein: 38, carbs: 6, fat: 22 },
+  },
 
   // ---------- Volaille (suite 2) ----------
   {
@@ -6709,6 +6773,10 @@ const SLOT_OVERRIDES: Record<string, MealSlot[]> = {
   b38: ["petit_dej"],
   b39: ["petit_dej"],
   b40: ["petit_dej", "dejeuner"],
+  // Petits-déjeuners protéinés ≥35g additionnels
+  b41: ["petit_dej", "dejeuner"],
+  b42: ["petit_dej"],
+  b43: ["petit_dej", "dejeuner"],
   // Œufs : petit-déj ou déjeuner léger
   b03: ["petit_dej", "dejeuner"],
   b06: ["petit_dej", "dejeuner"],
