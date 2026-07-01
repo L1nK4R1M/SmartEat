@@ -274,7 +274,7 @@ const BASE_RECIPES: Omit<Recipe, "slots">[] = [
   },
   {
     id: "r15", title: "Bowl poulet & riz (meal prep)", emoji: "🍗",
-    mealTypes: ["proteine", "sain"], dietTags: ["halal", "sans_gluten", "sans_lactose"],
+    mealTypes: ["proteine", "sain"], dietTags: ["halal", "sans_lactose"],
     reqCapabilities: ["roast"], prepMinutes: 35, defaultServings: 2,
     ingredients: [
       { ingredientId: "chicken", qtyPerServing: 160, unit: "g" },
@@ -765,7 +765,7 @@ const BASE_RECIPES: Omit<Recipe, "slots">[] = [
   },
   {
     id: "b05", title: "Smoothie bowl fruits rouges", emoji: "🫐",
-    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "pescetarien", "sans_gluten"],
+    mealTypes: ["sain", "leger"], dietTags: ["halal", "vege", "pescetarien"],
     reqCapabilities: ["heat"], prepMinutes: 8, defaultServings: 2,
     ingredients: [
       { ingredientId: "berries", qtyPerServing: 120, unit: "g" },
