@@ -39,7 +39,7 @@ export const MEAL_TYPE_LABELS: Record<MealType, { label: string; emoji: string }
 
 // Protéines minimales par portion exigées quand l'ambiance "Riche en protéines"
 // est demandée (le moteur ne retient alors que des repas >= ce seuil).
-export const PROTEIN_MIN = 40; // g / portion
+export const PROTEIN_MIN = 35; // g / portion
 
 // Moments de la journée. `short` sert l'onglet vertical de la carte jour ;
 // `color` reprend la palette pastel pour distinguer les sections du plan.

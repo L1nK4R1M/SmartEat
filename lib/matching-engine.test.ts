@@ -132,7 +132,7 @@ describe("Recipe Matching Engine — combinatoire intelligente", () => {
     expect(eligible.find((r) => r.id === "r04")).toBeUndefined();
   });
 
-  it("ambiance protéinée : chaque repas retenu a >= 40 g de protéines", () => {
+  it("ambiance protéinée : chaque repas retenu atteint le seuil de protéines", () => {
     const prefs: UserPrefs = { ...basePrefs, mealSlots: ["dejeuner", "diner"] };
     const request: GenerationRequest = { budget: 200, mealTypes: ["proteine"] };
     const eligible = eligibleRecipes(RECIPES, prefs, request);
