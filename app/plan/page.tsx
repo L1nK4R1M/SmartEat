@@ -3,11 +3,12 @@ import type { MealSlot } from "@/lib/types";
 import { repo } from "@/lib/repo";
 import { getPrefs, parseMealIds, parseRequest } from "@/lib/prefs";
 import {
-  assignSlots,
-  bestSubstitute,
   buildPlanFromIds,
   planWeek,
   requestedSlots,
+  slotSubstitutes,
+  toDayGrid,
+  type PlannedMeal,
 } from "@/lib/matching-engine";
 import { buildShoppingList } from "@/lib/shopping-list";
 import { recipeMealCost } from "@/lib/pricing";
@@ -48,25 +49,31 @@ export default async function PlanPage({
   // Prix RÉELS (Open Prices) là où dispo, sinon repli catalogue. Résolu une fois.
   const priceBook = await getPriceBook([...ingredientsMap.values()], store);
 
-  // Sélection : ids fournis (après swap) sinon plan hebdo budget-aware.
+  // Moments demandés (ordre matin -> soir, repli midi + soir).
+  const selectedSlots: MealSlot[] = requestedSlots(prefs);
+
+  // Grille JOUR × MOMENT : ids fournis (après swap) sinon plan hebdo budget-aware.
   const presetIds = parseMealIds(sp);
-  const preset = presetIds.length ? buildPlanFromIds(presetIds, recipes) : [];
-  let selected = preset;
+  let meals: PlannedMeal[];
   let withinBudget = true;
-  if (preset.length === 0) {
+  let plannedDays = 0;
+  if (presetIds.length) {
+    meals = toDayGrid(buildPlanFromIds(presetIds, recipes), selectedSlots);
+    plannedDays = new Set(meals.map((m) => m.day)).size;
+  } else {
     const plan = planWeek(recipes, prefs, request, ingredientsMap, store, priceBook.unit);
-    selected = plan.recipes;
+    meals = plan.meals;
     withinBudget = plan.withinBudget;
+    plannedDays = plan.plannedDays;
   }
+  const selected = meals.map((m) => m.recipe);
   const selectedIds = selected.map((r) => r.id);
 
-  // Moments demandés (ordre matin -> soir, repli midi + soir) — étiquetage + sections.
-  const selectedSlots: MealSlot[] = requestedSlots(prefs);
-  // Répartition équilibrée des repas entre les moments (petit-déj / déjeuner / dîner).
-  const slotByRecipe = assignSlots(selected, selectedSlots);
-
   const list = buildShoppingList(selected, ingredientsMap, prefs.householdSize, store, priceBook.unit);
-  const substitute = bestSubstitute(
+
+  // Substituts par MOMENT : "Changer" remplace un repas par un autre du même
+  // moment, absent de la semaine (position conservée -> même jour/moment).
+  const subFor = slotSubstitutes(
     recipes,
     prefs,
     request,
@@ -87,29 +94,33 @@ export default async function PlanPage({
 
   const viewData: PlanViewData = {
     store: { name: store.name, domain: store.domain, color: store.color },
-    recipes: selected.map((recipe) => ({
-      id: recipe.id,
-      title: recipe.title,
-      emoji: recipe.emoji,
-      imageUrl: recipe.imageUrl,
-      prepMinutes: recipe.prepMinutes,
-      mealTypes: recipe.mealTypes,
-      slot: slotByRecipe.get(recipe.id) ?? selectedSlots[0],
-      mealCost: recipeMealCost(recipe, ingredientsMap, store, prefs.householdSize, priceBook.unit),
-      swapHref: substitute
-        ? planHref(
-            request.budget,
-            request.mealTypes,
-            selectedIds.map((id) => (id === recipe.id ? substitute.id : id)),
-          )
-        : null,
-    })),
+    recipes: meals.map(({ recipe, slot, day }) => {
+      const sub = subFor(slot);
+      return {
+        id: recipe.id,
+        title: recipe.title,
+        emoji: recipe.emoji,
+        imageUrl: recipe.imageUrl,
+        prepMinutes: recipe.prepMinutes,
+        mealTypes: recipe.mealTypes,
+        slot,
+        day,
+        mealCost: recipeMealCost(recipe, ingredientsMap, store, prefs.householdSize, priceBook.unit),
+        swapHref: sub
+          ? planHref(
+              request.budget,
+              request.mealTypes,
+              selectedIds.map((id) => (id === recipe.id ? sub.id : id)),
+            )
+          : null,
+      };
+    }),
     selectedIds,
     total: list.total,
     budget: request.budget,
     itemCount: list.itemCount,
     householdSize: prefs.householdSize,
-    mealsPerWeek: prefs.mealsPerWeek,
+    plannedDays,
     withinBudget,
     regenerateHref: planHref(request.budget, request.mealTypes, [], nextSeed),
     listHref: `/list?meals=${selectedIds.join(",")}`,
@@ -117,7 +128,6 @@ export default async function PlanPage({
     homeLabel: home.label,
     priceLive: priceBook.liveCount,
     priceStatus: priceBook.status,
-    requestedSlots: selectedSlots,
   };
 
   return (

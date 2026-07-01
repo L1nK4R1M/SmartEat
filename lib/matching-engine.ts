@@ -11,6 +11,10 @@ import { buildShoppingList } from "./shopping-list";
 
 const DEFAULT_SLOTS: MealSlot[] = ["dejeuner", "diner"];
 
+// La semaine se planifie JOUR par JOUR (Lundi -> Dimanche). Chaque jour reçoit
+// une recette par moment demandé (petit-déj / déjeuner / dîner).
+export const WEEK_LEN = 7;
+
 // Moments demandés, TRIÉS dans l'ordre canonique (matin -> soir). L'ordre fixe
 // garantit que le petit-déj n'est pas affamé par l'ordre de sélection : il passe
 // en premier au tourniquet du plan. Repli midi + soir si rien n'est précisé.
@@ -51,10 +55,11 @@ export interface ScoredRecipe {
   costPerServing: number;
 }
 
-// Part équitable par portion = budget / (repas × foyer). Sert de référence au
-// scoring "prix" (une recette sous cette part marque mieux).
+// Part équitable par portion = budget / (jours × moments × foyer). Sert de
+// référence au scoring "prix" (une recette sous cette part marque mieux).
 export function fairSharePerServing(prefs: UserPrefs, request: GenerationRequest): number {
-  const servings = Math.max(1, prefs.mealsPerWeek * prefs.householdSize);
+  const slots = Math.max(1, requestedSlots(prefs).length);
+  const servings = Math.max(1, WEEK_LEN * slots * prefs.householdSize);
   return request.budget / servings;
 }
 
@@ -146,18 +151,28 @@ export function rankRecipes(
     .sort((a, b) => b.score - a.score || a.recipe.id.localeCompare(b.recipe.id));
 }
 
+// Un repas placé dans la semaine : quel jour (0 = Lundi), quel moment, quelle recette.
+export interface PlannedMeal {
+  day: number; // 0..6 -> Lundi..Dimanche
+  slot: MealSlot;
+  recipe: Recipe;
+}
+
 export interface WeekPlan {
-  recipes: Recipe[];
+  meals: PlannedMeal[]; // grille jour × moment
+  recipes: Recipe[]; // liste plate (ordre par jour) pour la liste de courses
   total: number; // coût réel du panier (au magasin) — DOIT être <= budget
-  withinBudget: boolean; // a-t-on pu remplir tous les jours sous le budget ?
+  plannedDays: number; // nb de jours complets réellement générés
+  targetDays: number; // nb de jours visés (borné par le budget)
+  withinBudget: boolean; // a-t-on atteint le nb de jours visé ?
   eligibleCount: number;
 }
 
-// ---- Passe 3 : plan hebdo glouton, ÉQUILIBRÉ entre moments, sous budget ----
-// On regroupe les recettes éligibles par moment demandé, puis on pioche en
-// tourniquet (petit-déj, déjeuner, dîner…) la meilleure recette qui tient encore
-// dans le budget, jusqu'à couvrir `mealsPerWeek`. Le coût du panier ne pouvant
-// que croître, une recette qui ne rentre pas est définitivement écartée.
+// ---- Passe 3 : plan hebdo, JOUR par JOUR, sous contrainte de budget ----
+// Pour chaque jour (Lundi -> Dimanche) on compose UNE recette par moment demandé.
+// Un jour n'est retenu que s'il est COMPLET et que le panier agrégé (dédoublonné,
+// produits entiers) reste <= budget. On s'arrête au premier jour qu'on ne peut
+// plus compléter dans le budget. Recettes distinctes sur toute la semaine.
 export function planWeek(
   recipes: Recipe[],
   prefs: UserPrefs,
@@ -167,12 +182,10 @@ export function planWeek(
   priceBook?: Map<string, number>,
 ): WeekPlan {
   const ranked = rankRecipes(recipes, prefs, request, ingredientsById, store, priceBook);
-  const days = prefs.mealsPerWeek;
   const slots = requestedSlots(prefs);
 
-  // Buckets ordonnés par score : une recette figure dans CHAQUE moment qu'elle
-  // couvre (un plat midi+soir alimente donc les deux files). La déduplication
-  // garantit qu'on ne la choisit qu'une fois.
+  // Une file ordonnée par score et par moment : une recette figure dans chaque
+  // moment qu'elle couvre ; la déduplication évite de la reprendre deux fois.
   const bySlot = new Map<MealSlot, Recipe[]>(slots.map((s) => [s, []]));
   for (const { recipe } of ranked) {
     for (const s of slots) {
@@ -180,43 +193,59 @@ export function planWeek(
     }
   }
   const cursor = new Map<MealSlot, number>(slots.map((s) => [s, 0]));
+  const usedIds = new Set<string>();
 
   const chosen: Recipe[] = [];
-  const chosenIds = new Set<string>();
-  let progressed = true;
-  while (chosen.length < days && progressed) {
-    progressed = false;
+  const meals: PlannedMeal[] = [];
+
+  for (let day = 0; day < WEEK_LEN; day++) {
+    // On tente de composer un jour COMPLET : une recette par moment, sans
+    // dépasser le budget une fois toutes ajoutées.
+    const dayPicks: { slot: MealSlot; recipe: Recipe }[] = [];
+    let complete = true;
+
     for (const slot of slots) {
-      if (chosen.length >= days) break;
       const list = bySlot.get(slot)!;
       let i = cursor.get(slot)!;
+      let picked: Recipe | null = null;
       while (i < list.length) {
-        const candidate = list[i];
+        const cand = list[i];
         i++;
-        if (chosenIds.has(candidate.id)) continue; // déjà pris via un autre moment
-        const total = buildShoppingList(
-          [...chosen, candidate],
-          ingredientsById,
-          prefs.householdSize,
-          store,
-          priceBook,
-        ).total;
+        if (usedIds.has(cand.id) || dayPicks.some((p) => p.recipe.id === cand.id)) continue;
+        const basket = [...chosen, ...dayPicks.map((p) => p.recipe), cand];
+        const total = buildShoppingList(basket, ingredientsById, prefs.householdSize, store, priceBook).total;
         if (total <= request.budget) {
-          chosen.push(candidate);
-          chosenIds.add(candidate.id);
-          progressed = true;
+          picked = cand;
+          cursor.set(slot, i);
           break;
         }
+        // Trop cher : on continue à scanner des recettes moins coûteuses.
       }
-      cursor.set(slot, i);
+      if (!picked) {
+        complete = false;
+        break;
+      }
+      dayPicks.push({ slot, recipe: picked });
+    }
+
+    if (!complete) break; // jour incomplet dans le budget -> on arrête la semaine
+
+    for (const p of dayPicks) {
+      chosen.push(p.recipe);
+      usedIds.add(p.recipe.id);
+      meals.push({ day, slot: p.slot, recipe: p.recipe });
     }
   }
 
   const total = buildShoppingList(chosen, ingredientsById, prefs.householdSize, store, priceBook).total;
+  const plannedDays = new Set(meals.map((m) => m.day)).size;
   return {
+    meals,
     recipes: chosen,
     total,
-    withinBudget: chosen.length >= days,
+    plannedDays,
+    targetDays: WEEK_LEN,
+    withinBudget: plannedDays >= WEEK_LEN,
     eligibleCount: ranked.length,
   };
 }
@@ -229,6 +258,22 @@ export function buildPlanFromIds(
   return ids
     .map((id) => recipes.find((r) => r.id === id))
     .filter((r): r is Recipe => Boolean(r));
+}
+
+// Reconstruit une grille jour × moment depuis une liste plate (chemin "preset",
+// après un swap). On assigne un moment à chaque recette (équilibrage), puis le
+// k-ième repas d'un moment tombe le jour k.
+export function toDayGrid(recipes: Recipe[], selectedSlots: MealSlot[]): PlannedMeal[] {
+  const slots = MEAL_SLOT_ORDER.filter((s) => selectedSlots.includes(s));
+  const effective = slots.length ? slots : DEFAULT_SLOTS;
+  const slotOf = assignSlots(recipes, effective);
+  const dayOf = new Map<MealSlot, number>();
+  return recipes.map((r) => {
+    const slot = slotOf.get(r.id) ?? effective[0];
+    const day = dayOf.get(slot) ?? 0;
+    dayOf.set(slot, day + 1);
+    return { day, slot, recipe: r };
+  });
 }
 
 // Meilleur substitut pour le swap : top-1 éligible hors sélection courante.
@@ -245,4 +290,22 @@ export function bestSubstitute(
     (s) => !currentIds.includes(s.recipe.id),
   );
   return ranked[0]?.recipe ?? null;
+}
+
+// Substituts par MOMENT : pour chaque repas on veut un remplaçant qui sert le
+// même moment et n'est pas déjà dans la semaine. On classe une fois, puis on
+// pioche le meilleur candidat par moment.
+export function slotSubstitutes(
+  recipes: Recipe[],
+  prefs: UserPrefs,
+  request: GenerationRequest,
+  ingredientsById: Map<string, Ingredient>,
+  store: Store,
+  usedIds: string[],
+  priceBook?: Map<string, number>,
+): (slot: MealSlot) => Recipe | null {
+  const used = new Set(usedIds);
+  const ranked = rankRecipes(recipes, prefs, request, ingredientsById, store, priceBook);
+  return (slot: MealSlot) =>
+    ranked.find((s) => s.recipe.slots.includes(slot) && !used.has(s.recipe.id))?.recipe ?? null;
 }

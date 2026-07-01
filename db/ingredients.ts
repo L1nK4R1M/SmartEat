@@ -18,6 +18,7 @@ export const INGREDIENTS: Ingredient[] = [
   { id: "cod", name: "Filet de cabillaud", aisle: "boucherie", baseUnit: "g", packSize: 300, packLabel: "≈300 g (2 filets)", packPrice: 6.0 },
   { id: "shrimp", name: "Crevettes", aisle: "boucherie", baseUnit: "g", packSize: 200, packLabel: "200 g", packPrice: 5.0 },
   { id: "tuna_canned", name: "Thon en boîte", aisle: "epicerie", baseUnit: "g", packSize: 140, packLabel: "boîte 140 g", packPrice: 1.6 },
+  { id: "sardines", name: "Sardines en boîte", aisle: "epicerie", baseUnit: "g", packSize: 120, packLabel: "boîte 120 g", packPrice: 1.8 },
 
   // ---------- Crémerie ----------
   { id: "eggs", name: "Œufs", aisle: "cremerie", baseUnit: "piece", packSize: 6, packLabel: "boîte de 6", packPrice: 2.45 },
@@ -30,6 +31,8 @@ export const INGREDIENTS: Ingredient[] = [
   { id: "butter", name: "Beurre", aisle: "cremerie", baseUnit: "g", packSize: 250, packLabel: "plaquette 250 g", packPrice: 2.0 },
   { id: "milk", name: "Lait demi-écrémé", aisle: "cremerie", baseUnit: "ml", packSize: 1000, packLabel: "brique 1 L", packPrice: 1.1 },
   { id: "soy_milk", name: "Lait de soja", aisle: "cremerie", baseUnit: "ml", packSize: 1000, packLabel: "brique 1 L", packPrice: 1.6 },
+  { id: "fromage_blanc", name: "Fromage blanc", aisle: "cremerie", baseUnit: "g", packSize: 500, packLabel: "pot 500 g", packPrice: 1.9 },
+  { id: "halloumi", name: "Halloumi", aisle: "cremerie", baseUnit: "g", packSize: 225, packLabel: "225 g", packPrice: 3.2 },
 
   // ---------- Fruits & Légumes ----------
   { id: "potato", name: "Pommes de terre", aisle: "fruits_legumes", baseUnit: "g", packSize: 1000, packLabel: "filet 1 kg", packPrice: 2.0 },
@@ -53,6 +56,11 @@ export const INGREDIENTS: Ingredient[] = [
   { id: "lemon", name: "Citron", aisle: "fruits_legumes", baseUnit: "piece", packSize: 4, packLabel: "filet x4", packPrice: 1.4 },
   { id: "green_beans", name: "Haricots verts", aisle: "fruits_legumes", baseUnit: "g", packSize: 400, packLabel: "400 g", packPrice: 2.4 },
   { id: "banana", name: "Bananes", aisle: "fruits_legumes", baseUnit: "piece", packSize: 6, packLabel: "régime ≈6", packPrice: 1.5 },
+  { id: "apple", name: "Pommes", aisle: "fruits_legumes", baseUnit: "piece", packSize: 6, packLabel: "filet ≈6", packPrice: 2.4 },
+  { id: "leek", name: "Poireaux", aisle: "fruits_legumes", baseUnit: "g", packSize: 500, packLabel: "≈2-3 pièces", packPrice: 2.0 },
+  { id: "cabbage", name: "Chou", aisle: "fruits_legumes", baseUnit: "g", packSize: 800, packLabel: "1 pièce", packPrice: 1.5 },
+  { id: "butternut", name: "Courge butternut", aisle: "fruits_legumes", baseUnit: "g", packSize: 1000, packLabel: "≈1 kg", packPrice: 2.5 },
+  { id: "pak_choi", name: "Pak choï", aisle: "fruits_legumes", baseUnit: "g", packSize: 400, packLabel: "≈2 pièces", packPrice: 2.2 },
 
   // ---------- Épicerie ----------
   { id: "tofu", name: "Tofu nature", aisle: "epicerie", baseUnit: "g", packSize: 200, packLabel: "bloc 200 g", packPrice: 1.8 },
@@ -75,6 +83,14 @@ export const INGREDIENTS: Ingredient[] = [
   { id: "pesto", name: "Pesto", aisle: "epicerie", baseUnit: "g", packSize: 190, packLabel: "pot 190 g", packPrice: 2.5 },
   { id: "peanut_butter", name: "Beurre de cacahuète", aisle: "epicerie", baseUnit: "g", packSize: 350, packLabel: "pot 350 g", packPrice: 3.0 },
   { id: "honey", name: "Miel", aisle: "epicerie", baseUnit: "g", packSize: 250, packLabel: "pot 250 g", packPrice: 4.0 },
+  { id: "black_beans", name: "Haricots noirs", aisle: "epicerie", baseUnit: "g", packSize: 400, packLabel: "boîte 400 g", packPrice: 1.1 },
+  { id: "corn", name: "Maïs", aisle: "epicerie", baseUnit: "g", packSize: 285, packLabel: "boîte 285 g", packPrice: 1.0 },
+  { id: "polenta", name: "Polenta", aisle: "epicerie", baseUnit: "g", packSize: 500, packLabel: "500 g", packPrice: 1.6 },
+  { id: "gnocchi", name: "Gnocchi", aisle: "epicerie", baseUnit: "g", packSize: 500, packLabel: "sachet 500 g", packPrice: 2.0 },
+  { id: "seitan", name: "Seitan", aisle: "epicerie", baseUnit: "g", packSize: 200, packLabel: "200 g", packPrice: 3.0 },
+  { id: "chia", name: "Graines de chia", aisle: "epicerie", baseUnit: "g", packSize: 200, packLabel: "200 g", packPrice: 3.5 },
+  { id: "almonds", name: "Amandes", aisle: "epicerie", baseUnit: "g", packSize: 200, packLabel: "200 g", packPrice: 2.8 },
+  { id: "raisins", name: "Raisins secs", aisle: "epicerie", baseUnit: "g", packSize: 250, packLabel: "250 g", packPrice: 1.8 },
 
   // ---------- Boulangerie ----------
   { id: "bread", name: "Pain", aisle: "boulangerie", baseUnit: "piece", packSize: 1, packLabel: "1 pain", packPrice: 0.6 },

@@ -45,6 +45,13 @@ export const PRICE_CATEGORIES: Record<string, PriceCategory> = {
   soy_milk: { tag: "en:soy-milks", per: "l" },
   berries: { tag: "en:frozen-red-berries", per: "kg" },
   edamame: { tag: "en:edamame", per: "kg" },
+  leek: { tag: "en:leeks", per: "kg" },
+  cabbage: { tag: "en:cabbages", per: "kg" },
+  butternut: { tag: "en:butternut-squash", per: "kg" },
+  almonds: { tag: "en:almonds", per: "kg" },
+  black_beans: { tag: "en:black-beans", per: "kg" },
+  sardines: { tag: "en:canned-sardines", per: "kg" },
+  fromage_blanc: { tag: "en:fromage-blancs", per: "kg" },
   // NB : pas d'ingrédient en "piece" ici (banane, œufs…) : le prix Open Prices
   // est au kg/L et serait mal interprété sur une unité "pièce".
 };
