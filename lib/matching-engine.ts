@@ -171,8 +171,17 @@ export interface WeekPlan {
 // ---- Passe 3 : plan hebdo, JOUR par JOUR, sous contrainte de budget ----
 // Pour chaque jour (Lundi -> Dimanche) on compose UNE recette par moment demandé.
 // Un jour n'est retenu que s'il est COMPLET et que le panier agrégé (dédoublonné,
-// produits entiers) reste <= budget. On s'arrête au premier jour qu'on ne peut
-// plus compléter dans le budget. Recettes distinctes sur toute la semaine.
+// produits entiers) reste <= budget.
+//
+// Politique de variété (2 passes) :
+//   1) On privilégie des recettes DISTINCTES sur toute la semaine.
+//   2) Si une file de moment est épuisée (peu de recettes éligibles à cause
+//      des filtres régime/protéines), on autorise la RÉUTILISATION d'une recette
+//      déjà servie plutôt que de bloquer la génération du reste de la semaine.
+//      Ex : un seul petit-déj protéiné éligible -> il revient chaque jour au lieu
+//      d'arrêter tout le plan.
+// On s'arrête seulement quand aucune recette (même réutilisée) ne rentre dans
+// le budget pour un moment donné.
 export function planWeek(
   recipes: Recipe[],
   prefs: UserPrefs,
@@ -185,55 +194,60 @@ export function planWeek(
   const slots = requestedSlots(prefs);
 
   // Une file ordonnée par score et par moment : une recette figure dans chaque
-  // moment qu'elle couvre ; la déduplication évite de la reprendre deux fois.
+  // moment qu'elle couvre.
   const bySlot = new Map<MealSlot, Recipe[]>(slots.map((s) => [s, []]));
   for (const { recipe } of ranked) {
     for (const s of slots) {
       if (recipe.slots.includes(s)) bySlot.get(s)!.push(recipe);
     }
   }
-  const cursor = new Map<MealSlot, number>(slots.map((s) => [s, 0]));
   const usedIds = new Set<string>();
-
   const chosen: Recipe[] = [];
   const meals: PlannedMeal[] = [];
 
+  // Choisit la meilleure recette qui tient dans le budget pour un moment donné.
+  // `allowReuse` = true autorise à re-piocher une recette déjà servie.
+  function pickForSlot(
+    slot: MealSlot,
+    todayPicks: Recipe[],
+    allowReuse: boolean,
+  ): Recipe | null {
+    const list = bySlot.get(slot)!;
+    for (const cand of list) {
+      // Toujours interdire de servir 2 fois la MÊME recette dans un même jour.
+      if (todayPicks.some((r) => r.id === cand.id)) continue;
+      if (!allowReuse && usedIds.has(cand.id)) continue;
+      const basket = [...chosen, ...todayPicks, cand];
+      const total = buildShoppingList(basket, ingredientsById, prefs.householdSize, store, priceBook).total;
+      if (total <= request.budget) return cand;
+    }
+    return null;
+  }
+
   for (let day = 0; day < WEEK_LEN; day++) {
-    // On tente de composer un jour COMPLET : une recette par moment, sans
-    // dépasser le budget une fois toutes ajoutées.
-    const dayPicks: { slot: MealSlot; recipe: Recipe }[] = [];
+    // Composer un jour COMPLET : 1 recette par moment, panier <= budget.
+    const dayPicks: Recipe[] = [];
+    const dayMeals: PlannedMeal[] = [];
     let complete = true;
 
     for (const slot of slots) {
-      const list = bySlot.get(slot)!;
-      let i = cursor.get(slot)!;
-      let picked: Recipe | null = null;
-      while (i < list.length) {
-        const cand = list[i];
-        i++;
-        if (usedIds.has(cand.id) || dayPicks.some((p) => p.recipe.id === cand.id)) continue;
-        const basket = [...chosen, ...dayPicks.map((p) => p.recipe), cand];
-        const total = buildShoppingList(basket, ingredientsById, prefs.householdSize, store, priceBook).total;
-        if (total <= request.budget) {
-          picked = cand;
-          cursor.set(slot, i);
-          break;
-        }
-        // Trop cher : on continue à scanner des recettes moins coûteuses.
-      }
+      // Priorité aux recettes fraîches, sinon on autorise la réutilisation.
+      const picked =
+        pickForSlot(slot, dayPicks, false) ?? pickForSlot(slot, dayPicks, true);
       if (!picked) {
         complete = false;
         break;
       }
-      dayPicks.push({ slot, recipe: picked });
+      dayPicks.push(picked);
+      dayMeals.push({ day, slot, recipe: picked });
     }
 
-    if (!complete) break; // jour incomplet dans le budget -> on arrête la semaine
+    if (!complete) break;
 
-    for (const p of dayPicks) {
-      chosen.push(p.recipe);
-      usedIds.add(p.recipe.id);
-      meals.push({ day, slot: p.slot, recipe: p.recipe });
+    for (const m of dayMeals) {
+      chosen.push(m.recipe);
+      usedIds.add(m.recipe.id);
+      meals.push(m);
     }
   }
 

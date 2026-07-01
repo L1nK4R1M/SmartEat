@@ -77,11 +77,34 @@ describe("Recipe Matching Engine — combinatoire intelligente", () => {
   it("planWeek garantit que le panier de la semaine reste <= budget", () => {
     const plan = planWeek(RECIPES, basePrefs, { budget: 60, mealTypes: [] }, ingredientsById, store);
     expect(plan.total).toBeLessThanOrEqual(60 + 0.001);
-    // Recettes distinctes sur toute la semaine.
-    expect(new Set(plan.recipes.map((r) => r.id)).size).toBe(plan.recipes.length);
     // Au plus 7 jours × nb de moments demandés.
     expect(plan.plannedDays).toBeLessThanOrEqual(7);
     expect(plan.recipes.length).toBeLessThanOrEqual(7 * basePrefs.mealSlots.length);
+  });
+
+  it("recettes uniques quand la variété est disponible (budget large)", () => {
+    // Avec budget large et pool de recettes large, chaque repas doit être unique.
+    const plan = planWeek(RECIPES, basePrefs, { budget: 300, mealTypes: [] }, ingredientsById, store);
+    expect(plan.plannedDays).toBeGreaterThan(0);
+    expect(new Set(plan.recipes.map((r) => r.id)).size).toBe(plan.recipes.length);
+  });
+
+  it("réutilise une recette si un moment a un pool épuisé (au lieu de bloquer)", () => {
+    // Petit-déj + protéiné ≥ 35g : très peu de recettes éligibles.
+    // Le plan doit continuer à générer des jours (avec réutilisation) au lieu
+    // de s'arrêter à 1 jour.
+    const prefs: UserPrefs = { ...basePrefs, mealSlots: ["petit_dej", "dejeuner"], householdSize: 1 };
+    const plan = planWeek(
+      RECIPES,
+      prefs,
+      { budget: 100, mealTypes: ["proteine"] },
+      ingredientsById,
+      store,
+    );
+    // Doit couvrir plusieurs jours, pas se bloquer à 1.
+    expect(plan.plannedDays).toBeGreaterThan(1);
+    // Le panier reste sous le budget.
+    expect(plan.total).toBeLessThanOrEqual(100 + 0.001);
   });
 
   it("chaque jour généré est COMPLET (un repas par moment demandé)", () => {
