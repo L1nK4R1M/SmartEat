@@ -29,6 +29,7 @@ export const INGREDIENTS: Ingredient[] = [
   { id: "yogurt", name: "Yaourt grec", aisle: "cremerie", baseUnit: "g", packSize: 400, packLabel: "pot 400 g", packPrice: 2.0 },
   { id: "butter", name: "Beurre", aisle: "cremerie", baseUnit: "g", packSize: 250, packLabel: "plaquette 250 g", packPrice: 2.0 },
   { id: "milk", name: "Lait demi-écrémé", aisle: "cremerie", baseUnit: "ml", packSize: 1000, packLabel: "brique 1 L", packPrice: 1.1 },
+  { id: "soy_milk", name: "Lait de soja", aisle: "cremerie", baseUnit: "ml", packSize: 1000, packLabel: "brique 1 L", packPrice: 1.6 },
 
   // ---------- Fruits & Légumes ----------
   { id: "potato", name: "Pommes de terre", aisle: "fruits_legumes", baseUnit: "g", packSize: 1000, packLabel: "filet 1 kg", packPrice: 2.0 },
@@ -83,4 +84,5 @@ export const INGREDIENTS: Ingredient[] = [
   { id: "frozen_veg", name: "Poêlée de légumes surgelés", aisle: "surgele", baseUnit: "g", packSize: 750, packLabel: "sachet 750 g", packPrice: 2.5 },
   { id: "peas", name: "Petits pois surgelés", aisle: "surgele", baseUnit: "g", packSize: 1000, packLabel: "sachet 1 kg", packPrice: 2.0 },
   { id: "berries", name: "Fruits rouges surgelés", aisle: "surgele", baseUnit: "g", packSize: 450, packLabel: "sachet 450 g", packPrice: 3.5 },
+  { id: "edamame", name: "Édamame", aisle: "surgele", baseUnit: "g", packSize: 500, packLabel: "sachet 500 g", packPrice: 3.5 },
 ];

@@ -799,6 +799,100 @@ const BASE_RECIPES: Omit<Recipe, "slots">[] = [
     ],
     nutrition: { kcal: 372, protein: 24, carbs: 22, fat: 21 },
   },
+  {
+    id: "b07", title: "Œufs brouillés & skyr protéiné", emoji: "💪",
+    mealTypes: ["proteine", "rapide"], dietTags: ["halal", "vege", "pescetarien", "sans_gluten"],
+    reqCapabilities: ["fry"], prepMinutes: 10, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "eggs", qtyPerServing: 4, unit: "piece" },
+      { ingredientId: "yogurt", qtyPerServing: 200, unit: "g" },
+      { ingredientId: "cherry_tomato", qtyPerServing: 80, unit: "g" },
+      { ingredientId: "butter", qtyPerServing: 10, unit: "g" },
+    ],
+    steps: [
+      "Battre les œufs, saler et poivrer.",
+      "Cuire les œufs brouillés au beurre à feu doux.",
+      "Couper les tomates cerises.",
+      "Servir avec le skyr (yaourt grec) nature et les tomates.",
+    ],
+    nutrition: { kcal: 445, protein: 44, carbs: 12, fat: 26 },
+  },
+  {
+    id: "b08", title: "Porridge végétal & fruits rouges", emoji: "🌱",
+    mealTypes: ["sain", "rapide"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_lactose"],
+    reqCapabilities: ["heat"], prepMinutes: 8, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "oats", qtyPerServing: 60, unit: "g" },
+      { ingredientId: "soy_milk", qtyPerServing: 200, unit: "ml" },
+      { ingredientId: "banana", qtyPerServing: 1, unit: "piece" },
+      { ingredientId: "berries", qtyPerServing: 60, unit: "g" },
+    ],
+    steps: [
+      "Chauffer les flocons d'avoine avec le lait de soja 4 à 5 min.",
+      "Ajouter la banane écrasée.",
+      "Garnir de fruits rouges.",
+      "Servir chaud ou tiède.",
+    ],
+    nutrition: { kcal: 372, protein: 15, carbs: 62, fat: 8 },
+  },
+  {
+    id: "b09", title: "Smoothie soja, banane & cacahuète", emoji: "🥤",
+    mealTypes: ["sain", "rapide"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_lactose", "sans_gluten"],
+    reqCapabilities: ["heat"], prepMinutes: 5, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "soy_milk", qtyPerServing: 250, unit: "ml" },
+      { ingredientId: "banana", qtyPerServing: 1, unit: "piece" },
+      { ingredientId: "berries", qtyPerServing: 80, unit: "g" },
+      { ingredientId: "peanut_butter", qtyPerServing: 15, unit: "g" },
+    ],
+    steps: [
+      "Mettre lait de soja, banane, fruits rouges et beurre de cacahuète au blender.",
+      "Mixer jusqu'à obtenir une texture lisse.",
+      "Verser dans un grand verre.",
+      "Déguster bien frais.",
+    ],
+    nutrition: { kcal: 320, protein: 14, carbs: 40, fat: 12 },
+  },
+  {
+    id: "p01", title: "Bowl tofu & édamame protéiné", emoji: "🥢",
+    mealTypes: ["proteine", "sain"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
+    reqCapabilities: ["fry"], prepMinutes: 22, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "tofu", qtyPerServing: 200, unit: "g" },
+      { ingredientId: "edamame", qtyPerServing: 150, unit: "g" },
+      { ingredientId: "quinoa", qtyPerServing: 80, unit: "g" },
+      { ingredientId: "broccoli", qtyPerServing: 100, unit: "g" },
+      { ingredientId: "olive_oil", qtyPerServing: 10, unit: "ml" },
+      { ingredientId: "lemon", qtyPerServing: 0.5, unit: "piece" },
+    ],
+    steps: [
+      "Cuire le quinoa 12 min à l'eau, puis égoutter.",
+      "Saisir le tofu en cubes à la poêle avec l'huile jusqu'à coloration.",
+      "Ajouter édamame et brocoli, faire sauter 5 min.",
+      "Dresser sur le quinoa, arroser de jus de citron.",
+    ],
+    nutrition: { kcal: 625, protein: 44, carbs: 52, fat: 28 },
+  },
+  {
+    id: "p02", title: "Curry protéiné tofu & lentilles", emoji: "🍛",
+    mealTypes: ["proteine", "sain", "monde"], dietTags: ["halal", "vege", "vegan", "pescetarien", "sans_gluten", "sans_lactose"],
+    reqCapabilities: ["simmer"], prepMinutes: 30, defaultServings: 2,
+    ingredients: [
+      { ingredientId: "tofu", qtyPerServing: 150, unit: "g" },
+      { ingredientId: "lentils", qtyPerServing: 80, unit: "g" },
+      { ingredientId: "coconut_milk", qtyPerServing: 100, unit: "ml" },
+      { ingredientId: "tomato_canned", qtyPerServing: 100, unit: "g" },
+      { ingredientId: "onion", qtyPerServing: 50, unit: "g" },
+      { ingredientId: "curry_paste", qtyPerServing: 15, unit: "g" },
+    ],
+    steps: [
+      "Faire revenir l'oignon, ajouter la pâte de curry.",
+      "Ajouter lentilles, tomates et lait de coco, mijoter 18 min.",
+      "Incorporer le tofu en cubes et poursuivre 5 min.",
+      "Rectifier l'assaisonnement et servir.",
+    ],
+    nutrition: { kcal: 640, protein: 42, carbs: 58, fat: 30 },
+  },
 ];
 
 // Moments de la journée par recette. Par défaut une recette convient au déjeuner
@@ -809,6 +903,10 @@ const SLOT_OVERRIDES: Record<string, MealSlot[]> = {
   b02: ["petit_dej"],
   b04: ["petit_dej"],
   b05: ["petit_dej"],
+  // Petits-déjeuners ajoutés (protéiné + végétaliens)
+  b07: ["petit_dej", "dejeuner"],
+  b08: ["petit_dej"],
+  b09: ["petit_dej"],
   // Œufs : petit-déj ou déjeuner léger
   b03: ["petit_dej", "dejeuner"],
   b06: ["petit_dej", "dejeuner"],
