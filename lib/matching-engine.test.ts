@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { INGREDIENTS, RECIPES, STORES } from "@/db/seed-data";
 import { PROTEIN_MIN } from "./labels";
 import { canCook } from "./capabilities";
-import { displaySlot, eligibleRecipes, planWeek } from "./matching-engine";
+import { eligibleRecipes, planWeek } from "./matching-engine";
 import { recipeCostPerServing } from "./pricing";
 import type { GenerationRequest, Ingredient, UserPrefs } from "./types";
 
@@ -77,8 +77,23 @@ describe("Recipe Matching Engine — combinatoire intelligente", () => {
   it("planWeek garantit que le panier de la semaine reste <= budget", () => {
     const plan = planWeek(RECIPES, basePrefs, { budget: 60, mealTypes: [] }, ingredientsById, store);
     expect(plan.total).toBeLessThanOrEqual(60 + 0.001);
-    expect(plan.recipes.length).toBeLessThanOrEqual(basePrefs.mealsPerWeek);
+    // Recettes distinctes sur toute la semaine.
     expect(new Set(plan.recipes.map((r) => r.id)).size).toBe(plan.recipes.length);
+    // Au plus 7 jours × nb de moments demandés.
+    expect(plan.plannedDays).toBeLessThanOrEqual(7);
+    expect(plan.recipes.length).toBeLessThanOrEqual(7 * basePrefs.mealSlots.length);
+  });
+
+  it("chaque jour généré est COMPLET (un repas par moment demandé)", () => {
+    const prefs: UserPrefs = { ...basePrefs, mealSlots: ["dejeuner", "diner"] };
+    const plan = planWeek(RECIPES, prefs, { budget: 120, mealTypes: [] }, ingredientsById, store);
+    expect(plan.plannedDays).toBeGreaterThan(0);
+    // Regroupe par jour : chaque jour a exactement un déjeuner et un dîner.
+    const byDay = new Map<number, string[]>();
+    for (const m of plan.meals) byDay.set(m.day, [...(byDay.get(m.day) ?? []), m.slot]);
+    for (const slots of byDay.values()) {
+      expect(slots.sort()).toEqual(["dejeuner", "diner"]);
+    }
   });
 
   it("un budget plus serré ne sélectionne pas plus de repas", () => {
@@ -127,12 +142,17 @@ describe("Recipe Matching Engine — combinatoire intelligente", () => {
     expect(plan.recipes.every((r) => r.nutrition.protein >= PROTEIN_MIN)).toBe(true);
   });
 
-  it("équilibre la semaine entre les moments demandés", () => {
-    const prefs: UserPrefs = { ...basePrefs, mealSlots: ["petit_dej", "dejeuner"], mealsPerWeek: 4 };
+  it("chaque jour couvre tous les moments demandés (petit-déj + déjeuner)", () => {
+    const prefs: UserPrefs = { ...basePrefs, mealSlots: ["petit_dej", "dejeuner"] };
     const plan = planWeek(RECIPES, prefs, { budget: 120, mealTypes: [] }, ingredientsById, store);
-    const slots = plan.recipes.map((r) => displaySlot(r, prefs.mealSlots));
-    // Avec deux moments demandés et un budget large, les deux sont représentés.
+    const slots = plan.meals.map((m) => m.slot);
+    // Les deux moments sont représentés, et chaque jour les a tous les deux.
     expect(slots).toContain("petit_dej");
     expect(slots).toContain("dejeuner");
+    const byDay = new Map<number, Set<string>>();
+    for (const m of plan.meals) byDay.set(m.day, (byDay.get(m.day) ?? new Set()).add(m.slot));
+    for (const set of byDay.values()) {
+      expect(set.has("petit_dej") && set.has("dejeuner")).toBe(true);
+    }
   });
 });

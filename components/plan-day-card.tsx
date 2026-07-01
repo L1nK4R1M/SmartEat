@@ -16,6 +16,7 @@ export interface PlanCardRecipe {
   prepMinutes: number;
   mealTypes: MealType[];
   slot: MealSlot;
+  day: number; // 0 = Lundi … (regroupement par jour dans le plan)
 }
 
 // Carte repas enrichie (plan, façon Romi) : onglet "moment" coloré à gauche,

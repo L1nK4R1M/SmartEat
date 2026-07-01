@@ -11,7 +11,7 @@ export function PrefsSummary({ summary }: { summary: Summary }) {
     {
       icon: <Users size={15} />,
       label: "Foyer",
-      value: `${summary.householdSize} pers · ${summary.mealsPerWeek} repas/sem`,
+      value: `${summary.householdSize} pers`,
     },
     {
       icon: <Clock size={15} />,
