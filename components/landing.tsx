@@ -165,8 +165,11 @@ export function Landing({
 
       {/* ---------- VITRINE RECETTES ---------- */}
       <section className="mt-12">
-        <Reveal>
+        <Reveal className="flex items-baseline justify-between gap-2">
           <h2 className="text-xl font-semibold tracking-tight">Des idées qui te ressemblent</h2>
+          <Link href="/recettes" className="shrink-0 text-sm font-medium text-primary hover:underline">
+            Tout voir →
+          </Link>
         </Reveal>
         <Stagger className="mt-5 grid grid-cols-2 gap-3">
           {showcase.map((r) => (

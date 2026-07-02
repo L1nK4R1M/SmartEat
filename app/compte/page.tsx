@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronLeft, ListChecks, LogOut, Pencil, UtensilsCrossed } from "lucide-react";
+import { ChevronLeft, ImageIcon, ListChecks, LogOut, Pencil, UtensilsCrossed } from "lucide-react";
 import { getPrefs } from "@/lib/prefs";
 import { getCurrentUser } from "@/lib/supabase/server";
 import { repo } from "@/lib/repo";
@@ -54,6 +54,9 @@ export default async function ComptePage() {
             <Link href="/listes" className={`${buttonClasses("ghost", "md")} w-full`}>
               <ListChecks size={16} /> Mes listes de courses
             </Link>
+            <Link href="/recettes" className={`${buttonClasses("ghost", "md")} w-full`}>
+              <ImageIcon size={16} /> Toutes les recettes
+            </Link>
           </div>
         </>
       ) : (
@@ -61,6 +64,9 @@ export default async function ComptePage() {
           <p className="font-medium">Tu n&apos;as pas encore configuré tes repas.</p>
           <Link href="/onboarding" className={`${buttonClasses("primary", "lg")} mt-4 w-full`}>
             Commencer
+          </Link>
+          <Link href="/recettes" className={`${buttonClasses("ghost", "md")} mt-3 w-full`}>
+            <ImageIcon size={16} /> Voir toutes les recettes
           </Link>
         </div>
       )}
