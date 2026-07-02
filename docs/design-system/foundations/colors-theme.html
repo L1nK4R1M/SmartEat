@@ -1,0 +1,18 @@
+<!-- @dsCard group="Colors" viewport="700x220" name="Thème clair & sombre" subtitle="Mêmes tokens, deux thèmes. Auto (système) ou choisi via data-theme." -->
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"/><link rel="stylesheet" href="../styles.css"/><style>body{margin:0;padding:18px 20px;background:var(--background);color:var(--on-surface);font-family:var(--font-sans)}.panel{flex:1;border-radius:var(--radius-card);border:1px solid var(--outline);background:var(--background);color:var(--on-surface);padding:14px}.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--on-surface-muted);margin-bottom:10px}.card{border-radius:var(--radius-card);border:1px solid var(--outline);background:var(--surface);padding:12px}.sw{display:flex;gap:6px;margin-top:10px}.sw span{height:22px;flex:1;border-radius:6px;border:1px solid var(--outline)}</style></head><body>
+<div style="display:flex;gap:16px">
+  <div class="panel" data-theme="light">
+    <div class="lbl">☀︎ Clair</div>
+    <div class="card"><div style="font-weight:600">Poulet rôti &amp; légumes 🍗</div><div class="tnum" style="color:var(--primary);font-weight:700;font-size:20px;margin-top:4px">≈ 3,20 €</div>
+      <div class="sw"><span style="background:var(--primary)"></span><span style="background:var(--accent)"></span><span style="background:var(--surface-variant)"></span><span style="background:var(--background)"></span></div>
+    </div>
+  </div>
+  <div class="panel" data-theme="dark">
+    <div class="lbl">☾ Sombre</div>
+    <div class="card"><div style="font-weight:600">Poulet rôti &amp; légumes 🍗</div><div class="tnum" style="color:var(--primary);font-weight:700;font-size:20px;margin-top:4px">≈ 3,20 €</div>
+      <div class="sw"><span style="background:var(--primary)"></span><span style="background:var(--accent)"></span><span style="background:var(--surface-variant)"></span><span style="background:var(--background)"></span></div>
+    </div>
+  </div>
+</div>
+<p style="font-size:11px;color:var(--on-surface-muted);margin:12px 0 0">Par défaut le thème suit le système. Forcer : <code>&lt;html data-theme="dark"&gt;</code> ou <code>"light"</code>. Retirer l'attribut = revenir à « système ».</p>
+</body></html>

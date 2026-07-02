@@ -1,0 +1,4 @@
+/* SmartEat webfont — Inter (self-host automatique via next/font dans l'app ;
+   ici chargé depuis Google Fonts). Inter est LA police du produit : neutre,
+   lisible en petite taille, excellente en chiffres tabulaires. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");

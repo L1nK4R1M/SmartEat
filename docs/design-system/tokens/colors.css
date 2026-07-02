@@ -1,0 +1,93 @@
+/* ===========================================================================
+   SmartEat — COULEURS
+   Palette issue de docs/CAHIER_DES_CHARGES.md §3 et app/globals.css.
+   Vert = aliment frais / sain (cœur de la promesse). Ambre = signal BUDGET
+   uniquement. Contrastes conformes WCAG AA.
+
+   THÈME : clair par défaut. Le sombre s'active soit AUTOMATIQUEMENT selon le
+   système (prefers-color-scheme: dark), soit MANUELLEMENT via un attribut sur
+   <html> :
+     • <html data-theme="dark">  → force le sombre
+     • <html data-theme="light"> → force le clair (ignore le système)
+     • (rien)                     → suit le système
+   Pour un sélecteur à 3 états, écris data-theme="light|dark" ou retire
+   l'attribut pour revenir à "système".
+   =========================================================================== */
+
+:root {
+  /* --- Rôles de surface & texte (light) --- */
+  --primary: #16a34a;          /* vert frais — CTA, sélection active */
+  --on-primary: #ffffff;       /* texte sur primary */
+  --surface: #ffffff;          /* fond des cartes */
+  --surface-variant: #f1f5f3;  /* fonds secondaires, chips au repos */
+  --on-surface: #0f172a;       /* texte principal */
+  --on-surface-muted: #5b6b66; /* texte secondaire, labels */
+  --outline: #d6dedb;          /* bordures discrètes */
+  --accent: #f59e0b;           /* ambre — réservé au signal BUDGET / alerte douce */
+  --error: #dc2626;            /* erreurs */
+  --background: #f7faf9;       /* fond d'application (vert très désaturé) */
+
+  /* --- Teintes dérivées (surcharges d'opacité fréquentes dans l'UI) --- */
+  --primary-tint: color-mix(in srgb, var(--primary) 12%, transparent);
+  --primary-tint-strong: color-mix(in srgb, var(--primary) 30%, transparent);
+  --accent-tint: color-mix(in srgb, var(--accent) 15%, transparent);
+  --error-tint: color-mix(in srgb, var(--error) 10%, transparent);
+
+  /* --- Couleurs des "moments" du repas (onglet coloré des cartes jour) --- */
+  --slot-petit-dej: #f59e0b;   /* matin — ambre */
+  --slot-dejeuner: #16a34a;    /* midi — vert primaire */
+  --slot-diner: #6366f1;       /* soir — indigo */
+
+  /* --- Couleurs de jour (pastille J1..J7 du plan hebdo) --- */
+  --day-1: #16a34a;  --day-2: #0ea5e9;  --day-3: #f59e0b;  --day-4: #8b5cf6;
+  --day-5: #ec4899;  --day-6: #14b8a6;  --day-7: #f97316;
+}
+
+/* Valeurs du thème SOMBRE — factorisées pour être appliquées à la fois par le
+   système et par le choix manuel. */
+@media (prefers-color-scheme: dark) {
+  /* AUTO : suit le système. Un choix manuel [data-theme="light|dark"] (déclaré
+     plus bas, même spécificité) l'emporte grâce à l'ordre des règles. */
+  :root {
+    --primary: #22c55e;
+    --on-primary: #062b12;
+    --surface: #0b0f0e;
+    --surface-variant: #1a211f;
+    --on-surface: #e7ecea;
+    --on-surface-muted: #9aa8a3;
+    --outline: #2a332f;
+    --accent: #fbbf24;
+    --error: #f87171;
+    --background: #060908;
+  }
+}
+
+/* MANUEL : force le sombre quel que soit le réglage système. S'applique à
+   <html data-theme="dark"> OU à n'importe quel conteneur [data-theme="dark"]
+   (utile pour prévisualiser les deux thèmes côte à côte). */
+[data-theme="dark"] {
+  --primary: #22c55e;
+  --on-primary: #062b12;
+  --surface: #0b0f0e;
+  --surface-variant: #1a211f;
+  --on-surface: #e7ecea;
+  --on-surface-muted: #9aa8a3;
+  --outline: #2a332f;
+  --accent: #fbbf24;
+  --error: #f87171;
+  --background: #060908;
+}
+
+/* MANUEL : force le clair — idem, sur <html> ou tout conteneur. */
+[data-theme="light"] {
+  --primary: #16a34a;
+  --on-primary: #ffffff;
+  --surface: #ffffff;
+  --surface-variant: #f1f5f3;
+  --on-surface: #0f172a;
+  --on-surface-muted: #5b6b66;
+  --outline: #d6dedb;
+  --accent: #f59e0b;
+  --error: #dc2626;
+  --background: #f7faf9;
+}

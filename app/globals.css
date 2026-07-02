@@ -1,7 +1,18 @@
 @import "tailwindcss";
 
-/* Design tokens — voir docs/CAHIER_DES_CHARGES.md §3 (UX/UI Guidelines).
-   On mappe les tokens Tailwind v4 vers des variables CSS surchargées en dark. */
+/* ============================================================================
+   SmartEat — Design tokens (voir docs/design-system/).
+   Palette : vert #16A34A (aliment sain / CTA / sélection) + ambre #F59E0B
+   (RÉSERVÉ au signal budget). Neutres teintés de vert désaturé. Contrastes AA.
+
+   THÈME : clair par défaut, sombre en 3 états :
+     • <html data-theme="dark">   → force sombre
+     • <html data-theme="light">  → force clair
+     • (rien)                     → suit le système (prefers-color-scheme)
+   Voir components/theme-toggle.tsx.
+   ============================================================================ */
+
+/* Mapping Tailwind v4 — chaque token natif pointe vers une variable CSS. */
 @theme inline {
   --color-background: var(--background);
   --color-primary: var(--primary);
@@ -17,7 +28,11 @@
   --radius-card: 1rem;
 }
 
+/* -------------------------------------------------------------------------- */
+/*  THÈME CLAIR (par défaut)                                                  */
+/* -------------------------------------------------------------------------- */
 :root {
+  /* Rôles de surface & texte */
   --primary: #16a34a;
   --on-primary: #ffffff;
   --surface: #ffffff;
@@ -28,8 +43,63 @@
   --accent: #f59e0b;
   --error: #dc2626;
   --background: #f7faf9;
+
+  /* Teintes dérivées (via color-mix, disponibles inline dans les composants) */
+  --primary-tint: color-mix(in srgb, var(--primary) 12%, transparent);
+  --primary-tint-strong: color-mix(in srgb, var(--primary) 30%, transparent);
+  --accent-tint: color-mix(in srgb, var(--accent) 15%, transparent);
+  --error-tint: color-mix(in srgb, var(--error) 10%, transparent);
+
+  /* Moments du repas — onglet coloré des cartes jour */
+  --slot-petit-dej: #f59e0b;  /* matin — ambre */
+  --slot-dejeuner: #16a34a;   /* midi — vert primaire */
+  --slot-diner: #6366f1;      /* soir — indigo */
+
+  /* Palette des 7 jours (pastille J1..J7 du plan hebdo) */
+  --day-1: #16a34a;  --day-2: #0ea5e9;  --day-3: #f59e0b;  --day-4: #8b5cf6;
+  --day-5: #ec4899;  --day-6: #14b8a6;  --day-7: #f97316;
+
+  /* Typographie — Material 3, mobile-first (32/22/18/16/13/12) */
+  --text-display: 2rem;         --leading-display: 2.5rem;
+  --text-title: 1.375rem;       --leading-title: 1.75rem;
+  --text-body-lg: 1.125rem;     --leading-body-lg: 1.75rem;
+  --text-body: 1rem;            --leading-body: 1.5rem;
+  --text-label: 0.8125rem;      --leading-label: 1rem;
+  --text-caption: 0.75rem;      --leading-caption: 1rem;
+  --text-hero: 2.1rem;          /* titre landing */
+  --text-numeral-xl: 3.75rem;   /* gros chiffre onboarding */
+  --tracking-tight: -0.02em;
+
+  /* Espacement (base 4px) */
+  --space-1: 0.25rem;  --space-2: 0.5rem;   --space-3: 0.75rem;
+  --space-4: 1rem;     --space-5: 1.25rem;  --space-6: 1.5rem;
+  --space-7: 1.75rem;  --space-8: 2rem;
+
+  /* Rayons (--radius-card déjà exposé via @theme) */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.5rem;
+  --radius-2xl: 1.75rem;
+  --radius-pill: 9999px;
+
+  /* Cible tactile mini (Apple HIG) */
+  --tap-min: 44px;
+
+  /* Ombres — discrètes, la hiérarchie vient de --outline */
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+  --shadow-md: 0 4px 12px -2px rgb(15 23 42 / 0.08);
+  --shadow-lg: 0 12px 32px -6px rgb(15 23 42 / 0.12);
+
+  /* Animation — micro-interactions 150–250ms sur ease-brand */
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 150ms;
+  --dur-base: 200ms;
+  --dur-slow: 350ms;
 }
 
+/* -------------------------------------------------------------------------- */
+/*  THÈME SOMBRE — automatique (système) + manuel via [data-theme]            */
+/* -------------------------------------------------------------------------- */
 @media (prefers-color-scheme: dark) {
   :root {
     --primary: #22c55e;
@@ -45,6 +115,36 @@
   }
 }
 
+/* Choix manuel — l'emporte sur le média query grâce à l'ordre des règles. */
+[data-theme="dark"] {
+  --primary: #22c55e;
+  --on-primary: #062b12;
+  --surface: #0b0f0e;
+  --surface-variant: #1a211f;
+  --on-surface: #e7ecea;
+  --on-surface-muted: #9aa8a3;
+  --outline: #2a332f;
+  --accent: #fbbf24;
+  --error: #f87171;
+  --background: #060908;
+}
+
+[data-theme="light"] {
+  --primary: #16a34a;
+  --on-primary: #ffffff;
+  --surface: #ffffff;
+  --surface-variant: #f1f5f3;
+  --on-surface: #0f172a;
+  --on-surface-muted: #5b6b66;
+  --outline: #d6dedb;
+  --accent: #f59e0b;
+  --error: #dc2626;
+  --background: #f7faf9;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  BASE — application des tokens sur le document                             */
+/* -------------------------------------------------------------------------- */
 body {
   background: var(--background);
   color: var(--on-surface);
@@ -52,7 +152,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Chiffres tabulaires pour prix & quantités (§3 typographie). */
+/* Chiffres tabulaires — obligatoire pour prix & quantités (§3 typographie). */
 .tnum {
   font-variant-numeric: tabular-nums;
+}
+
+/* Accessibilité — respect du réglage système de réduction des animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

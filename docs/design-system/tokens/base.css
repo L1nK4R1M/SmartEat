@@ -1,0 +1,42 @@
+/* ===========================================================================
+   SmartEat — BASE
+   Reset léger + réglages globaux. Applique la police, le fond et les chiffres
+   tabulaires. Repris de app/globals.css (body) + helper .tnum.
+   =========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Chiffres tabulaires pour prix & quantités (§3 typographie). */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Respecte prefers-reduced-motion pour toutes les transitions décoratives. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
