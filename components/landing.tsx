@@ -9,6 +9,7 @@ import { buttonClasses } from "@/components/ui/button";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
 import { RecipeImage } from "@/components/recipe-image";
 import { PrefsSummary } from "@/components/prefs-summary";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import type { PrefsSummary as Summary } from "@/lib/summary";
 import { formatEuro } from "@/lib/utils";
@@ -26,17 +27,17 @@ export interface ShowcaseRecipe {
 const STEPS = [
   {
     icon: <Wallet2 size={22} />,
-    title: "ton budget",
+    title: "Ton budget",
     text: "Dis-nous ton budget de la semaine et ton enseigne.",
   },
   {
     icon: <Sparkles size={22} />,
-    title: "on prépare",
+    title: "On prépare",
     text: "On compose une semaine de repas adaptés à ton budget.",
   },
   {
     icon: <ShoppingCart size={22} />,
-    title: "ta liste",
+    title: "Ta liste",
     text: "Ta liste de courses est prête, groupée par rayon.",
   },
 ];
@@ -59,23 +60,26 @@ export function Landing({
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="pt-12"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-lg font-bold tracking-tight">
             <span className="text-2xl" aria-hidden>
               🥗
             </span>
             SmartEat
           </div>
-          <Link
-            href="/login"
-            className="text-sm font-medium text-on-surface-muted hover:text-on-surface"
-          >
-            Se connecter
-          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle compact />
+            <Link
+              href="/login"
+              className="text-sm font-medium text-on-surface-muted hover:text-on-surface"
+            >
+              Se connecter
+            </Link>
+          </div>
         </div>
 
         <h1 className="mt-10 text-[2.1rem] font-bold leading-[1.1] tracking-tight">
-          qu&apos;est-ce qu&apos;on mange ce soir ?
+          Qu&apos;est-ce qu&apos;on mange ce soir ?
         </h1>
         <p className="mt-3 text-xl font-medium text-primary">Plus jamais cette question.</p>
         <p className="mt-4 text-on-surface-muted">
@@ -94,7 +98,7 @@ export function Landing({
             <span className="text-xs font-semibold uppercase tracking-wide text-on-surface-muted">
               Coût estimé
             </span>
-            <Badge tone="primary">🛒 ma semaine</Badge>
+            <Badge tone="primary">🛒 Ma semaine</Badge>
           </div>
           <div className="mt-1 flex items-baseline gap-1.5">
             <span className="tnum text-3xl font-bold text-primary">32,40 €</span>
@@ -138,7 +142,7 @@ export function Landing({
       {/* ---------- COMMENT ÇA MARCHE ---------- */}
       <section className="mt-12">
         <Reveal>
-          <h2 className="text-xl font-semibold tracking-tight">comment ça marche ?</h2>
+          <h2 className="text-xl font-semibold tracking-tight">Comment ça marche ?</h2>
         </Reveal>
         <div className="mt-5 space-y-3">
           {STEPS.map((s, i) => (
@@ -162,7 +166,7 @@ export function Landing({
       {/* ---------- VITRINE RECETTES ---------- */}
       <section className="mt-12">
         <Reveal>
-          <h2 className="text-xl font-semibold tracking-tight">des idées qui te ressemblent</h2>
+          <h2 className="text-xl font-semibold tracking-tight">Des idées qui te ressemblent</h2>
         </Reveal>
         <Stagger className="mt-5 grid grid-cols-2 gap-3">
           {showcase.map((r) => (

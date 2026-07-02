@@ -29,12 +29,22 @@ export function formatQty(qty: number, unit: "g" | "ml" | "piece"): string {
 }
 
 // URL d'image "photo" déterministe par plat, via un service génératif sans clé
-// (Pollinations). Elle s'affiche PAR-DESSUS le fallback dégradé+emoji : si elle
-// est lente ou indisponible, le dégradé reste visible (cf. RecipeImage).
-// Images générées (placeholder) — à remplacer par de vraies photos curatées ensuite.
-export function foodPhotoUrl(query: string, w = 600, h = 450): string {
-  const prompt = `${query}, plat cuisiné dans une assiette, photographie culinaire, appétissant, lumière naturelle`;
+// (Pollinations, modèle Flux). Elle s'affiche PAR-DESSUS le fallback dégradé+emoji :
+// si elle est lente ou indisponible, le dégradé reste visible (cf. RecipeImage).
+//
+// Le prompt est enrichi (style photo culinaire pro, cadrage, éclairage) et un
+// hash déterministe garantit la même image pour un même titre (donc cachée par
+// le CDN Pollinations, très rapide à partir du 2ᵉ chargement).
+export function foodPhotoUrl(query: string, w = 800, h = 600): string {
+  const prompt =
+    `${query}, food photography, top-down flat lay, appetizing, professional culinary shot, ` +
+    `natural daylight, shallow depth of field, styled on ceramic plate, high resolution, ` +
+    `no text, no watermark`;
   let s = 0;
   for (let i = 0; i < query.length; i++) s = (s * 31 + query.charCodeAt(i)) >>> 0;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&nologo=true&seed=${s % 100000}`;
+  const seed = s % 100000;
+  return (
+    `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}` +
+    `?width=${w}&height=${h}&nologo=true&enhance=true&model=flux&seed=${seed}`
+  );
 }

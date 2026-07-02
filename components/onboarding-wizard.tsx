@@ -160,7 +160,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
             className="mx-auto w-full max-w-md"
           >
             {step === 0 && (
-              <Step title="dans quel pays ?" subtitle="On charge les enseignes de ton pays.">
+              <Step title="Dans quel pays ?" subtitle="On charge les enseignes de ton pays.">
                 <div className="grid grid-cols-2 gap-3">
                   {COUNTRIES.map((c) => (
                     <ChoiceCard
@@ -180,7 +180,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
 
             {step === 1 && (
               <Step
-                title="où fais-tu tes courses ?"
+                title="Où fais-tu tes courses ?"
                 subtitle={`${storesForCountry.length} enseignes en ${COUNTRY_LABELS[country].label}. On adapte les prix.`}
               >
                 <div className="-mx-1 max-h-[58dvh] space-y-2.5 overflow-y-auto px-1 pb-2">
@@ -217,7 +217,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
             )}
 
             {step === 2 && (
-              <Step title="quel budget cette semaine ?" subtitle="Tu pourras l'ajuster à tout moment.">
+              <Step title="Quel budget cette semaine ?" subtitle="Tu pourras l'ajuster à tout moment.">
                 <div className="mt-2 text-center">
                   <CountUp
                     value={budget}
@@ -246,7 +246,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
             )}
 
             {step === 3 && (
-              <Step title="vous êtes combien ?" subtitle="Pour ajuster les quantités et les prix.">
+              <Step title="Vous êtes combien ?" subtitle="Pour ajuster les quantités et les prix.">
                 <div className="mt-2 text-center">
                   <CountUp
                     value={householdSize}
@@ -277,7 +277,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
 
             {step === 4 && (
               <Step
-                title="quels repas planifier ?"
+                title="Quels repas planifier ?"
                 subtitle="On génère des recettes adaptées à chaque moment."
               >
                 <div className="space-y-3">
@@ -315,7 +315,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
 
             {step === 5 && (
               <Step
-                title="quelle ambiance ?"
+                title="Quelle ambiance ?"
                 subtitle={`Choisis jusqu'à ${MAX_AMBIANCE} options. (facultatif)`}
               >
                 <div className="grid grid-cols-2 gap-3">
@@ -361,7 +361,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
 
             {step === 6 && (
               <Step
-                title="des besoins alimentaires ?"
+                title="Des besoins alimentaires ?"
                 subtitle="Plusieurs choix possibles. Laisse vide sinon."
               >
                 <div className="grid grid-cols-2 gap-3">
@@ -384,7 +384,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
 
             {step === 7 && (
               <Step
-                title="à éviter ?"
+                title="À éviter ?"
                 subtitle="Allergènes ou aliments que tu ne veux pas. (facultatif)"
               >
                 <div className="grid grid-cols-2 gap-3">
@@ -403,7 +403,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
 
             {step === 8 && (
               <Step
-                title="quel équipement as-tu ?"
+                title="Quel équipement as-tu ?"
                 subtitle="On exclut les recettes que tu ne peux pas cuisiner."
               >
                 <div className="grid grid-cols-2 gap-3">

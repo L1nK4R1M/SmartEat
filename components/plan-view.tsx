@@ -62,7 +62,7 @@ export function PlanView(data: PlanViewData) {
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         className="mb-5"
       >
-        <h1 className="text-3xl font-bold tracking-tight">bon appétit ! 🎉</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Bon appétit ! 🎉</h1>
         <p className="mt-1 text-on-surface-muted">Ta semaine est prête.</p>
         <div className="mt-3">
           <span className="inline-flex items-center gap-2 rounded-full border border-outline bg-surface px-3 py-1.5 text-sm">
