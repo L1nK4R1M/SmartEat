@@ -42,14 +42,15 @@ export const MEAL_TYPE_LABELS: Record<MealType, { label: string; emoji: string }
 export const PROTEIN_MIN = 35; // g / portion
 
 // Moments de la journée. `short` sert l'onglet vertical de la carte jour ;
-// `color` reprend la palette pastel pour distinguer les sections du plan.
+// `color` pointe vers les variables CSS du design system (--slot-*) pour
+// respecter automatiquement le thème (voir app/globals.css).
 export const MEAL_SLOT_LABELS: Record<
   MealSlot,
   { label: string; short: string; emoji: string; color: string }
 > = {
-  petit_dej: { label: "Petit-déjeuner", short: "P-déj", emoji: "🥐", color: "#f59e0b" },
-  dejeuner: { label: "Déjeuner", short: "Déj", emoji: "🍽️", color: "#16a34a" },
-  diner: { label: "Dîner", short: "Dîner", emoji: "🌙", color: "#6366f1" },
+  petit_dej: { label: "Petit-déjeuner", short: "P-déj", emoji: "🥐", color: "var(--slot-petit-dej)" },
+  dejeuner: { label: "Déjeuner", short: "Déj", emoji: "🍽️", color: "var(--slot-dejeuner)" },
+  diner: { label: "Dîner", short: "Dîner", emoji: "🌙", color: "var(--slot-diner)" },
 };
 
 // Ordre d'affichage des moments dans le plan (matin -> soir).
@@ -141,16 +142,17 @@ export function dayShort(index: number): string {
   return full.length > 4 ? full.slice(0, 3) : full;
 }
 
-// Onglet jour coloré à gauche de la carte (plan, façon Romi). Couleurs douces
-// cohérentes avec la palette pastel des ambiances.
+// Onglet jour coloré à gauche de la carte (plan, façon Romi). Les couleurs
+// pointent vers les variables CSS du design system (--day-1..--day-7) pour
+// s'adapter automatiquement au thème (voir app/globals.css).
 const DAY_COLORS = [
-  "#16a34a", // lun — vert primaire
-  "#0ea5e9", // mar — sky
-  "#f59e0b", // mer — ambre
-  "#8b5cf6", // jeu — violet
-  "#ec4899", // ven — rose
-  "#14b8a6", // sam — teal
-  "#f97316", // dim — orange
+  "var(--day-1)", // lun — vert primaire
+  "var(--day-2)", // mar — sky
+  "var(--day-3)", // mer — ambre
+  "var(--day-4)", // jeu — violet
+  "var(--day-5)", // ven — rose
+  "var(--day-6)", // sam — teal
+  "var(--day-7)", // dim — orange
 ];
 
 export function dayColor(index: number): string {

@@ -22,11 +22,24 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Script inline exécuté AVANT le premier paint. Lit le choix utilisateur dans
+// localStorage et applique data-theme sur <html>, ce qui évite le flash de
+// thème incorrect à l'ouverture. "system" retire l'attribut -> prefers-color-scheme.
+const themeInitScript = `
+try {
+  var t = localStorage.getItem('smarteat-theme');
+  if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+} catch (_) {}
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" className={`${inter.variable} h-full antialiased`}>
+    <html lang="fr" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

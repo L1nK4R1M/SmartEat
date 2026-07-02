@@ -6,6 +6,7 @@ import { repo } from "@/lib/repo";
 import { signOut } from "@/app/actions";
 import { buildPrefsSummary } from "@/lib/summary";
 import { PrefsSummary } from "@/components/prefs-summary";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonClasses } from "@/components/ui/button";
 
 // Dashboard du compte : récap des choix + accès aux repas, jamais bloquant.
@@ -64,7 +65,15 @@ export default async function ComptePage() {
         </div>
       )}
 
+      {/* Réglages d'affichage */}
       <div className="mt-8 border-t border-outline pt-5">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm font-medium">Thème</span>
+          <ThemeToggle compact />
+        </div>
+      </div>
+
+      <div className="mt-6 border-t border-outline pt-5">
         {user ? (
           <form action={signOut}>
             <button type="submit" className={`${buttonClasses("ghost", "md")} w-full text-error`}>
