@@ -17,8 +17,12 @@ export default async function Home() {
   const userStore = prefs ? stores.find((s) => s.id === prefs.storeId) : undefined;
   const summary = prefs ? buildPrefsSummary(prefs, userStore) : null;
 
-  // Vitrine : quelques recettes variées pour la landing (coût/pers pré-calculé).
-  const showcase: ShowcaseRecipe[] = ["r01", "r03", "r13", "r24", "r19", "r10"]
+  // Vitrine : un large aperçu du catalogue pour la landing (coût/pers pré-calculé).
+  // Le catalogue complet, avec photo pour chaque recette, reste consultable sur /recettes.
+  const showcase: ShowcaseRecipe[] = [
+    "r01", "r03", "r13", "r24", "r19", "r10",
+    "b05", "b12", "r30", "r45", "p01", "r08",
+  ]
     .map((id) => recipes.find((r) => r.id === id))
     .filter((r): r is NonNullable<typeof r> => Boolean(r))
     .map((r) => ({
