@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   SmartEat — Design tokens (voir docs/design-system/).
-   Palette : vert #16A34A (aliment sain / CTA / sélection) + ambre #F59E0B
-   (RÉSERVÉ au signal budget). Neutres teintés de vert désaturé. Contrastes AA.
+   SmartEat 3.0 — Design tokens « Fraîcheur éditoriale » (voir
+   docs/design-system/REFONTE.md).
+   Palette : fond crème, vert basilic profond (CTA / sélection), terracotta
+   (accent / signal budget). Neutres chauds. Contrastes AA.
 
    THÈME : clair par défaut, sombre en 3 états :
      • <html data-theme="dark">   → force sombre
@@ -25,24 +26,28 @@
   --color-accent: var(--accent);
   --color-error: var(--error);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --radius-card: 1rem;
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --radius-card: 1.5rem;
 }
 
 /* -------------------------------------------------------------------------- */
 /*  THÈME CLAIR (par défaut)                                                  */
 /* -------------------------------------------------------------------------- */
 :root {
-  /* Rôles de surface & texte */
-  --primary: #16a34a;
+  /* Rôles de surface & texte — neutres chauds sur fond crème */
+  --primary: #1b7a4e;
   --on-primary: #ffffff;
   --surface: #ffffff;
-  --surface-variant: #f1f5f3;
-  --on-surface: #0f172a;
-  --on-surface-muted: #5b6b66;
-  --outline: #d6dedb;
-  --accent: #f59e0b;
+  --surface-variant: #f2ecdf;
+  --on-surface: #221f1a;
+  --on-surface-muted: #7a7266;
+  --outline: #e6ddcc;
+  --accent: #d9542e;
   --error: #dc2626;
-  --background: #f7faf9;
+  --background: #faf6ee;
+
+  /* Rayon carte (doublé dans @theme pour les utilitaires arbitraires) */
+  --radius-card: 1.5rem;
 
   /* Teintes dérivées (via color-mix, disponibles inline dans les composants) */
   --primary-tint: color-mix(in srgb, var(--primary) 12%, transparent);
@@ -51,22 +56,22 @@
   --error-tint: color-mix(in srgb, var(--error) 10%, transparent);
 
   /* Moments du repas — onglet coloré des cartes jour */
-  --slot-petit-dej: #f59e0b;  /* matin — ambre */
-  --slot-dejeuner: #16a34a;   /* midi — vert primaire */
-  --slot-diner: #6366f1;      /* soir — indigo */
+  --slot-petit-dej: #e0a12f;  /* matin — safran */
+  --slot-dejeuner: #1b7a4e;   /* midi — basilic */
+  --slot-diner: #6b5bd6;      /* soir — violet nuit */
 
   /* Palette des 7 jours (pastille J1..J7 du plan hebdo) */
-  --day-1: #16a34a;  --day-2: #0ea5e9;  --day-3: #f59e0b;  --day-4: #8b5cf6;
-  --day-5: #ec4899;  --day-6: #14b8a6;  --day-7: #f97316;
+  --day-1: #1b7a4e;  --day-2: #2e7fbe;  --day-3: #e0a12f;  --day-4: #8a5cd6;
+  --day-5: #d6558e;  --day-6: #1f9e8e;  --day-7: #e0742f;
 
-  /* Typographie — Material 3, mobile-first (32/22/18/16/13/12) */
+  /* Typographie — display serif éditorial + Inter, mobile-first */
   --text-display: 2rem;         --leading-display: 2.5rem;
   --text-title: 1.375rem;       --leading-title: 1.75rem;
   --text-body-lg: 1.125rem;     --leading-body-lg: 1.75rem;
   --text-body: 1rem;            --leading-body: 1.5rem;
   --text-label: 0.8125rem;      --leading-label: 1rem;
   --text-caption: 0.75rem;      --leading-caption: 1rem;
-  --text-hero: 2.1rem;          /* titre landing */
+  --text-hero: 2.25rem;         /* titre landing */
   --text-numeral-xl: 3.75rem;   /* gros chiffre onboarding */
   --tracking-tight: -0.02em;
 
@@ -75,7 +80,7 @@
   --space-4: 1rem;     --space-5: 1.25rem;  --space-6: 1.5rem;
   --space-7: 1.75rem;  --space-8: 2rem;
 
-  /* Rayons (--radius-card déjà exposé via @theme) */
+  /* Rayons */
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1.5rem;
@@ -85,10 +90,10 @@
   /* Cible tactile mini (Apple HIG) */
   --tap-min: 44px;
 
-  /* Ombres — discrètes, la hiérarchie vient de --outline */
-  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
-  --shadow-md: 0 4px 12px -2px rgb(15 23 42 / 0.08);
-  --shadow-lg: 0 12px 32px -6px rgb(15 23 42 / 0.12);
+  /* Ombres — chaudes et douces, la hiérarchie vient de --outline */
+  --shadow-sm: 0 1px 2px 0 rgb(60 50 30 / 0.06);
+  --shadow-md: 0 4px 14px -2px rgb(60 50 30 / 0.10);
+  --shadow-lg: 0 14px 36px -8px rgb(60 50 30 / 0.16);
 
   /* Animation — micro-interactions 150–250ms sur ease-brand */
   --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
@@ -102,44 +107,68 @@
 /* -------------------------------------------------------------------------- */
 @media (prefers-color-scheme: dark) {
   :root {
-    --primary: #22c55e;
-    --on-primary: #062b12;
-    --surface: #0b0f0e;
-    --surface-variant: #1a211f;
-    --on-surface: #e7ecea;
-    --on-surface-muted: #9aa8a3;
-    --outline: #2a332f;
-    --accent: #fbbf24;
+    --primary: #46c483;
+    --on-primary: #06301b;
+    --surface: #1c1915;
+    --surface-variant: #29241d;
+    --on-surface: #f2ede2;
+    --on-surface-muted: #a69d8d;
+    --outline: #3a342a;
+    --accent: #f07e52;
     --error: #f87171;
-    --background: #060908;
+    --background: #12100c;
+    --slot-petit-dej: #f2b84b;
+    --slot-dejeuner: #46c483;
+    --slot-diner: #8b7ef0;
+    --day-1: #46c483;  --day-2: #5da8de;  --day-3: #f2b84b;  --day-4: #a98af0;
+    --day-5: #ee85b5;  --day-6: #48c4b4;  --day-7: #f0985e;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+    --shadow-md: 0 4px 14px -2px rgb(0 0 0 / 0.45);
+    --shadow-lg: 0 14px 36px -8px rgb(0 0 0 / 0.55);
   }
 }
 
 /* Choix manuel — l'emporte sur le média query grâce à l'ordre des règles. */
 [data-theme="dark"] {
-  --primary: #22c55e;
-  --on-primary: #062b12;
-  --surface: #0b0f0e;
-  --surface-variant: #1a211f;
-  --on-surface: #e7ecea;
-  --on-surface-muted: #9aa8a3;
-  --outline: #2a332f;
-  --accent: #fbbf24;
+  --primary: #46c483;
+  --on-primary: #06301b;
+  --surface: #1c1915;
+  --surface-variant: #29241d;
+  --on-surface: #f2ede2;
+  --on-surface-muted: #a69d8d;
+  --outline: #3a342a;
+  --accent: #f07e52;
   --error: #f87171;
-  --background: #060908;
+  --background: #12100c;
+  --slot-petit-dej: #f2b84b;
+  --slot-dejeuner: #46c483;
+  --slot-diner: #8b7ef0;
+  --day-1: #46c483;  --day-2: #5da8de;  --day-3: #f2b84b;  --day-4: #a98af0;
+  --day-5: #ee85b5;  --day-6: #48c4b4;  --day-7: #f0985e;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+  --shadow-md: 0 4px 14px -2px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 14px 36px -8px rgb(0 0 0 / 0.55);
 }
 
 [data-theme="light"] {
-  --primary: #16a34a;
+  --primary: #1b7a4e;
   --on-primary: #ffffff;
   --surface: #ffffff;
-  --surface-variant: #f1f5f3;
-  --on-surface: #0f172a;
-  --on-surface-muted: #5b6b66;
-  --outline: #d6dedb;
-  --accent: #f59e0b;
+  --surface-variant: #f2ecdf;
+  --on-surface: #221f1a;
+  --on-surface-muted: #7a7266;
+  --outline: #e6ddcc;
+  --accent: #d9542e;
   --error: #dc2626;
-  --background: #f7faf9;
+  --background: #faf6ee;
+  --slot-petit-dej: #e0a12f;
+  --slot-dejeuner: #1b7a4e;
+  --slot-diner: #6b5bd6;
+  --day-1: #1b7a4e;  --day-2: #2e7fbe;  --day-3: #e0a12f;  --day-4: #8a5cd6;
+  --day-5: #d6558e;  --day-6: #1f9e8e;  --day-7: #e0742f;
+  --shadow-sm: 0 1px 2px 0 rgb(60 50 30 / 0.06);
+  --shadow-md: 0 4px 14px -2px rgb(60 50 30 / 0.10);
+  --shadow-lg: 0 14px 36px -8px rgb(60 50 30 / 0.16);
 }
 
 /* -------------------------------------------------------------------------- */
