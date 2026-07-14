@@ -70,10 +70,10 @@ export interface AmbianceConfig {
 export const AMBIANCES: AmbianceConfig[] = [
   { type: "rapide", label: "Rapide & facile", emoji: "⚡", tint: "bg-amber-50 border-amber-100", tintActive: "bg-amber-100 border-amber-300 ring-amber-300" },
   { type: "proteine", label: "Riche en protéines", emoji: "💪", hint: `≥ ${PROTEIN_MIN} g / repas`, tint: "bg-rose-50 border-rose-100", tintActive: "bg-rose-100 border-rose-300 ring-rose-300" },
-  { type: "famille", label: "En famille", emoji: "👨‍👩‍👧", tint: "bg-sky-50 border-sky-100", tintActive: "bg-sky-100 border-sky-300 ring-sky-300" },
+  { type: "famille", label: "En famille", emoji: "👨‍👩‍👧", tint: "bg-fuchsia-50 border-fuchsia-100", tintActive: "bg-fuchsia-100 border-fuchsia-300 ring-fuchsia-300" },
   { type: "sain", label: "Healthy", emoji: "🥗", tint: "bg-emerald-50 border-emerald-100", tintActive: "bg-emerald-100 border-emerald-300 ring-emerald-300" },
   { type: "gourmand", label: "Gourmand", emoji: "😋", tint: "bg-orange-50 border-orange-100", tintActive: "bg-orange-100 border-orange-300 ring-orange-300" },
-  { type: "monde", label: "Saveurs du monde", emoji: "🌍", tint: "bg-violet-50 border-violet-100", tintActive: "bg-violet-100 border-violet-300 ring-violet-300" },
+  { type: "monde", label: "Saveurs du monde", emoji: "🌍", tint: "bg-teal-50 border-teal-100", tintActive: "bg-teal-100 border-teal-300 ring-teal-300" },
 ];
 
 // Allergènes / aliments à éviter proposés à l'onboarding. Chaque groupe mappe

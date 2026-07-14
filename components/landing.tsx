@@ -46,13 +46,24 @@ export function Landing({
   hasPrefs,
   showcase,
   summary,
+  recipeCount,
+  storeCount,
 }: {
   hasPrefs: boolean;
   showcase: ShowcaseRecipe[];
   summary?: Summary | null;
+  recipeCount: number;
+  storeCount: number;
 }) {
+  // Rangée de preuves — stat-tiles sobres (valeur en display serif, libellé muet).
+  const stats = [
+    { value: String(recipeCount), label: "Recettes maison" },
+    { value: String(storeCount), label: "Enseignes, prix adaptés" },
+    { value: "3", label: "Clics pour ta liste" },
+  ];
+
   return (
-    <main className="mx-auto w-full max-w-md px-6 pb-28">
+    <main className="mx-auto w-full max-w-md px-6 pb-44">
       {/* ---------- HERO ---------- */}
       <motion.section
         initial={{ opacity: 0, y: 16 }}
@@ -61,25 +72,25 @@ export function Landing({
         className="pt-12"
       >
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-lg font-bold tracking-tight">
+          <div className="flex items-center gap-2 font-display text-xl font-semibold tracking-tight">
             <span className="text-2xl" aria-hidden>
               🥗
             </span>
             SmartEat
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <ThemeToggle compact />
             <Link
               href="/login"
-              className="text-sm font-medium text-on-surface-muted hover:text-on-surface"
+              className="inline-flex min-h-11 items-center px-1 text-sm font-medium text-on-surface-muted hover:text-on-surface"
             >
               Se connecter
             </Link>
           </div>
         </div>
 
-        <h1 className="mt-10 text-[2.1rem] font-bold leading-[1.1] tracking-tight">
-          Qu&apos;est-ce qu&apos;on mange ce soir ?
+        <h1 className="mt-10 font-display text-[2.5rem] font-semibold leading-[1.08] tracking-tight">
+          Qu&apos;est-ce qu&apos;on mange <em className="text-accent">ce soir</em> ?
         </h1>
         <p className="mt-3 text-xl font-medium text-primary">Plus jamais cette question.</p>
         <p className="mt-4 text-on-surface-muted">
@@ -92,7 +103,7 @@ export function Landing({
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.25, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-8 rounded-3xl border border-outline bg-surface p-5 shadow-sm"
+          className="mt-8 rounded-[var(--radius-card)] border border-outline bg-surface p-5 shadow-[var(--shadow-md)]"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wide text-on-surface-muted">
@@ -101,7 +112,9 @@ export function Landing({
             <Badge tone="primary">🛒 Ma semaine</Badge>
           </div>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="tnum text-3xl font-bold text-primary">32,40 €</span>
+            <span className="tnum font-display text-3xl font-semibold tracking-tight text-primary">
+              32,40 €
+            </span>
             <span className="text-sm text-on-surface-muted">/ 35 €</span>
           </div>
           <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-surface-variant">
@@ -119,6 +132,23 @@ export function Landing({
       <Reveal className="mt-6 text-center text-sm text-on-surface-muted">
         Une petite appli faite maison — <span className="font-medium text-on-surface">gratuite</span>{" "}
         et sans pub.
+      </Reveal>
+
+      {/* ---------- PREUVES ---------- */}
+      <Reveal className="mt-8">
+        <div className="grid grid-cols-3 gap-3">
+          {stats.map((s) => (
+            <div
+              key={s.label}
+              className="rounded-[var(--radius-card)] border border-outline bg-surface px-2 py-4 text-center"
+            >
+              <p className="font-display text-2xl font-semibold tracking-tight text-primary">
+                {s.value}
+              </p>
+              <p className="mt-1 text-[11px] leading-tight text-on-surface-muted">{s.label}</p>
+            </div>
+          ))}
+        </div>
       </Reveal>
 
       {/* Récap pour un utilisateur qui revient : ses choix + accès au menu */}
@@ -142,12 +172,14 @@ export function Landing({
       {/* ---------- COMMENT ÇA MARCHE ---------- */}
       <section className="mt-12">
         <Reveal>
-          <h2 className="text-xl font-semibold tracking-tight">Comment ça marche ?</h2>
+          <h2 className="font-display text-2xl font-semibold tracking-tight">
+            Comment ça marche ?
+          </h2>
         </Reveal>
         <div className="mt-5 space-y-3">
           {STEPS.map((s, i) => (
             <Reveal key={s.title} delay={i * 0.08}>
-              <div className="flex items-start gap-4 rounded-2xl border border-outline bg-surface p-4">
+              <div className="flex items-start gap-4 rounded-[var(--radius-card)] border border-outline bg-surface p-4">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
                   {s.icon}
                 </span>
@@ -166,7 +198,9 @@ export function Landing({
       {/* ---------- VITRINE RECETTES ---------- */}
       <section className="mt-12">
         <Reveal className="flex items-baseline justify-between gap-2">
-          <h2 className="text-xl font-semibold tracking-tight">Des idées qui te ressemblent</h2>
+          <h2 className="font-display text-2xl font-semibold tracking-tight">
+            Des idées qui te ressemblent
+          </h2>
           <Link href="/recettes" className="shrink-0 text-sm font-medium text-primary hover:underline">
             Tout voir →
           </Link>
@@ -174,7 +208,7 @@ export function Landing({
         <Stagger className="mt-5 grid grid-cols-2 gap-3">
           {showcase.map((r) => (
             <StaggerItem key={r.id}>
-              <div className="overflow-hidden rounded-2xl border border-outline bg-surface">
+              <div className="overflow-hidden rounded-[var(--radius-card)] border border-outline bg-surface">
                 <RecipeImage
                   src={r.imageUrl}
                   query={r.title}
@@ -209,23 +243,21 @@ export function Landing({
         </Stagger>
       </section>
 
-      {/* ---------- CTA STICKY ---------- */}
-      <div className="fixed inset-x-0 bottom-0 z-20">
-        <div className="mx-auto max-w-md border-t border-outline bg-background/85 p-5 backdrop-blur">
+      {/* ---------- CTA FLOTTANT (au-dessus de la bottom nav, voir REFONTE §5) ---------- */}
+      <div className="fixed inset-x-0 bottom-[72px] z-30">
+        <div className="mx-auto max-w-md px-5">
           {hasPrefs ? (
-            <div className="space-y-2">
-              <Link href="/plan" className={`${buttonClasses("primary", "lg")} w-full`}>
-                Reprendre mes repas
-              </Link>
-              <Link
-                href="/onboarding"
-                className={`${buttonClasses("ghost", "md")} w-full`}
-              >
-                Modifier mes préférences
-              </Link>
-            </div>
+            <Link
+              href="/plan"
+              className={`${buttonClasses("primary", "lg")} w-full shadow-[var(--shadow-lg)]`}
+            >
+              Reprendre mes repas
+            </Link>
           ) : (
-            <Link href="/onboarding" className={`${buttonClasses("primary", "lg")} w-full`}>
+            <Link
+              href="/onboarding"
+              className={`${buttonClasses("primary", "lg")} w-full shadow-[var(--shadow-lg)]`}
+            >
               Commencer gratuitement
             </Link>
           )}

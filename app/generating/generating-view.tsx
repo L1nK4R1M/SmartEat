@@ -5,15 +5,16 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Loader2 } from "lucide-react";
 
-// Écran de génération animé (Romi) : "on prépare ta semaine…" + checklist
+// Écran de génération SmartEat 3.0 : « On prépare ta semaine… » + checklist
 // séquentielle, puis redirection vers le plan (~2,5 s, côté client).
+// La bottom nav est cachée sur /generating (flux plein écran).
 const STEPS = [
   "Analyse du budget et de tes préférences",
   "Création de ton plan de repas",
   "Génération de la liste de courses",
 ];
 
-export function GeneratingScreen({
+export function GeneratingView({
   planHref,
   storeName,
 }: {
@@ -44,7 +45,7 @@ export function GeneratingScreen({
         initial={{ scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 12 }}
-        className="grid h-24 w-24 place-items-center rounded-3xl bg-primary/10 text-5xl"
+        className="grid h-24 w-24 place-items-center rounded-[var(--radius-card)] bg-primary/10 text-5xl"
         aria-hidden
       >
         <motion.span
@@ -55,7 +56,9 @@ export function GeneratingScreen({
         </motion.span>
       </motion.div>
 
-      <h1 className="mt-7 text-2xl font-semibold tracking-tight">on prépare ta semaine…</h1>
+      <h1 className="mt-7 font-display text-3xl font-semibold tracking-tight">
+        On prépare ta semaine…
+      </h1>
       {storeName && (
         <p className="mt-1.5 text-on-surface-muted">
           Prévu pour <span className="font-medium text-on-surface">{storeName}</span>
@@ -72,7 +75,7 @@ export function GeneratingScreen({
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: done || current ? 1 : 0.4, x: 0 }}
               transition={{ duration: 0.3 }}
-              className="flex items-center gap-3 rounded-2xl border border-outline bg-surface p-4"
+              className="flex items-center gap-3 rounded-[var(--radius-card)] border border-outline bg-surface p-4"
             >
               <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full">
                 <AnimatePresence mode="wait" initial={false}>

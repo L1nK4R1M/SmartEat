@@ -26,7 +26,7 @@ export default async function RecettesPage() {
   }));
 
   return (
-    <div className="mx-auto w-full max-w-md px-5 pb-16 pt-6">
+    <div className="mx-auto w-full max-w-md px-5 pb-28 pt-6">
       <Link
         href="/"
         className="mb-3 inline-flex items-center gap-1 text-sm text-on-surface-muted hover:text-on-surface"
@@ -34,7 +34,7 @@ export default async function RecettesPage() {
         <ChevronLeft size={16} /> Accueil
       </Link>
 
-      <h1 className="text-3xl font-bold tracking-tight">Toutes les recettes</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight">Toutes les recettes</h1>
       <p className="mt-1 text-on-surface-muted">
         {recipes.length} idées de repas, chacune avec sa photo.
       </p>

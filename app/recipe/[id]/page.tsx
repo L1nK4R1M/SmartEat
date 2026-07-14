@@ -12,6 +12,7 @@ import { RecipeImage } from "@/components/recipe-image";
 import { NutritionCard } from "@/components/nutrition-card";
 import { RecipeSteps } from "@/components/recipe-steps";
 import { AiNotice } from "@/components/ai-notice";
+import { FavoriteButton } from "@/components/favorite-button";
 import { getDetailedRecipe } from "@/lib/ai/recipe-detail";
 import { formatQty } from "@/lib/utils";
 import type { DietTag } from "@/lib/types";
@@ -73,7 +74,7 @@ export default async function RecipePage({
   }
 
   return (
-    <div className="mx-auto w-full max-w-md pb-16">
+    <div className="mx-auto w-full max-w-md pb-28">
       {/* En-tête visuel plein cadre */}
       <div className="relative">
         <RecipeImage
@@ -90,22 +91,30 @@ export default async function RecipePage({
         <Link
           href="/plan"
           aria-label="Retour aux repas"
-          className="absolute left-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-surface/90 text-on-surface backdrop-blur"
+          className="absolute left-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-surface/90 text-on-surface backdrop-blur"
         >
           <ChevronLeft size={20} />
         </Link>
         {swap && (
           <Link
             href={`/recipe/${swap.id}`}
-            className="absolute right-4 top-4 inline-flex h-10 items-center gap-1.5 rounded-full bg-surface/90 px-4 text-sm font-medium text-on-surface backdrop-blur"
+            className="absolute right-4 top-4 inline-flex h-11 items-center gap-1.5 rounded-full bg-surface/90 px-4 text-sm font-medium text-on-surface backdrop-blur"
           >
             <RefreshCw size={15} /> Changer
           </Link>
         )}
+        {/* Favori (cœur), persistant en localStorage */}
+        <FavoriteButton
+          recipeId={recipe.id}
+          title={recipe.title}
+          className="absolute bottom-4 right-4 shadow-[var(--shadow-md)]"
+        />
       </div>
 
       <div className="px-5">
-        <h1 className="mt-5 text-2xl font-semibold tracking-tight">{detailed.title}</h1>
+        <h1 className="mt-5 font-display text-3xl font-semibold tracking-tight">
+          {detailed.title}
+        </h1>
 
         <AiNotice status={detailed.status} />
 

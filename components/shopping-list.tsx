@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Check } from "lucide-react";
 import type { ShoppingSection } from "@/lib/shopping-list";
 import { Stagger, StaggerItem } from "@/components/ui/motion";
-import { CopyListButton } from "@/components/copy-list-button";
+import { ProgressBar } from "@/components/ui/progress-bar";
+import { ShareListButton } from "@/components/share-list-button";
 import { setPantryItem } from "@/app/pantry-actions";
 import { cn, formatEuro, formatQty } from "@/lib/utils";
 
@@ -57,21 +58,26 @@ export function ShoppingList({
     });
   }
 
-  const { total, remaining } = useMemo(() => {
+  // Total restant + progression : X articles cochés sur N (le placard peut
+  // contenir des ingrédients hors liste, on ne compte que ceux de la liste).
+  const { total, itemCount, checkedCount } = useMemo(() => {
     let total = 0;
-    let remaining = 0;
+    let itemCount = 0;
+    let checkedCount = 0;
     for (const s of sections) {
       for (const l of s.lines) {
-        if (!owned.has(l.ingredient.id)) {
-          total += l.cost;
-          remaining += 1;
-        }
+        itemCount += 1;
+        if (owned.has(l.ingredient.id)) checkedCount += 1;
+        else total += l.cost;
       }
     }
-    return { total, remaining };
+    return { total, itemCount, checkedCount };
   }, [sections, owned]);
 
-  const copyText = useMemo(() => {
+  const remaining = itemCount - checkedCount;
+
+  // Texte brut de partage : titre, rayons, articles + quantités, total estimé.
+  const shareText = useMemo(() => {
     const lines = [`SmartEat — Liste de courses (${storeName})`, ""];
     for (const s of sections) {
       const kept = s.lines.filter((l) => !owned.has(l.ingredient.id));
@@ -91,7 +97,24 @@ export function ShoppingList({
 
   return (
     <>
-      <Stagger className="space-y-5">
+      {/* Progression : X/N articles + barre fine, mise à jour au fil des cases */}
+      <div className="mb-5 rounded-[var(--radius-card)] border border-outline bg-surface p-4 shadow-[var(--shadow-md)]">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="tnum text-sm font-semibold">
+            {checkedCount}/{itemCount} articles
+            <span className="ml-1.5 font-normal text-on-surface-muted">au placard</span>
+          </p>
+          <p className="tnum font-display text-xl font-semibold tracking-tight">
+            {formatEuro(total)}
+          </p>
+        </div>
+        <ProgressBar value={checkedCount} max={itemCount} className="mt-2.5 h-1.5" />
+        <p className="mt-2 text-xs text-on-surface-muted">
+          {remaining} à acheter · produits entiers · total estimé
+        </p>
+      </div>
+
+      <Stagger className="space-y-4">
         {sections.map((section) => {
           const subtotal = section.lines.reduce(
             (sum, l) => (owned.has(l.ingredient.id) ? sum : sum + l.cost),
@@ -99,77 +122,88 @@ export function ShoppingList({
           );
           return (
             <StaggerItem key={section.aisle}>
-              <div className="mb-2 flex items-baseline justify-between">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-on-surface-muted">
-                  {section.label}
-                </h2>
-                <span className="tnum text-xs text-on-surface-muted">{formatEuro(subtotal)}</span>
-              </div>
-              <ul className="overflow-hidden rounded-[var(--radius-card)] border border-outline bg-surface">
-                {section.lines.map((line) => {
-                  const isOwned = owned.has(line.ingredient.id);
-                  return (
-                    <li
-                      key={line.ingredient.id}
-                      className={cn(
-                        "flex items-center gap-3 border-b border-outline px-4 py-3 last:border-b-0 transition-opacity",
-                        isOwned && "opacity-50",
-                      )}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => toggle(line.ingredient.id)}
-                        aria-pressed={isOwned}
-                        aria-label={`J'ai déjà ${line.ingredient.name}`}
+              <section className="overflow-hidden rounded-[var(--radius-card)] border border-outline bg-surface">
+                <div className="flex items-baseline justify-between border-b border-outline bg-surface-variant/50 px-4 py-2.5">
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-on-surface-muted">
+                    {section.label}
+                  </h2>
+                  <span className="tnum text-xs text-on-surface-muted">{formatEuro(subtotal)}</span>
+                </div>
+                <ul>
+                  {section.lines.map((line) => {
+                    const isOwned = owned.has(line.ingredient.id);
+                    return (
+                      <li
+                        key={line.ingredient.id}
                         className={cn(
-                          "grid h-6 w-6 shrink-0 place-items-center rounded-full border transition-colors",
-                          isOwned
-                            ? "border-primary bg-primary text-on-primary"
-                            : "border-outline hover:border-primary",
+                          "flex items-center gap-2 border-b border-outline py-1.5 pl-2 pr-4 transition-opacity last:border-b-0",
+                          isOwned && "opacity-55",
                         )}
                       >
-                        {isOwned && <Check size={14} strokeWidth={3} />}
-                      </button>
-                      <div className="min-w-0 flex-1">
-                        <span className={cn("block truncate font-medium", isOwned && "line-through")}>
-                          {line.ingredient.name}
-                        </span>
-                        <span className="block text-xs text-on-surface-muted">
-                          {isOwned
-                            ? "déjà dans le placard"
-                            : `besoin ${formatQty(line.neededQty, line.ingredient.baseUnit)}`}
-                        </span>
-                      </div>
-                      <div className="shrink-0 text-right">
-                        <span
-                          className={cn(
-                            "block text-sm font-medium",
-                            isOwned && "text-on-surface-muted line-through",
-                          )}
+                        <button
+                          type="button"
+                          onClick={() => toggle(line.ingredient.id)}
+                          aria-pressed={isOwned}
+                          aria-label={`J'ai déjà ${line.ingredient.name}`}
+                          className="grid h-11 w-11 shrink-0 place-items-center"
                         >
-                          {line.packs} × {line.ingredient.packLabel}
-                        </span>
-                        <span className="tnum block text-xs text-on-surface-muted">
-                          {formatEuro(line.cost)}
-                        </span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+                          <span
+                            className={cn(
+                              "grid h-6 w-6 place-items-center rounded-full border transition-colors",
+                              isOwned
+                                ? "border-primary bg-primary text-on-primary"
+                                : "border-outline hover:border-primary",
+                            )}
+                          >
+                            {isOwned && <Check size={14} strokeWidth={3} />}
+                          </span>
+                        </button>
+                        <div className="min-w-0 flex-1 py-1.5">
+                          <span
+                            className={cn(
+                              "block truncate font-medium",
+                              isOwned && "line-through decoration-1",
+                            )}
+                          >
+                            {line.ingredient.name}
+                          </span>
+                          <span className="block text-xs text-on-surface-muted">
+                            {isOwned
+                              ? "déjà dans le placard"
+                              : `besoin ${formatQty(line.neededQty, line.ingredient.baseUnit)}`}
+                          </span>
+                        </div>
+                        <div className="shrink-0 py-1.5 text-right">
+                          <span
+                            className={cn(
+                              "block text-sm font-medium",
+                              isOwned && "text-on-surface-muted line-through decoration-1",
+                            )}
+                          >
+                            {line.packs} × {line.ingredient.packLabel}
+                          </span>
+                          <span className="tnum block text-xs text-on-surface-muted">
+                            {formatEuro(line.cost)}
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
             </StaggerItem>
           );
         })}
       </Stagger>
 
-      {/* Total + export, sticky en thumb-zone (recalculé sans les articles du placard) */}
-      <div className="fixed inset-x-0 bottom-0">
-        <div className="mx-auto max-w-md border-t border-outline bg-background/80 p-5 backdrop-blur">
-          <div className="mb-3 flex items-center justify-between">
-            <span className="text-on-surface-muted">{remaining} à acheter · produits entiers</span>
-            <span className="tnum text-xl font-bold">{formatEuro(total)}</span>
-          </div>
-          <CopyListButton text={copyText} />
+      {/* CTA flottant au-dessus de la barre d'onglets (voir REFONTE.md §5) */}
+      <div className="fixed inset-x-0 bottom-[72px] z-30">
+        <div className="mx-auto max-w-md px-5">
+          <ShareListButton
+            title={`SmartEat — Liste de courses (${storeName})`}
+            text={shareText}
+            className="w-full shadow-[var(--shadow-lg)]"
+          />
         </div>
       </div>
     </>

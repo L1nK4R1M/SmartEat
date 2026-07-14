@@ -59,11 +59,12 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
             key={o.value}
             type="button"
             aria-pressed={active}
+            aria-label={o.label}
             title={o.label}
             onClick={() => pick(o.value)}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full text-sm font-medium transition-colors",
-              compact ? "px-2.5 py-1.5" : "px-3.5 py-1.5",
+              compact ? "px-2.5 py-2" : "px-3.5 py-2",
               active
                 ? "bg-primary text-on-primary"
                 : "text-on-surface-muted hover:text-on-surface",

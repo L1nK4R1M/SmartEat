@@ -105,6 +105,9 @@ export default async function PlanPage({
         mealTypes: recipe.mealTypes,
         slot,
         day,
+        // Équilibre de la semaine : nutrition estimée PAR PORTION (voir plan-view).
+        kcal: recipe.nutrition.kcal,
+        protein: recipe.nutrition.protein,
         mealCost: recipeMealCost(recipe, ingredientsMap, store, prefs.householdSize, priceBook.unit),
         swapHref: sub
           ? planHref(
@@ -131,20 +134,16 @@ export default async function PlanPage({
   };
 
   return (
-    <>
-      <PlanView {...viewData} />
-      {/* Ajuster les arbitrages de la semaine (budget + envies). */}
-      {viewData.recipes.length > 0 && (
-        <div className="mx-auto w-full max-w-md px-5 pb-28">
-          <details className="group">
-            <summary className="mb-3 inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-on-surface-muted [&::-webkit-details-marker]:hidden">
-              Ajuster cette semaine
-              <span className="transition-transform group-open:rotate-180">▾</span>
-            </summary>
-            <FilterBar initialBudget={request.budget} initialTypes={request.mealTypes} />
-          </details>
-        </div>
-      )}
-    </>
+    <PlanView {...viewData}>
+      {/* Ajuster les arbitrages de la semaine (budget + envies). Rendu en
+          children pour rester AU-DESSUS du CTA flottant (padding pb-44). */}
+      <details className="group mt-6">
+        <summary className="mb-3 inline-flex min-h-11 cursor-pointer items-center gap-1.5 text-sm font-semibold text-on-surface-muted [&::-webkit-details-marker]:hidden">
+          Ajuster cette semaine
+          <span className="transition-transform group-open:rotate-180">▾</span>
+        </summary>
+        <FilterBar initialBudget={request.budget} initialTypes={request.mealTypes} />
+      </details>
+    </PlanView>
   );
 }

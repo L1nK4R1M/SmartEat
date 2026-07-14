@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { AlertTriangle, ChevronLeft, ChevronRight, RotateCcw, ShoppingCart } from "lucide-react";
+import {
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  Flame,
+  RotateCcw,
+  ShoppingCart,
+  UtensilsCrossed,
+  Zap,
+} from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { CountUpEuro } from "@/components/ui/count-up";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -32,7 +41,10 @@ export interface PlanViewData {
 
 const slotRank = (s: PlanCardRecipe["slot"]) => MEAL_SLOT_ORDER.indexOf(s);
 
-export function PlanView(data: PlanViewData) {
+export function PlanView({
+  children,
+  ...data
+}: PlanViewData & { children?: React.ReactNode }) {
   const over = data.total > data.budget + 0.001;
 
   // Regroupement par JOUR de la semaine (Lundi -> Dimanche). Chaque jour affiche
@@ -45,8 +57,19 @@ export function PlanView(data: PlanViewData) {
       .sort((a, b) => slotRank(a.slot) - slotRank(b.slot)),
   }));
 
+  // Équilibre de la semaine : moyennes PAR JOUR et PAR PERSONNE, à partir des
+  // valeurs nutritionnelles (par portion) des recettes planifiées.
+  const dayCount = Math.max(days.length, 1);
+  const avgKcal = Math.round(data.recipes.reduce((s, r) => s + r.kcal, 0) / dayCount);
+  const avgProtein = Math.round(data.recipes.reduce((s, r) => s + r.protein, 0) / dayCount);
+  const balance = [
+    { icon: Flame, value: String(avgKcal), caption: "kcal / jour" },
+    { icon: Zap, value: `${avgProtein} g`, caption: "protéines / jour" },
+    { icon: UtensilsCrossed, value: String(data.recipes.length), caption: "repas planifiés" },
+  ];
+
   return (
-    <div className="mx-auto w-full max-w-md px-5 pb-32 pt-6">
+    <div className="mx-auto w-full max-w-md px-5 pb-44 pt-6">
       {/* Navigation : retour au compte (connecté) ou à l'accueil (invité) */}
       <Link
         href={data.homeHref}
@@ -62,7 +85,7 @@ export function PlanView(data: PlanViewData) {
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         className="mb-5"
       >
-        <h1 className="text-3xl font-bold tracking-tight">Bon appétit ! 🎉</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Bon appétit ! 🎉</h1>
         <p className="mt-1 text-on-surface-muted">Ta semaine est prête.</p>
         <div className="mt-3">
           <span className="inline-flex items-center gap-2 rounded-full border border-outline bg-surface px-3 py-1.5 text-sm">
@@ -97,22 +120,22 @@ export function PlanView(data: PlanViewData) {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05, duration: 0.4 }}
-            className="rounded-[var(--radius-card)] border border-outline bg-surface p-4"
+            className="rounded-[var(--radius-card)] border border-outline bg-surface p-4 shadow-[var(--shadow-md)]"
           >
             <div className="flex items-baseline justify-between">
               <span className="text-xs font-semibold uppercase tracking-wide text-on-surface-muted">
                 Coût estimé
               </span>
-              <span className="text-sm text-on-surface-muted">
+              <span className="tnum text-sm text-on-surface-muted">
                 budget {formatEuro(data.budget)}
               </span>
             </div>
             <div className="mt-1 flex items-baseline gap-1.5">
               <CountUpEuro
                 value={data.total}
-                className={`tnum text-3xl font-bold ${over ? "text-accent" : "text-primary"}`}
+                className={`tnum font-display text-3xl font-semibold tracking-tight ${over ? "text-accent" : "text-primary"}`}
               />
-              <span className="text-sm text-on-surface-muted">/ {formatEuro(data.budget)}</span>
+              <span className="tnum text-sm text-on-surface-muted">/ {formatEuro(data.budget)}</span>
             </div>
             <ProgressBar value={data.total} max={data.budget} over={over} className="mt-3" />
           </motion.section>
@@ -124,6 +147,32 @@ export function PlanView(data: PlanViewData) {
                 : `💰 ${data.priceLive} prix réels (Open Prices) · le reste estimé`}
             </p>
           )}
+
+          {/* NOUVEAU : Équilibre de la semaine (moyennes par jour, par personne) */}
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08, duration: 0.4 }}
+            className="mt-3 rounded-[var(--radius-card)] border border-outline bg-surface p-4"
+          >
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-on-surface-muted">
+              Équilibre de la semaine
+            </h2>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {balance.map((b) => (
+                <div key={b.caption} className="rounded-2xl bg-primary/10 px-2 py-3 text-center">
+                  <b.icon size={15} className="mx-auto text-primary" aria-hidden />
+                  <div className="tnum mt-1 font-display text-xl font-semibold tracking-tight text-on-surface">
+                    {b.value}
+                  </div>
+                  <div className="text-[11px] font-medium text-on-surface-muted">{b.caption}</div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-center text-[11px] text-on-surface-muted">
+              Moyennes par personne, valeurs estimées.
+            </p>
+          </motion.section>
 
           {/* Carte "N articles · liste de courses" cliquable */}
           <motion.div
@@ -163,15 +212,14 @@ export function PlanView(data: PlanViewData) {
           )}
 
           {/* Repas regroupés par JOUR de la semaine (Lundi -> Dimanche) */}
-          <div className="mt-5 space-y-7">
+          <div className="mt-6 space-y-7">
             {groups.map((g) => (
               <section key={g.day}>
-                <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-on-surface-muted">
-                  <span className="grid h-6 min-w-6 place-items-center rounded-full bg-primary/12 px-1.5 text-[11px] font-bold text-primary">
-                    J{g.day + 1}
-                  </span>
+                <h2 className="mb-2 flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
                   {dayLabel(g.day)}
-                  <span className="font-normal normal-case">· {g.items.length} repas</span>
+                  <span className="text-sm font-normal text-on-surface-muted">
+                    · {g.items.length} repas
+                  </span>
                 </h2>
                 <Stagger className="space-y-3">
                   {g.items.map((r) => (
@@ -193,19 +241,25 @@ export function PlanView(data: PlanViewData) {
           <div className="mt-6 text-center">
             <Link
               href={data.regenerateHref}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-primary hover:underline"
             >
               <RotateCcw size={15} /> Régénérer la semaine
             </Link>
           </div>
+
+          {/* Réglages complémentaires (ex. "Ajuster cette semaine") */}
+          {children}
         </>
       )}
 
-      {/* CTA sticky */}
+      {/* CTA flottant AU-DESSUS de la bottom nav (voir REFONTE.md §5) */}
       {data.recipes.length > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-20">
-          <div className="mx-auto max-w-md border-t border-outline bg-background/85 p-5 backdrop-blur">
-            <Link href={data.listHref} className={`${buttonClasses("primary", "lg")} w-full`}>
+        <div className="fixed inset-x-0 bottom-[72px] z-30">
+          <div className="mx-auto max-w-md px-5">
+            <Link
+              href={data.listHref}
+              className={`${buttonClasses("primary", "lg")} w-full shadow-[var(--shadow-lg)]`}
+            >
               <ShoppingCart size={18} /> Voir la liste de courses
             </Link>
           </div>
