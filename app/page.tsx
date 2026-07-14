@@ -35,5 +35,13 @@ export default async function Home() {
       costPerServing: recipeCostPerServing(r, ingredientsMap, store),
     }));
 
-  return <Landing hasPrefs={!!prefs} showcase={showcase} summary={summary} />;
+  return (
+    <Landing
+      hasPrefs={!!prefs}
+      showcase={showcase}
+      summary={summary}
+      recipeCount={recipes.length}
+      storeCount={stores.length}
+    />
+  );
 }

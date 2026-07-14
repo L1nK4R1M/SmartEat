@@ -83,120 +83,129 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-6 py-10">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-6 py-8">
       <Link
         href="/"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-on-surface-muted hover:text-on-surface"
+        className="inline-flex min-h-11 items-center gap-1 self-start text-sm text-on-surface-muted hover:text-on-surface"
       >
         <ChevronLeft size={16} /> Accueil
       </Link>
 
-      <div className="flex flex-1 flex-col justify-center">
-        <span className="text-5xl" aria-hidden>
-          🥗
-        </span>
+      <div className="flex flex-1 flex-col justify-center pb-10">
+        <div className="text-center">
+          <span className="text-5xl" aria-hidden>
+            🥗
+          </span>
 
-        {!configured ? (
-          <>
-            <h1 className="mt-6 text-3xl font-bold tracking-tight">Connexion</h1>
-            <p className="mt-6 rounded-2xl border border-outline bg-surface-variant p-4 text-sm text-on-surface-muted">
-              La connexion n&apos;est pas encore configurée sur cet environnement. L&apos;app reste
-              utilisable en mode invité.
-            </p>
-          </>
-        ) : userEmail ? (
-          <div className="space-y-3">
-            <h1 className="text-3xl font-bold tracking-tight">Te voilà connecté</h1>
-            <div className="flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/8 p-4 text-sm">
-              <Check size={16} className="text-primary" /> {userEmail}
-            </div>
-            <Link href="/compte" className="block">
-              <Button size="lg" className="w-full">
-                Mon compte
-              </Button>
-            </Link>
-            <Button onClick={logout} variant="ghost" size="md" className="w-full">
-              Se déconnecter
-            </Button>
-          </div>
-        ) : (
-          <>
-            <h1 className="mt-6 text-3xl font-bold tracking-tight">
-              {mode === "signin" ? "Connexion" : "Créer un compte"}
-            </h1>
+          <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">
+            {!configured
+              ? "Connexion"
+              : userEmail
+                ? "Te voilà connecté"
+                : mode === "signin"
+                  ? "Connexion"
+                  : "Créer un compte"}
+          </h1>
+          {configured && !userEmail && (
             <p className="mt-2 text-on-surface-muted">
               Tes repas, ton placard et ton budget te suivent sur tous tes appareils.
             </p>
+          )}
+        </div>
 
-            {/* Onglets connexion / inscription */}
-            <div className="mt-6 grid grid-cols-2 rounded-full border border-outline p-1 text-sm font-medium">
-              {(["signin", "signup"] as Mode[]).map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => {
-                    setMode(m);
-                    setMsg(null);
-                  }}
+        {/* Carte centrale */}
+        <div className="mt-6 rounded-[var(--radius-card)] border border-outline bg-surface p-5 shadow-[var(--shadow-md)]">
+          {!configured ? (
+            <p className="rounded-2xl bg-surface-variant p-4 text-sm text-on-surface-muted">
+              La connexion n&apos;est pas encore configurée sur cet environnement. L&apos;app reste
+              utilisable en mode invité.
+            </p>
+          ) : userEmail ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/8 p-4 text-sm">
+                <Check size={16} className="text-primary" /> {userEmail}
+              </div>
+              <Link href="/compte" className="block">
+                <Button size="lg" className="w-full">
+                  Mon compte
+                </Button>
+              </Link>
+              <Button onClick={logout} variant="ghost" size="md" className="w-full">
+                Se déconnecter
+              </Button>
+            </div>
+          ) : (
+            <>
+              {/* Onglets connexion / inscription */}
+              <div className="grid grid-cols-2 rounded-full border border-outline bg-background p-1 text-sm font-medium">
+                {(["signin", "signup"] as Mode[]).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => {
+                      setMode(m);
+                      setMsg(null);
+                    }}
+                    className={cn(
+                      "rounded-full py-2.5 transition-colors",
+                      mode === m ? "bg-primary text-on-primary" : "text-on-surface-muted",
+                    )}
+                  >
+                    {m === "signin" ? "Connexion" : "Inscription"}
+                  </button>
+                ))}
+              </div>
+
+              <form onSubmit={withPassword} className="mt-4 space-y-3">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="ton@email.com"
+                  autoComplete="email"
+                  className="h-12 w-full rounded-2xl border border-outline bg-background px-4 outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+                />
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Mot de passe (6 caractères min.)"
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                  className="h-12 w-full rounded-2xl border border-outline bg-background px-4 outline-none focus:border-primary focus:ring-2 focus:ring-primary"
+                />
+                <Button size="lg" className="w-full" disabled={busy}>
+                  <Lock size={16} />
+                  {busy ? "…" : mode === "signin" ? "Se connecter" : "Créer mon compte"}
+                </Button>
+              </form>
+
+              <button
+                type="button"
+                onClick={magicLink}
+                disabled={busy}
+                className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              >
+                <Mail size={15} /> Recevoir plutôt un lien magique
+              </button>
+
+              {msg && (
+                <p
                   className={cn(
-                    "rounded-full py-2 transition-colors",
-                    mode === m ? "bg-primary text-on-primary" : "text-on-surface-muted",
+                    "mt-3 rounded-2xl p-3 text-sm",
+                    msg.kind === "error"
+                      ? "bg-error/10 text-error"
+                      : "border border-primary/30 bg-primary/8",
                   )}
                 >
-                  {m === "signin" ? "Connexion" : "Inscription"}
-                </button>
-              ))}
-            </div>
-
-            <form onSubmit={withPassword} className="mt-4 space-y-3">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="ton@email.com"
-                autoComplete="email"
-                className="h-12 w-full rounded-2xl border border-outline bg-surface px-4 outline-none focus:border-primary focus:ring-2 focus:ring-primary"
-              />
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mot de passe (6 caractères min.)"
-                autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                className="h-12 w-full rounded-2xl border border-outline bg-surface px-4 outline-none focus:border-primary focus:ring-2 focus:ring-primary"
-              />
-              <Button size="lg" className="w-full" disabled={busy}>
-                <Lock size={16} />
-                {busy ? "…" : mode === "signin" ? "Se connecter" : "Créer mon compte"}
-              </Button>
-            </form>
-
-            <button
-              type="button"
-              onClick={magicLink}
-              disabled={busy}
-              className="mt-3 inline-flex w-full items-center justify-center gap-1.5 text-sm font-medium text-primary hover:underline"
-            >
-              <Mail size={15} /> Recevoir plutôt un lien magique
-            </button>
-
-            {msg && (
-              <p
-                className={cn(
-                  "mt-4 rounded-2xl p-3 text-sm",
-                  msg.kind === "error"
-                    ? "bg-error/10 text-error"
-                    : "border border-primary/30 bg-primary/8",
-                )}
-              >
-                {msg.text}
-              </p>
-            )}
-          </>
-        )}
+                  {msg.text}
+                </p>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </main>
   );

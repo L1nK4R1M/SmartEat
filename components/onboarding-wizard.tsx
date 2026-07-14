@@ -122,30 +122,33 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="flex items-center gap-3 px-5 pt-5">
-        {step > 0 ? (
-          <button
-            onClick={() => go(-1)}
-            aria-label="Retour"
-            className="grid h-9 w-9 place-items-center rounded-full hover:bg-surface-variant"
-          >
-            <ChevronLeft size={20} />
-          </button>
-        ) : (
-          <div className="h-9 w-9" />
-        )}
-        {/* Barre de progression animée */}
-        <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-surface-variant">
-          <motion.div
-            className="absolute inset-y-0 left-0 rounded-full bg-primary"
-            initial={false}
-            animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          />
+      <header className="px-5 pt-5">
+        <div className="flex items-center gap-3">
+          {step > 0 ? (
+            <button
+              onClick={() => go(-1)}
+              aria-label="Retour"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full hover:bg-surface-variant"
+            >
+              <ChevronLeft size={20} />
+            </button>
+          ) : (
+            <div className="h-11 w-11 shrink-0" aria-hidden />
+          )}
+          {/* Barre de progression animée */}
+          <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-surface-variant">
+            <motion.div
+              className="absolute inset-y-0 left-0 rounded-full bg-primary"
+              initial={false}
+              animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </div>
+          <div className="h-11 w-11 shrink-0" aria-hidden />
         </div>
-        <span className="tnum w-9 text-right text-xs font-medium text-on-surface-muted">
-          {step + 1}/{STEPS.length}
-        </span>
+        <p className="text-center text-xs font-medium text-on-surface-muted" aria-live="polite">
+          Étape {step + 1} sur {STEPS.length}
+        </p>
       </header>
 
       <main className="flex-1 overflow-hidden px-5 pt-8">
@@ -191,7 +194,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
                         aria-pressed={storeId === s.id}
                         onClick={() => setStoreId(s.id)}
                         className={cn(
-                          "flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-colors",
+                          "flex w-full items-center gap-3 rounded-[var(--radius-card)] border p-3 text-left transition-colors",
                           storeId === s.id
                             ? "border-primary bg-primary/8 ring-2 ring-primary"
                             : "border-outline bg-surface hover:bg-surface-variant",
@@ -223,7 +226,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
                     value={budget}
                     duration={0.3}
                     format={formatEuro}
-                    className="tnum text-6xl font-bold text-primary"
+                    className="tnum font-display text-6xl font-semibold tracking-tight text-primary"
                   />
                   <p className="mt-1 text-on-surface-muted">cette semaine</p>
                 </div>
@@ -252,7 +255,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
                     value={householdSize}
                     duration={0.25}
                     format={(v) => String(Math.round(v))}
-                    className="tnum text-6xl font-bold"
+                    className="tnum font-display text-6xl font-semibold tracking-tight"
                   />
                   <p className="mt-1 text-on-surface-muted">
                     {householdSize > 1 ? "personnes" : "personne"}
@@ -290,7 +293,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
                           aria-pressed={selected}
                           onClick={() => toggleSlot(s)}
                           className={cn(
-                            "relative flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-colors",
+                            "relative flex w-full items-center gap-3 rounded-[var(--radius-card)] border p-4 text-left transition-colors",
                             selected
                               ? "border-primary bg-primary/8 ring-2 ring-primary"
                               : "border-outline bg-surface hover:bg-surface-variant",
@@ -330,7 +333,7 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
                           disabled={atCap}
                           onClick={() => toggleAmbiance(a.type)}
                           className={cn(
-                            "relative flex h-full w-full flex-col items-start gap-2 rounded-3xl border p-4 text-left transition-all",
+                            "relative flex h-full w-full flex-col items-start gap-2 rounded-[var(--radius-card)] border p-4 text-left transition-all",
                             selected
                               ? cn("ring-2", a.tintActive, "text-on-surface")
                               : cn(a.tint, "text-on-surface hover:brightness-[0.98]"),
@@ -340,11 +343,11 @@ export function OnboardingWizard({ stores }: { stores: Store[] }) {
                           <span className="text-3xl" aria-hidden>
                             {a.emoji}
                           </span>
-                          <span className="font-semibold leading-tight text-slate-800">
+                          <span className="font-semibold leading-tight text-stone-800">
                             {a.label}
                           </span>
                           {a.hint && (
-                            <span className="text-xs font-medium text-slate-600">{a.hint}</span>
+                            <span className="text-xs font-medium text-stone-600">{a.hint}</span>
                           )}
                           {selected && (
                             <span className="absolute right-3 top-3 grid h-5 w-5 place-items-center rounded-full bg-primary text-on-primary">
@@ -451,7 +454,9 @@ function Step({
 }) {
   return (
     <div>
-      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+      <h1 className="font-display text-[1.7rem] font-semibold leading-[1.15] tracking-tight">
+        {title}
+      </h1>
       <p className="mt-1.5 text-on-surface-muted">{subtitle}</p>
       <div className="mt-6">{children}</div>
     </div>
@@ -478,7 +483,7 @@ function ChoiceCard({
         aria-pressed={selected}
         onClick={onClick}
         className={cn(
-          "relative flex h-full w-full items-center gap-3 rounded-2xl border p-4 text-left transition-colors",
+          "relative flex h-full w-full items-center gap-3 rounded-[var(--radius-card)] border p-4 text-left transition-colors",
           selected
             ? "border-primary bg-primary/8 ring-2 ring-primary"
             : "border-outline bg-surface hover:bg-surface-variant",

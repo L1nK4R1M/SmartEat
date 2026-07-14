@@ -17,10 +17,12 @@ export interface PlanCardRecipe {
   mealTypes: MealType[];
   slot: MealSlot;
   day: number; // 0 = Lundi … (regroupement par jour dans le plan)
+  kcal: number; // par portion (équilibre de la semaine)
+  protein: number; // g par portion
 }
 
-// Carte repas enrichie (plan, façon Romi) : onglet "moment" coloré à gauche,
-// visuel, nom, temps, nb personnes, prix calculé, tags d'ambiance. -> détail.
+// Carte repas photo-forward (SmartEat 3.0) : grande photo à gauche, pastille
+// « moment » posée sur la photo, nom, temps, nb personnes, prix. -> détail.
 export function PlanDayCard({
   recipe,
   householdSize,
@@ -34,30 +36,30 @@ export function PlanDayCard({
 }) {
   const slot = MEAL_SLOT_LABELS[recipe.slot];
   return (
-    <article className="relative flex overflow-hidden rounded-[var(--radius-card)] border border-outline bg-surface">
-      {/* Onglet moment coloré */}
-      <div
-        className="flex w-9 shrink-0 items-center justify-center"
-        style={{ backgroundColor: slot.color }}
-        aria-hidden
-      >
-        <span className="rotate-180 text-[11px] font-bold uppercase tracking-wider text-white [writing-mode:vertical-rl]">
-          {slot.short}
-        </span>
-      </div>
+    <article className="relative overflow-hidden rounded-[var(--radius-card)] border border-outline bg-surface">
+      <Link href={`/recipe/${recipe.id}`} className="flex min-w-0 items-stretch">
+        <div className="relative shrink-0">
+          <RecipeImage
+            src={recipe.imageUrl}
+            query={recipe.title}
+            emoji={recipe.emoji}
+            seed={recipe.id}
+            alt={recipe.title}
+            rounded="rounded-none"
+            className="h-28 w-28"
+            emojiClassName="text-4xl"
+          />
+          {/* Pastille moment posée sur la photo */}
+          <span
+            className="absolute left-1.5 top-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white"
+            style={{ backgroundColor: slot.color }}
+          >
+            {slot.short}
+          </span>
+        </div>
 
-      <Link href={`/recipe/${recipe.id}`} className="flex min-w-0 flex-1 items-center gap-3 p-3 pr-11">
-        <RecipeImage
-          src={recipe.imageUrl}
-          query={recipe.title}
-          emoji={recipe.emoji}
-          seed={recipe.id}
-          alt={recipe.title}
-          className="h-16 w-16 shrink-0"
-          emojiClassName="text-3xl"
-        />
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate text-[15px] font-semibold">{recipe.title}</h3>
+        <div className="min-w-0 flex-1 self-center p-3 pr-12">
+          <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug">{recipe.title}</h3>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {recipe.mealTypes.slice(0, 2).map((t) => (
               <Badge key={t} tone="primary">
@@ -66,10 +68,10 @@ export function PlanDayCard({
             ))}
           </div>
           <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-on-surface-muted">
-            <span className="inline-flex items-center gap-1">
+            <span className="tnum inline-flex items-center gap-1">
               <Clock size={12} /> {recipe.prepMinutes} min
             </span>
-            <span className="inline-flex items-center gap-1">
+            <span className="tnum inline-flex items-center gap-1">
               <Users size={12} /> {householdSize}
             </span>
             <span className="tnum inline-flex items-center gap-1 font-medium text-on-surface">
@@ -83,9 +85,9 @@ export function PlanDayCard({
         <Link
           href={swapHref}
           aria-label={`Changer ${recipe.title}`}
-          className="absolute right-2.5 top-2.5 z-10 grid h-9 w-9 place-items-center rounded-full bg-surface-variant text-on-surface-muted transition-colors hover:text-on-surface"
+          className="absolute right-1.5 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-on-surface-muted transition-colors hover:bg-surface-variant hover:text-on-surface"
         >
-          <RefreshCw size={16} />
+          <RefreshCw size={17} />
         </Link>
       )}
     </article>
