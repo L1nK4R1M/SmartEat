@@ -42,7 +42,7 @@ export default async function ListPage({
   const initialOwned = user ? await loadPantry() : [];
 
   return (
-    <div className="mx-auto w-full max-w-md px-5 pb-40 pt-6">
+    <div className="mx-auto w-full max-w-md px-5 pb-44 pt-6">
       <header className="mb-5">
         <Link
           href={`/plan?meals=${ids.join(",")}`}
@@ -53,7 +53,9 @@ export default async function ListPage({
         <div className="flex items-center gap-3">
           <BrandLogo domain={store.domain} name={store.name} color={store.color} size={44} />
           <div className="min-w-0">
-            <h1 className="text-2xl font-semibold tracking-tight">Liste de courses</h1>
+            <h1 className="font-display text-3xl font-semibold tracking-tight">
+              Liste de courses
+            </h1>
             <p className="mt-0.5 text-sm text-on-surface-muted">
               {recipes.length} repas · {list.itemCount} produits · {store.name}
             </p>
@@ -89,7 +91,7 @@ export default async function ListPage({
 
       {/* Recettes de la semaine avec toutes les étapes */}
       <section className="mt-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-on-surface-muted">
+        <h2 className="mb-3 font-display text-xl font-semibold tracking-tight">
           Recettes de la semaine
         </h2>
         <div className="space-y-2.5">
