@@ -58,7 +58,8 @@ export function useFavorites() {
     const next = current.includes(id)
       ? current.filter((x) => x !== id)
       : [...current, id];
-    writeFavorites(next); // notifie toutes les instances du hook (dont celle-ci)
+    setIds(next); // réactivité immédiate, même si l'écriture échoue
+    writeFavorites(next); // persiste + notifie les autres instances du hook
   }, []);
 
   const isFavorite = useCallback((id: string) => ids.includes(id), [ids]);

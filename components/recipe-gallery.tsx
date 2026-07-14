@@ -113,14 +113,12 @@ export function RecipeGallery({ recipes }: { recipes: GalleryRecipe[] }) {
           </p>
         </div>
       ) : (
-        <Stagger key={`${filter}-${q}`} className="mt-4 grid grid-cols-2 gap-3">
+        <Stagger className="mt-4 grid grid-cols-2 gap-3">
           {filtered.map((r) => (
             <StaggerItem key={r.id}>
-              <Link
-                href={`/recipe/${r.id}`}
-                className="block overflow-hidden rounded-[var(--radius-card)] border border-outline bg-surface"
-              >
-                <div className="relative">
+              {/* Le cœur vit HORS du lien (pas d'interactif imbriqué) */}
+              <article className="relative overflow-hidden rounded-[var(--radius-card)] border border-outline bg-surface">
+                <Link href={`/recipe/${r.id}`} className="block">
                   <RecipeImage
                     src={r.imageUrl}
                     query={r.title}
@@ -131,31 +129,31 @@ export function RecipeGallery({ recipes }: { recipes: GalleryRecipe[] }) {
                     className="aspect-[4/3] w-full"
                     emojiClassName="text-5xl"
                   />
-                  <FavoriteButton
-                    recipeId={r.id}
-                    title={r.title}
-                    className="absolute right-2 top-2"
-                  />
-                </div>
-                <div className="p-3">
-                  <p className="truncate text-sm font-semibold">{r.title}</p>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                    {r.mealType && (
-                      <Badge tone="primary">
-                        {MEAL_TYPE_LABELS[r.mealType].emoji} {MEAL_TYPE_LABELS[r.mealType].label}
-                      </Badge>
-                    )}
+                  <div className="p-3">
+                    <p className="truncate text-sm font-semibold">{r.title}</p>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                      {r.mealType && (
+                        <Badge tone="primary">
+                          {MEAL_TYPE_LABELS[r.mealType].emoji} {MEAL_TYPE_LABELS[r.mealType].label}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="mt-1.5 flex items-center gap-3 text-xs text-on-surface-muted">
+                      <span className="tnum inline-flex items-center gap-1">
+                        <Clock size={12} /> {r.prepMinutes} min
+                      </span>
+                      <span className="tnum inline-flex items-center gap-1">
+                        <Wallet size={12} /> {formatEuro(r.costPerServing)}/pers
+                      </span>
+                    </div>
                   </div>
-                  <div className="mt-1.5 flex items-center gap-3 text-xs text-on-surface-muted">
-                    <span className="tnum inline-flex items-center gap-1">
-                      <Clock size={12} /> {r.prepMinutes} min
-                    </span>
-                    <span className="tnum inline-flex items-center gap-1">
-                      <Wallet size={12} /> {formatEuro(r.costPerServing)}/pers
-                    </span>
-                  </div>
-                </div>
-              </Link>
+                </Link>
+                <FavoriteButton
+                  recipeId={r.id}
+                  title={r.title}
+                  className="absolute right-2 top-2 z-10"
+                />
+              </article>
             </StaggerItem>
           ))}
         </Stagger>
