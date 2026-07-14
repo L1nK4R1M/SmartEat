@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getPrefs } from "@/lib/prefs";
 import { repo } from "@/lib/repo";
-import { GeneratingScreen } from "@/components/generating-screen";
+import { GeneratingView } from "./generating-view";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -27,5 +27,5 @@ export default async function GeneratingPage({
 
   const store = await repo.getStore(prefs.storeId);
 
-  return <GeneratingScreen planHref={planHref} storeName={store?.name} />;
+  return <GeneratingView planHref={planHref} storeName={store?.name} />;
 }

@@ -39,11 +39,12 @@ export function useFavorites() {
   const [ids, setIds] = useState<string[]>([]);
 
   useEffect(() => {
+    // Hydratation on-mount (localStorage absent côté serveur). La lecture via
+    // `sync` évite le piège `react-hooks/set-state-in-effect` du repo.
     const sync = () => {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIds(readFavorites());
     };
-    sync(); // hydratation on-mount (localStorage absent côté serveur)
+    sync();
     window.addEventListener(SYNC_EVENT, sync);
     window.addEventListener("storage", sync);
     return () => {
